@@ -1,9 +1,3 @@
-
-
-# Swamp Swap
-
-This is a graphical user interface created to wrap around the command line tool [croc by Zack Schollz]()
-
 <div align="center">
     <img src="/images/SwampSwap_Icon.png" width="408px" border="0" alt="croc">
     <br>
