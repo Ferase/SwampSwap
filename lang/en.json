@@ -1,0 +1,131 @@
+{
+    "_meta": {
+        "language": "English",
+        "author": "Ferase",
+        "version": 1.0
+    },
+
+    "generic:send":                                 "Send",
+    "generic:receive":                              "Receive",
+    "generic:settings":                             "Settings",
+    "generic:submit":                               "Submit",
+    "generic:save":                                 "Save",
+    "generic:cancel":                               "Cancel",
+    "generic:clear":                                "Clear",
+    "generic:close":                                "Close",
+    "generic:error":                                "Error",
+    "generic:reset_defaults":                       "Reset to defaults",
+    "generic:file_single":                          "file",
+    "generic:file_plural":                          "files",
+    "generic:folder_single":                        "folder",
+    "generic:folder_plural":                        "folders",
+
+    "dialog:croc_not_installed:title":              "croc not installed",
+    "dialog:croc_not_installed:body":               "It looks like croc isn't installed!<br><br>Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
+
+    "dialog:accept:title":                          "Accept transfer",
+    "dialog:accept:body":                           "Will you accept",
+
+    "dialog:saved_settings:title":                  "Saved settings",
+    "dialog:saved_settings:body":                   "Your settings were saved.",
+
+    "dialog:default_settings:title":                "Reset settings",
+    "dialog:default_settings:body":                 "Are you sure you want to reset settings to default? This can't be undone!",
+
+    "dialog:settings_are_default:title":            "Settings are default",
+    "dialog:settings_are_default:body":             "All of the settings are already at their default values. No action has been performed.",
+
+    "dialog:unsaved_settings:title":                "Unsaved settings",
+    "dialog:unsaved_settings:body":                 "You have unsaved changes. WIthout saving, your custom settings will not be applied to your croc transfers.<br><br>It is advised that you save your settings before continuing.",
+
+    "state:idle":                                   "Idle",
+    "state:wait_peer":                              "Waiting for peer...",
+    "state:sending":                                "Sending...",
+    "state:connect_peer":                           "Connecting to peer...",
+    "state:await_approval":                         "Awaiting approval...",
+    "state:receiving":                              "Receiving...",
+    "state:completed":                              "Completed!",
+    "state:cancelled":                              "Cancelled",
+
+    "menubar:file":                                 "File",
+    "menubar:actions":                              "Actions",
+
+    "menubar:file:console":                         "Open console",
+    "menubar:file:about":                           "About Swamp Swap",
+
+    "menubar:actions:send_file":                    "Send file...",
+    "menubar:actions:send_folder":                  "Send folder...",
+    "menubar:actions:receive":                      "Receive file/folder...",
+    "menubar:actions:stop_all":                     "Stop all actions",
+
+    "menubar:window_receive_code:title":            "Enter receive code",
+    "menubar:window_receive_code:body":             "Enter your receive code:",
+
+    "menubar:window_bad_code:title":                "Invalid code",
+    "menubar:window_bad_code:body":                 "The provided code was blank or invalid.",
+
+    "send:btn:select_file":                         "Select file",
+    "send:btn:select_folder":                       "Select folder",
+    "send:btn:clear_selection":                     "Clear selection",
+    "send:label:no_selection":                      "No file or folder selected.",
+    "send:label:please_select":                     "Please select a file or folder.",
+    "send:lineedit:placeholder_code":               "Your code will appear here",
+    "send:btn:copy_code":                           "Copy code",
+
+    "receive:lineedit:placeholder_path":            "Enter a path...",
+    "receive:btn:select_folder":                    "Select output folder",
+    "receive:btn:default_folder":                   "Reset to default output path",
+    "receive:btn:paste_code":                       "Paste code",
+
+    "options:heading:general":                      "General",
+    "options:heading:relays":                       "Relays",
+    "options:heading:network":                      "Network",
+    "options:heading:flags":                        "Flags",
+
+    "options:language:label":                       "Language",
+    "options:language:tooltip":                     "Set the application's display language.",
+    "options:startup_console:label":                "Show console on startup",
+
+    "options:yes:label":                            "Auto-agree to all prompts",
+    "options:yes:tooltip":                          "If checked, you will automatically accept all files being received and approve all files being sent.",
+    "options:nocompress:label":                     "Disable compression",
+    "options:nocompress:tooltip":                   "Disables compressing the files that will be sent.",
+
+    "options:relay:label":                          "IPv4 address:",
+    "options:relay:tooltip":                        "The IPv4 address of the relay. Don't change this unless you're configuring your own relay.",
+    "options:relay6:label":                         "IPv6 address:",
+    "options:relay6:tooltip":                       "The IPv6 address of the relay. Don't change this unless you're configuring your own relay.",
+    "options:password:label":                       "Password:",
+    "options:password:tooltip":                     "The password for the relay. Don't change this unless you're configuring your own relay.",
+
+    "options:curve:label":                          "Encryption curve:",
+    "options:curve:tooltip":                        "The encryption curve used when sending and receiving files.",
+    "options:ip:label":                             "Sender IP:",
+    "options:ip:tooltip":                           "Restrict received transfers to originate from a specified IP. Useful to confirm the sender's identity if their IP is known.",
+    "options:multicast:label":                      "Multicast IP:",
+    "options:multicast:tooltip":                    "Multicast IP address used for local discovery.",
+    "options:socks5:label":                         "SOCKS5 proxy:",
+    "options:socks5:tooltip":                       "Specify a SOCKS5 proxy.",
+    "options:connect:label":                        "HTTP proxy:",
+    "options:connect:tooltip":                      "Specify an HTTP proxy.",
+    "options:throttleupload:label":                 "Upload throttle:",
+    "options:throttleupload:tooltip":               "Throttle the upload speed by a specified amount.",
+
+    "options:internaldns:label":                    "Use built-in DNS solver",
+    "options:internaldns:tooltip":                  "If checked, a built-in DNS resolver will be used instead of the normal DNS resolver used by the user's machine.",
+    "options:classic:label":                        "Classic mode (unsecure)",
+    "options:classic:tooltip":                      "Uses croc's classic mode. This is less secure due to potential local attack vectors, so only use this if you know what you're doing.",
+    "options:local:label":                          "Local connections only",
+    "options:local:tooltip":                        "Only allows connections and file transfers over LAN.",
+
+    "console:window:title":                         "Console",
+    "console:input_placeholder":                    "Enter commands while croc runs...",
+
+    "about:window:title":                           "About",
+    "about:credits:croc":                           "croc by",
+    "about:credits:ui_developers":                  "User interface by",
+    "about:credits:testers":                        "Tested by",
+    "about:credits:languages":                      "Translations by",
+    
+    "about:disclaimer":                             "Swamp Swap is not affiliated with Zack Schollz or croc."
+}

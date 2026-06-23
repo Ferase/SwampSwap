@@ -1,0 +1,246 @@
+import re
+from pathlib import Path
+
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QPushButton, QLineEdit, QLabel, QCheckBox,
+    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
+    QSizePolicy, QApplication, QMessageBox
+)
+from PyQt6.QtCore import Qt, pyqtSignal, QRegularExpression
+from PyQt6.QtGui import QFont, QRegularExpressionValidator
+
+import app.utils as app_utils
+from app.enums import CrocState, CrocOperation, CrocAction
+from app.workers.worker_croc import CrocWorker
+
+CODE_RE = QRegularExpression(r"^([0-9]){4}(-[a-z]+){3}$")
+_ACCEPT_RE = QRegularExpression(r"Accept\s+(?:'(?P<filename>[^']+)'|(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?))\s*\((?P<size>[^)]+)\)\?")
+
+
+
+class ReceiveWidget(QWidget):
+
+    output_line = pyqtSignal(str)
+    operation_running = pyqtSignal(bool)
+    send_complete = pyqtSignal(str)
+
+    # Init
+    def __init__(self, worker: CrocWorker, parent=None) -> None:
+        # Run base init
+        super().__init__(parent)
+
+        self._output_path: str | None = None
+        self._code: str | None = None
+
+        self.worker: CrocWorker = worker
+
+        # Build UI
+        self._build_central()
+
+        self._connect_signals()
+
+    # Construct the UI
+    def _build_central(self) -> None:
+        # Create box layout container
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        output_group = self._build_output_group()
+        controls_group = self._build_controls_group()
+
+        # Add widgets to box layout
+        root.addWidget(output_group)
+        root.addWidget(controls_group)
+
+    # Construct file group
+    def _build_output_group(self) -> QGroupBox:
+        group = QGroupBox()
+        layout = QVBoxLayout(group)
+
+        self.lineedit_path = QLineEdit()
+        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.lineedit_path.setText(self._get_default_path())
+        self._update_path_tooltip()
+
+        self.btn_browse_output_folder = QPushButton(self.worker.settings.tr("receive:btn:select_folder"))
+        self.btn_default_path = QPushButton(self.worker.settings.tr("receive:btn:default_folder"))
+
+        layout.addWidget(self.lineedit_path)
+        layout.addWidget(self.btn_browse_output_folder)
+        layout.addWidget(self.btn_default_path)
+
+        return group
+    
+    # Send controls
+    def _build_controls_group(self) -> QGroupBox:
+        group = QGroupBox()
+        layout = QVBoxLayout(group)
+
+        self.lineedit_code = QLineEdit()
+        self.lineedit_code.setPlaceholderText("1234-abcd-efgh-ijkl")
+        validator = QRegularExpressionValidator(CODE_RE)
+        self.lineedit_code.setValidator(validator)
+
+        self.btn_paste_code = QPushButton(self.worker.settings.tr("receive:btn:paste_code"))
+
+        self.btn_receive = QPushButton(self.worker.settings.tr("generic:receive"))
+        self.btn_receive.setMinimumHeight(80)
+        self.btn_receive.setEnabled(False)
+        self.btn_receive.setStyleSheet("font-size: 24pt;")
+
+        layout.addWidget(self.lineedit_code)
+        layout.addWidget(self.btn_paste_code)
+        layout.addWidget(self.btn_receive)
+
+        return group
+    
+
+
+    def _raise_accept_messagebox(self, name: str, size: str) -> None:
+        QApplication.alert(self)
+
+        box = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:accept:title"),
+            f"{self.worker.settings.tr("dialog:accept:body")} <b>{name}</b> ({size})?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if box == QMessageBox.StandardButton.Yes:
+            self.worker.send_input("y")
+            return
+    
+        self.worker.send_input("n")
+
+
+
+    def _retranslate(self) -> None:
+        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.btn_browse_output_folder.setText(self.worker.settings.tr("receive:btn:select_folder"))
+        self.btn_default_path.setText(self.worker.settings.tr("receive:btn:default_folder"))
+        self.btn_paste_code.setText(self.worker.settings.tr("receive:btn:paste_code"))
+
+        self._set_button_text_by_operation()
+        self._update_path_tooltip()
+
+
+
+    def _connect_signals(self) -> None:
+        self.worker.state_changed.connect(self._state_responses)
+        self.worker.line_received.connect(self._read_command_line)
+        self.worker.finished.connect(self._on_finish)
+
+        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
+        self.lineedit_path.textChanged.connect(self._entered_output_path)
+        self.lineedit_code.textChanged.connect(self._typed_in_code)
+
+        self.btn_browse_output_folder.clicked.connect(self._click_browse_button)
+        self.btn_default_path.clicked.connect(self._click_default_path_button)
+        self.btn_paste_code.clicked.connect(self._paste_code)
+        self.btn_receive.clicked.connect(self._click_receive_button)
+
+    def _set_button_text_by_operation(self) -> None:
+        match self.worker.state.operation:
+            case CrocOperation.RECEIVING:
+                self.btn_receive.setText(self.worker.settings.tr("generic:cancel"))
+            case _:
+                self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
+
+    def _is_code_valid(self) -> bool:
+        return CODE_RE.match(self._code).hasMatch()
+
+    def _determine_main_button_behavior(self) -> None:
+        matched_code_format: bool = self._is_code_valid()
+
+        if self.worker.state.operation == CrocOperation.SENDING or not matched_code_format:
+            self.btn_receive.setEnabled(False)
+            return
+        else:
+            self.btn_receive.setEnabled(True)
+
+        self._set_button_text_by_operation()
+
+    def _get_default_path(self) -> str:
+        defualt_path: str = str(app_utils.determine_received_path("received"))
+        self._output_path = defualt_path
+        return defualt_path
+
+    def _paste_code(self) -> None:
+        clipboard_text: str = QApplication.clipboard().text().strip()
+        matched_code_format: bool = CODE_RE.match(clipboard_text).hasMatch()
+
+        if matched_code_format:
+            self.lineedit_code.setText(clipboard_text)
+    
+    def _read_command_line(self, line: str) -> None:
+        self._test_for_accept(line)
+
+    def _test_for_accept(self, line: str) -> None:
+        matched_accept_prompt = _ACCEPT_RE.match(line, 0)
+
+        if not matched_accept_prompt.hasMatch():
+            return
+        
+        name = matched_accept_prompt.captured("filename") or matched_accept_prompt.captured("count") 
+        size = matched_accept_prompt.captured("size")
+
+        self._raise_accept_messagebox(name, size)
+
+    def _state_responses(self) -> None:
+        self._determine_main_button_behavior()
+
+    def _create_output_directory(self) -> None:
+        Path(self._output_path).mkdir(exist_ok=True)
+
+    def _on_finish(self, code: int) -> None:
+        if self._is_code_valid():
+            self.btn_receive.setEnabled(True)
+    
+
+
+    def _typed_in_code(self, code: str) -> None:
+        self._code = code
+        self._determine_main_button_behavior()
+
+    def _entered_output_path(self, output_path: str) -> None:
+        self._output_path = output_path
+        self._update_path_tooltip()
+
+    def _update_path_tooltip(self) -> None:
+        if self._output_path:
+            self.lineedit_path.setToolTip(self._output_path)
+            return
+
+        self.lineedit_path.setToolTip(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+    
+
+
+    def _click_browse_button(self) -> None:
+        dialog = QFileDialog(directory=self.lineedit_path.text())
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+
+        if dialog.exec():
+            self.lineedit_path.setText(dialog.selectedFiles()[0])
+    
+    def _click_default_path_button(self) -> None:
+        self.lineedit_path.setText(self._get_default_path())
+
+    def _click_receive_button(self) -> None:
+        is_active = self.worker.state.action not in (
+            CrocAction.NONE,
+            CrocAction.COMPLETED,
+            CrocAction.CANCELLED,
+            CrocAction.ERROR,
+        )
+
+        # Button is in cancel mode
+        if is_active:
+            self.worker.stop()
+            self.worker.change_action(CrocAction.CANCELLED)
+            return
+
+        self._create_output_directory()
+        self.worker.start_receive(self._code, self._output_path)
