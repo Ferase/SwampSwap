@@ -251,5 +251,26 @@ class ReceiveWidget(QWidget):
         self.worker.start_receive(self._code, self._output_path)
 
     def _click_open_output_folder_button(self) -> None:
-        if self._output_path:
-            app_utils.reveal_in_file_manager(self._output_path)
+        if not self._output_path:
+            QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:no_receive_path:title"),
+                self.worker.settings.tr("dialog:no_receive_path:body"),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        path = Path(self._output_path)
+
+        if not path.exists():
+            QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:invalid_receive_path:title"),
+                self.worker.settings.tr("dialog:invalid_receive_path:body1") + "<br><br>" + self.worker.settings.tr("dialog:invalid_receive_path:body2"),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        app_utils.reveal_in_file_manager(self._output_path)

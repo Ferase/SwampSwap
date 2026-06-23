@@ -166,7 +166,7 @@ class SendWidget(QWidget):
         folder_count = sum(1 for item in path.iterdir() if item.is_dir())
 
         folder_text: str = self.worker.settings.tr("generic:folder_single") if folder_count == 1 else self.worker.settings.tr("generic:folder_plural")
-        file_text: str = self.worker.settings.tr("generic:filesingle") if folder_count == 1 else self.worker.settings.tr("generic:file_plural")
+        file_text: str = self.worker.settings.tr("generic:file_single") if folder_count == 1 else self.worker.settings.tr("generic:file_plural")
 
         return f"{folder_count} {folder_text}, {file_count} {file_text}"
     

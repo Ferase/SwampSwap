@@ -271,7 +271,7 @@ class MainWindow(QMainWindow):
         box = QMessageBox.warning(
             self,
             self.worker.settings.tr("dialog:croc_not_installed:title"),
-            self.worker.settings.tr("dialog:croc_not_installed:body"),
+            self.worker.settings.tr("dialog:croc_not_installed:body1") + "\n\n" + self.worker.settings.tr("dialog:croc_not_installed:body2"),
             QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
             QMessageBox.StandardButton.Open
         )

@@ -21,10 +21,18 @@
     "generic:folder_plural":                        "folders",
 
     "dialog:croc_not_installed:title":              "croc not installed",
-    "dialog:croc_not_installed:body":               "It looks like croc isn't installed!<br><br>Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
+    "dialog:croc_not_installed:body1":              "It looks like croc isn't installed!",
+    "dialog:croc_not_installed:body2":              "Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
 
     "dialog:accept:title":                          "Accept transfer",
     "dialog:accept:body":                           "Will you accept",
+
+    "dialog:no_receive_path:title":                 "No output path",
+    "dialog:no_receive_path:body":                  "The output folder is blank. Please enter a path.",
+
+    "dialog:invalid_receive_path:title":            "Invalid output folder",
+    "dialog:invalid_receive_path:body1":            "The output folder doesn't exist or is invalid.",
+    "dialog:invalid_receive_path:body2":            "However, Swamp Swap will create this path when receiving any files or folders <b>assuming the path is a possible path and not random text</b>. You just can't open the folder if it doesn't exist. Create it or allow Swamp Swap to do so when you receive files.",
 
     "dialog:saved_settings:title":                  "Saved settings",
     "dialog:saved_settings:body":                   "Your settings were saved.",
