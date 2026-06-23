@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="/images/SwampSwap_Icon.png" width="408px" border="0" alt="croc">
+    <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="croc">
     <br>
     <h1>Swamp Swap</h1>
 </div>
