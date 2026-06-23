@@ -90,6 +90,7 @@ pyinstaller build_onedir.spec
 
 **Translations**
 - Ferase (English)
+- *Other translations to come*
 
 ## Disclaimer
 
