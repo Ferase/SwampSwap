@@ -19,6 +19,12 @@ Simply visit the [Releases page](https://github.com/Ferase/SwampSwap/releases/la
 
 Swamp Swap currently only supports **Linux** and **Windows**, however it can likely be built for your system if your OS supports Python.
 
+## Known Issues
+
+- Windows
+    - Whenevr sending or receiving with croc, the program opens a command prompt window that must be preset to allow the GUI to pipe croc's output into itself. Without this window, the GUI cannot read what croc is doing. If anyone has any ideas on how to fix this, pelase let me know!
+    - In some circumstances, the status text at the bottom left will disappear when running an operation.
+
 ## Building
 
 Swamp Swap is built using PyInstaller, meaning you can only build for your own operating system and architecture. For example, if you build the program on Linux with an ARM processor, only other computers running Linux with an ARM processor can execute the program.
