@@ -80,16 +80,16 @@ pyinstaller build_onedir.spec
 ## Credits
 
 **User Interface**
-Ferase
+- Ferase
 
 **croc**
-[Zack Schollz](https://github.com/schollz)
+- [Zack Schollz](https://github.com/schollz)
 
 **Testing**
-OctoToon
+- OctoToon
 
 **Translations**
-Ferase (English)
+- Ferase (English)
 
 ## Disclaimer
 
