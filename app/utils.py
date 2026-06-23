@@ -6,6 +6,50 @@ from pathlib import Path
 from PyQt6.QtWidgets import QGroupBox, QComboBox
 from PyQt6.QtGui import QWheelEvent
 
+
+
+
+
+def reveal_in_file_manager(path: str) -> None:
+    p = Path(path)
+    if not p.exists():
+        return
+
+    try:
+        if sys.platform == "win32":
+            subprocess.Popen(["explorer", "/select,", str(p)])
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", "-R", str(p)])
+        else:
+            target = str(p) if p.is_file() else str(p)
+            parent = str(p.parent) if p.is_file() else str(p)
+            for cmd in (
+                # GNOME
+                ["nautilus", "--select", target],
+
+                # KDE
+                ["dolphin", "--select", target],
+
+                # Cinnamon
+                ["nemo", target],
+
+                # XFCE
+                ["thunar", parent],
+
+                # Fallback
+                ["xdg-open", parent]
+            ):
+                try:
+                    subprocess.Popen(cmd)
+                    return
+                except FileNotFoundError:
+                    continue
+
+    except Exception:
+        pass
+
+
+
 def determine_filepath(filename: str, parent_levels: int = 0) -> Path:
     if getattr(sys, "frozen", False):
         base_path = Path(sys._MEIPASS)

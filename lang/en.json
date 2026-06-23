@@ -73,6 +73,7 @@
     "send:btn:copy_code":                           "Copy code",
 
     "receive:lineedit:placeholder_path":            "Enter a path...",
+    "receive:btn:open_output_folder":               "Open folder",
     "receive:btn:select_folder":                    "Select output folder",
     "receive:btn:default_folder":                   "Reset to default output path",
     "receive:btn:paste_code":                       "Paste code",

@@ -56,19 +56,22 @@ class ReceiveWidget(QWidget):
     # Construct file group
     def _build_output_group(self) -> QGroupBox:
         group = QGroupBox()
-        layout = QVBoxLayout(group)
+        layout = QGridLayout(group)
 
         self.lineedit_path = QLineEdit()
         self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
         self.lineedit_path.setText(self._get_default_path())
         self._update_path_tooltip()
 
+        self.btn_open_output_path = QPushButton(self.worker.settings.tr("receive:btn:open_output_folder"))
+
         self.btn_browse_output_folder = QPushButton(self.worker.settings.tr("receive:btn:select_folder"))
         self.btn_default_path = QPushButton(self.worker.settings.tr("receive:btn:default_folder"))
 
-        layout.addWidget(self.lineedit_path)
-        layout.addWidget(self.btn_browse_output_folder)
-        layout.addWidget(self.btn_default_path)
+        layout.addWidget(self.lineedit_path, 0, 0)
+        layout.addWidget(self.btn_open_output_path, 0, 1)
+        layout.addWidget(self.btn_browse_output_folder, 1, 0, 1, -1)
+        layout.addWidget(self.btn_default_path, 2, 0, 1, -1)
 
         return group
     
@@ -118,6 +121,7 @@ class ReceiveWidget(QWidget):
 
     def _retranslate(self) -> None:
         self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.btn_open_output_path.setText(self.worker.settings.tr("receive:btn:open_output_folder"))
         self.btn_browse_output_folder.setText(self.worker.settings.tr("receive:btn:select_folder"))
         self.btn_default_path.setText(self.worker.settings.tr("receive:btn:default_folder"))
         self.btn_paste_code.setText(self.worker.settings.tr("receive:btn:paste_code"))
@@ -137,6 +141,7 @@ class ReceiveWidget(QWidget):
         self.lineedit_path.textChanged.connect(self._entered_output_path)
         self.lineedit_code.textChanged.connect(self._typed_in_code)
 
+        self.btn_open_output_path.clicked.connect(self._click_open_output_folder_button)
         self.btn_browse_output_folder.clicked.connect(self._click_browse_button)
         self.btn_default_path.clicked.connect(self._click_default_path_button)
         self.btn_paste_code.clicked.connect(self._paste_code)
@@ -244,3 +249,7 @@ class ReceiveWidget(QWidget):
 
         self._create_output_directory()
         self.worker.start_receive(self._code, self._output_path)
+
+    def _click_open_output_folder_button(self) -> None:
+        if self._output_path:
+            app_utils.reveal_in_file_manager(self._output_path)
