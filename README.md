@@ -3,9 +3,12 @@
     <br>
     <h1>Swamp Swap</h1>
 </div>
-<div align="center">
-    <p>A graphical user interface that controls the command line file transfer program <a href="https://github.com/schollz/croc" target="_blank">croc by Zack Shollz</a>.</p>
-    <img src="/images/SwampSwap_Window.png" width="250px" border="0" alt="Swamp Swap window preview">
+<p align="center">A graphical user interface that controls the command line file transfer program <a href="https://github.com/schollz/croc" target="_blank">croc by Zack Shollz</a>.</p>
+<div align="center" float="left">
+    <img src="/images/SwampSwap_Window_ThemePink.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme">
+    <img src="/images/SwampSwap_Window_ThemeSteam.png" width="250px" border="0" alt="Swamp Swap window preview with Steam 1.0 theme">
+    <img src="/images/SwampSwap_Window_ThemeDark.png" width="250px" border="0" alt="Swamp Swap window preview with dark theme">
+    <img src="/images/SwampSwap_Window_ThemeDeepDark.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme">
 </div>
 
 ## Overview

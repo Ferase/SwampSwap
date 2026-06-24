@@ -36,8 +36,6 @@ def main() -> None:
 
     if sys.platform == "win32":
         app.setStyle("Fusion")
-        # if _is_dark(app):
-        #     _set_palette_windows(app)
 
     worker = CrocWorker(_APP_NAME, _APP_VERSION)
 
