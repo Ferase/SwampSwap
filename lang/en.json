@@ -1,8 +1,8 @@
 {
     "_meta": {
-        "language": "English",
-        "author": "Ferase",
-        "version": 1.0
+        "language":     "English",
+        "author":       "Ferase",
+        "version":      1.0
     },
 
     "generic:send":                                 "Send",
@@ -93,6 +93,8 @@
 
     "options:language:label":                       "Language",
     "options:language:tooltip":                     "Set the application's display language.",
+    "options:theme:label":                       "Theme",
+    "options:theme:tooltip":                     "Set the application's color theme.",
     "options:startup_console:label":                "Show console on startup",
 
     "options:yes:label":                            "Auto-agree to all prompts",

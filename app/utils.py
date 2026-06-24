@@ -1,6 +1,7 @@
 # app/utils.py
 import sys
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 
 from PyQt6.QtWidgets import QGroupBox, QComboBox

@@ -42,8 +42,7 @@ class MainWindow(QMainWindow):
         self._build_statusbar()
 
         self._connect_signals()
-        self._set_status()
-        self._show_console()
+        self._run_startup_functions()
 
     def _build_menu(self):
         menubar: QMenuBar = self.menuBar()
@@ -280,6 +279,12 @@ class MainWindow(QMainWindow):
             QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc#install"))
 
         self.close()
+
+
+
+    def _run_startup_functions(self) -> None:
+        self._set_status()
+        self._show_console()
 
     def _show_console(self) -> None:
         if self.worker.settings.startup_console:

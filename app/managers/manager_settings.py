@@ -5,11 +5,13 @@ from typing import Any
 from PyQt6.QtCore import QThread, pyqtSignal
 
 from app.managers.manager_locale import LocaleManager
+from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
 
 _DEFAULTS: dict[str, Any] = {
     # General
     "lang": "English",
+    "theme": "Pink",
     "startup_console": False,
 
     # Relay
@@ -66,6 +68,7 @@ class SettingsManager():
 
         # General
         self.lang: str | None = None
+        self.theme: str | None = None
         self.startup_console: bool | None = None
 
         # Relays
@@ -92,6 +95,9 @@ class SettingsManager():
         self.locale_manager = LocaleManager()
         self.lang_list: list[str] = self.locale_manager.get_lang_list()
 
+        self.theme_manager = ThemeManager()
+        self.theme_list: list[str] = self.theme_manager.get_theme_list()
+
         self._load_settings()
 
     def _load_settings(self) -> None:
@@ -112,6 +118,7 @@ class SettingsManager():
                 setattr(self, key, value)
 
         self.change_language()
+        self.change_theme()
 
     def set_defaults(self) -> None:
         self.set_all_from_dict(_DEFAULTS)
@@ -187,3 +194,7 @@ class SettingsManager():
 
     def tr(self, text: str) -> str:
         return self.locale_manager.get(text)
+    
+
+    def change_theme(self) -> None:
+        self.theme_manager.select_theme(self.theme)

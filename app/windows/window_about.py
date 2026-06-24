@@ -67,12 +67,12 @@ class AboutWindow(QDialog):
         border_color: QColor = QApplication.palette().color(QPalette.ColorRole.Highlight).toRgb()
         border_color_css: str = f"rgb({border_color.red()}, {border_color.green()}, {border_color.blue()})"
 
-        group.setStyleSheet("""
-            QGroupBox {
-                border-top: 0px solid transparent;
-                border-left: 0px solid transparent;
-                border-bottom: 0px solid transparent;
-                border-right: 1px solid """ + border_color_css + ";}")
+        # group.setStyleSheet("""
+        #     QGroupBox {
+        #         border-top: 0px solid transparent;
+        #         border-left: 0px solid transparent;
+        #         border-bottom: 0px solid transparent;
+        #         border-right: 1px solid """ + border_color_css + ";}")
         
         layout.setContentsMargins(0, 0, 30, 0)
 
@@ -138,7 +138,7 @@ class AboutWindow(QDialog):
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
-        app_utils.hide_group_box_border(group)
+        # app_utils.hide_group_box_border(group)
         
         credits_croc = self._build_single_credit(self.worker.settings.tr("about:credits:croc"), _CROC_DEVELOPERS)
         credits_ui_developers = self._build_single_credit(self.worker.settings.tr("about:credits:ui_developers"), _UI_DEVELOPERS)
@@ -157,7 +157,7 @@ class AboutWindow(QDialog):
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
-        app_utils.hide_group_box_border(group)
+        # app_utils.hide_group_box_border(group)
         
         self.btn_github_croc = QPushButton("GitHub (croc)")
         self.btn_github_croc.setMinimumHeight(50)
@@ -185,7 +185,7 @@ class AboutWindow(QDialog):
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
-        app_utils.hide_group_box_border(group)
+        # app_utils.hide_group_box_border(group)
         
         label = QLabel(label_key)
         label.setFont(self.bold_font)

@@ -88,11 +88,22 @@ class SettingsWidget(QWidget):
         self.combo_lang.addItems(self.worker.settings.lang_list)
         self.combo_lang.setCurrentText(self.worker.settings.lang)
 
+        self.label_theme = QLabel(self.worker.settings.tr("options:theme:label"))
+        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+
+        self.combo_theme = app_utils.NoScrollComboBox()
+        self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+        self.combo_theme.addItems(self.worker.settings.theme_list)
+        self.combo_theme.setCurrentText(self.worker.settings.theme)
+
         self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
         self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
 
         layout.addWidget(self.label_lang)
         layout.addWidget(self.combo_lang)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(self.label_theme)
+        layout.addWidget(self.combo_theme)
         layout.addSpacing(_PADDING)
         layout.addWidget(self.checkbox_startup_console)
 
@@ -257,6 +268,9 @@ class SettingsWidget(QWidget):
         self.label_lang.setText(self.worker.settings.tr("options:language:label"))
         self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
         self.combo_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
+        self.label_theme.setText(self.worker.settings.tr("options:theme:label"))
+        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+        self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
         self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
 
         self.relays_group.setTitle(self.worker.settings.tr("options:heading:relays"))
@@ -311,12 +325,14 @@ class SettingsWidget(QWidget):
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.combo_lang.currentTextChanged.connect(self._change_language)
+        self.combo_theme.currentTextChanged.connect(self._change_theme)
 
         self.btn_reset.clicked.connect(self._click_reset_button)
         self.btn_save.clicked.connect(self._click_save_button)
 
         # Mark changed settings as dirty
-        self.combo_lang.currentTextChanged.connect(self._mark_dirty)
+        self.combo_lang.currentIndexChanged.connect(self._mark_dirty)
+        self.combo_theme.currentIndexChanged.connect(self._mark_dirty)
         self.checkbox_startup_console.toggled.connect(self._mark_dirty)
 
         self.lineedit_relay.textChanged.connect(self._mark_dirty)
@@ -342,8 +358,13 @@ class SettingsWidget(QWidget):
         self.worker.settings.change_language()
         self.worker.settings.save_single_setting("lang", text)
 
+    def _change_theme(self, text: str) -> None:
+        self.worker.settings.theme = text
+        self.worker.settings.change_theme()
+
     def _load_from_settings(self) -> None:
         self.combo_lang.setCurrentText(self.worker.settings.lang)
+        self.combo_theme.setCurrentText(self.worker.settings.theme)
         self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
 
         self.lineedit_relay.setText(self.worker.settings.relay)
@@ -365,6 +386,7 @@ class SettingsWidget(QWidget):
 
     def _save_to_settings(self) -> None:
         self.worker.settings.lang = self.combo_lang.currentText()
+        self.worker.settings.theme = self.combo_theme.currentText()
         self.worker.settings.startup_console = self.checkbox_startup_console.isChecked()
 
         self.worker.settings.relay = self.lineedit_relay.text()
@@ -387,6 +409,7 @@ class SettingsWidget(QWidget):
     def _ui_settings_to_dict(self) -> dict[str, Any]:
         return {
             "lang": self.combo_lang.currentText(),
+            "theme": self.combo_theme.currentText(),
             "startup_console": self.checkbox_startup_console.isChecked(),
             
             "relay": self.lineedit_relay.text(),

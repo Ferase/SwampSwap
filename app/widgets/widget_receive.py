@@ -90,7 +90,9 @@ class ReceiveWidget(QWidget):
         self.btn_receive = QPushButton(self.worker.settings.tr("generic:receive"))
         self.btn_receive.setMinimumHeight(80)
         self.btn_receive.setEnabled(False)
-        self.btn_receive.setStyleSheet("font-size: 24pt;")
+        font = self.btn_receive.font()
+        font.setPointSize(24)
+        self.btn_receive.setFont(font)
 
         layout.addWidget(self.lineedit_code)
         layout.addWidget(self.btn_paste_code)

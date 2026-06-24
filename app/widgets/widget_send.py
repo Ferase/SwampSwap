@@ -92,7 +92,9 @@ class SendWidget(QWidget):
         self.btn_send = QPushButton(self.worker.settings.tr("generic:send"))
         self.btn_send.setMinimumHeight(80)
         self.btn_send.setEnabled(False)
-        self.btn_send.setStyleSheet("font-size: 24pt;")
+        font = self.btn_send.font()
+        font.setPointSize(24)
+        self.btn_send.setFont(font)
 
         self.lineedit_code = QLineEdit()
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
