@@ -5,9 +5,9 @@
 </div>
 <p align="center">A graphical user interface that controls the command line file transfer program <a href="https://github.com/schollz/croc" target="_blank">croc by Zack Shollz</a>.</p>
 <div align="center" float="left">
-    <img src="/images/SwampSwap_Window_ThemePink.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme">
-    <img src="/images/SwampSwap_Window_ThemeDeepDark.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme">
-    <img src="/images/SwampSwap_Window_ThemeDark.png" width="250px" border="0" alt="Swamp Swap window preview with dark theme">
+    <img src="/images/SwampSwap_Window_ThemePink.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme on the send tab">
+    <img src="/images/SwampSwap_Window_ThemeDeepDark.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme on the receive tab">
+    <img src="/images/SwampSwap_Window_ThemeDark.png" width="250px" border="0" alt="Swamp Swap window preview with dark theme on the settings tab">
 </div>
 
 ## Overview
