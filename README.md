@@ -49,7 +49,7 @@ When you build, you can use any of the four build scripts present in the root di
 
 1. Clone the repository and enter the newly made directory in your terminal
 ```
-git cline https://github.com/Ferase/SwampSwap
+git clone https://github.com/Ferase/SwampSwap
 cd SwampSwap
 ```
 
