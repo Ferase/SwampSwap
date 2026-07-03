@@ -34,7 +34,7 @@ Swamp Swap is built using PyInstaller, meaning you can only build for your own o
 
 ### Requirements
 
-In order to build this Swamp Swap, you must have **Python 3.10+**.
+In order to build Swamp Swap, you must have **Python 3.10+**.
 
 On Windows, you need the <a href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170" target="_blank">Microsoft C++ Redistributable</a>. On Linux, you will need to search for the C++ libraries for your distribution within your package manager.
 
