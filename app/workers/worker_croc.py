@@ -128,11 +128,13 @@ class CrocWorker(QThread):
             self._proc = None
             self.ended_croc.emit(self.state.operation)
 
-    def start_send(self, path: Path) -> None:
+    def start_send(self, paths: list[Path]) -> None:
         args = ["croc"]
         args.extend(self.settings.build_flags())
         args.append("send")
-        args.append(str(path))
+        args.extend(paths)
+
+        print(args)
 
         self.change_operation(CrocOperation.SENDING)
         self.change_action(CrocAction.WAIT_FOR_PEER)

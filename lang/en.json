@@ -15,10 +15,11 @@
     "generic:close":                                "Close",
     "generic:error":                                "Error",
     "generic:reset_defaults":                       "Reset to defaults",
-    "generic:file_single":                          "file",
-    "generic:file_plural":                          "files",
-    "generic:folder_single":                        "folder",
-    "generic:folder_plural":                        "folders",
+
+    "template:num_file_single":                     "{n} file",
+    "template:num_files_multiple":                  "{n} files",
+    "template:num_folder_single":                   "{n} folder",
+    "template:num_folders_multiple":                "{n} folders",
 
     "dialog:croc_not_installed:title":              "croc not installed",
     "dialog:croc_not_installed:body1":              "It looks like croc isn't installed!",
@@ -46,6 +47,9 @@
     "dialog:unsaved_settings:title":                "Unsaved settings",
     "dialog:unsaved_settings:body":                 "You have unsaved changes. WIthout saving, your custom settings will not be applied to your croc transfers.<br><br>It is advised that you save your settings before continuing.",
 
+    "file_dialog:choose_files":                     "Select files to send",
+    "file_dialog:choose_folders":                   "Select folders to send",
+
     "state:idle":                                   "Idle",
     "state:wait_peer":                              "Waiting for peer...",
     "state:sending":                                "Sending...",
@@ -61,8 +65,8 @@
     "menubar:file:console":                         "Open console",
     "menubar:file:about":                           "About Swamp Swap",
 
-    "menubar:actions:send_file":                    "Send file...",
-    "menubar:actions:send_folder":                  "Send folder...",
+    "menubar:actions:send_file":                    "Send file(s)...",
+    "menubar:actions:send_folder":                  "Send folder(s)...",
     "menubar:actions:receive":                      "Receive file/folder...",
     "menubar:actions:stop_all":                     "Stop all actions",
 
@@ -72,11 +76,12 @@
     "menubar:window_bad_code:title":                "Invalid code",
     "menubar:window_bad_code:body":                 "The provided code was blank or invalid.",
 
-    "send:btn:select_file":                         "Select file",
-    "send:btn:select_folder":                       "Select folder",
+    "send:btn:select_files":                        "Select file(s)",
+    "send:btn:select_folders":                      "Select folder(s)",
     "send:btn:clear_selection":                     "Clear selection",
     "send:label:no_selection":                      "No file or folder selected.",
-    "send:label:please_select":                     "Please select a file or folder.",
+    "send:label:please_select":                     "Select or drag-drop files or folders.",
+    "send:label:multiple_files":                    "Multiple selected (hover to see)",
     "send:lineedit:placeholder_code":               "Your code will appear here",
     "send:btn:copy_code":                           "Copy code",
 

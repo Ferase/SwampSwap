@@ -4,10 +4,9 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from PyQt6.QtWidgets import QGroupBox, QComboBox
-from PyQt6.QtGui import QWheelEvent
-
-
+from PyQt6.QtWidgets import QGroupBox, QComboBox, QFileDialog, QListView, QTreeView, QAbstractItemView
+from PyQt6.QtGui import QWheelEvent, QFileSystemModel
+from PyQt6.QtCore import Qt, pyqtSignal
 
 
 
@@ -87,3 +86,53 @@ def hide_group_box_border(group_box: QGroupBox) -> None:
 class NoScrollComboBox(QComboBox):
     def wheelEvent(self, event: QWheelEvent):
         event.ignore()
+
+class MultiFolderDialog(QFileDialog):
+    def __init__(self, parent=None, caption="Select Folders", directory=""):
+        super().__init__(parent, caption, directory)
+        
+        # 1. Enforce non-native dialog (Required to modify child widgets)
+        self.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+        
+        # 2. Tell the dialog it should look for Directories
+        self.setFileMode(QFileDialog.FileMode.Directory)
+        
+        # 3. Target internal list views and tree views to allow multi-selection
+        for view in self.findChildren((QListView, QTreeView)):
+            if isinstance(view.model(), QFileSystemModel):
+                view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+
+class QGroupBoxFileDrop(QGroupBox):
+    files_dropped = pyqtSignal(list)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls():
+            file_list = self._build_file_list(event)
+            if file_list:
+                self.files_dropped.emit([str(p) for p in file_list])
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def _build_file_list(self, event) -> list[Path]:
+        return [
+            Path(url.toLocalFile())
+            for url in event.mimeData().urls()
+            if url.isLocalFile()
+        ]

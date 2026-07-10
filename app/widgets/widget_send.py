@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import Path
 
@@ -18,7 +19,8 @@ from app.workers.worker_croc import CrocWorker
 
 class SendWidget(QWidget):
 
-    file_selected = pyqtSignal(Path)
+    file_selected = pyqtSignal(list)
+    dropped_files = pyqtSignal(list)
 
     output_line = pyqtSignal(str)
     operation_running = pyqtSignal(bool)
@@ -29,7 +31,7 @@ class SendWidget(QWidget):
         # Run base init
         super().__init__(parent)
 
-        self.selected_file_folder: Path | None = None
+        self.selected_file_folders: list[Path] | None = None
 
         self.worker: CrocWorker = worker
 
@@ -53,16 +55,17 @@ class SendWidget(QWidget):
 
     # Construct file group
     def _build_file_group(self) -> QGroupBox:
-        group = QGroupBox()
+        group = app_utils.QGroupBoxFileDrop()
+        group.files_dropped.connect(self.dropped_files.emit)
         layout = QGridLayout(group)
 
         bold_font = QFont()
         bold_font.setBold(True)
 
-        self.btn_browse_file = QPushButton(self.worker.settings.tr("send:btn:select_file"))
+        self.btn_browse_file = QPushButton(self.worker.settings.tr("send:btn:select_files"))
         self.btn_browse_file.setMinimumHeight(48)
 
-        self.btn_browse_folder = QPushButton(self.worker.settings.tr("send:btn:select_folder"))
+        self.btn_browse_folder = QPushButton(self.worker.settings.tr("send:btn:select_folders"))
         self.btn_browse_folder.setMinimumHeight(48)
 
         self.btn_clear_selected_file_folder = QPushButton(self.worker.settings.tr("send:btn:clear_selection"))
@@ -113,15 +116,15 @@ class SendWidget(QWidget):
 
 
     def _retranslate(self) -> None:
-        self.btn_browse_file.setText(self.worker.settings.tr("send:btn:select_file"))
-        self.btn_browse_folder.setText(self.worker.settings.tr("send:btn:select_folder"))
+        self.btn_browse_file.setText(self.worker.settings.tr("send:btn:select_files"))
+        self.btn_browse_folder.setText(self.worker.settings.tr("send:btn:select_folders"))
         self.btn_clear_selected_file_folder.setText(self.worker.settings.tr("send:btn:clear_selection"))
 
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
         self.btn_copy_code.setText(self.worker.settings.tr("send:btn:copy_code"))
 
         self._set_button_text_by_operation()
-        self._update_selected_file_ui(self.selected_file_folder)
+        self._update_selected_file_ui(self.selected_file_folders)
     
 
 
@@ -133,6 +136,7 @@ class SendWidget(QWidget):
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.file_selected.connect(self._update_selected_file_ui)
+        self.dropped_files.connect(self._set_selected_files)
 
         self.lineedit_code.textChanged.connect(self._enable_copy_code_button)
 
@@ -150,27 +154,47 @@ class SendWidget(QWidget):
                 self.btn_send.setText(self.worker.settings.tr("generic:send"))
 
     def _determine_main_button_behavior(self) -> None:
-        if self.worker.state.operation == CrocOperation.RECEIVING or self.selected_file_folder is None:
+        if self.worker.state.operation == CrocOperation.RECEIVING or self.selected_file_folders is None:
             self.btn_send.setEnabled(False)
             return
-        elif self.selected_file_folder is not None:
+        elif self.selected_file_folders is not None:
             self.btn_send.setEnabled(True)
 
         is_sending: bool = self.worker.state.action not in [CrocAction.NONE, CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]
         self._set_button_text_by_operation()
         self.lineedit_code.setEnabled(is_sending)
 
-    def _determine_selected_files(self, path: Path) -> str:
-        if not path.is_dir():
-            return "1 file"
+    def _determine_selected_files(self, paths: list[Path]) -> str:
+        # Init file/folder count
+        file_count: int = 0
+        folder_count: int = 0
 
-        file_count = sum(1 for item in path.iterdir() if item.is_file())
-        folder_count = sum(1 for item in path.iterdir() if item.is_dir())
+        for path in paths:
+            # Add sums to total
+            if path.is_dir():
+                file_count += sum(1 for item in path.rglob("*") if item.is_file())
+                folder_count += sum(1 for item in path.rglob("*") if item.is_dir()) + 1
+            else:
+                file_count += 1
 
-        folder_text: str = self.worker.settings.tr("generic:folder_single") if folder_count == 1 else self.worker.settings.tr("generic:folder_plural")
-        file_text: str = self.worker.settings.tr("generic:file_single") if folder_count == 1 else self.worker.settings.tr("generic:file_plural")
+        file_text: str = self._determine_selected_files_text("file", file_count)
+        folder_text: str = self._determine_selected_files_text("folder", folder_count)
 
-        return f"{folder_count} {folder_text}, {file_count} {file_text}"
+        if file_text and folder_text:
+            return f"{file_text}, {folder_text}"
+        
+        return folder_text if folder_text else file_text
+
+    def _determine_selected_files_text(self, target: str, count: int) -> str:
+        if count <= 0:
+            return ""
+        
+        count_text: str = format(count, ",")
+        
+        if count == 1:
+            return self.worker.settings.tr(f"template:num_{target}_single").format(n=count_text)
+        else:
+            return self.worker.settings.tr(f"template:num_{target}s_multiple").format(n=count_text)
     
     def _read_command_line(self, line: str) -> None:
         self._test_for_code(line)
@@ -180,33 +204,54 @@ class SendWidget(QWidget):
         if match:
             self.lineedit_code.setText(match.group(1).strip())
 
-    def is_file_selected(self) -> bool:
-        return bool(self.selected_file_folder)
+    def are_files_selected(self) -> bool:
+        return bool(self.selected_file_folders)
 
     def _state_responses(self) -> None:
         self._determine_main_button_behavior()
 
     def _on_finish(self, code: int) -> None:
-        if self.is_file_selected():
+        if self.are_files_selected():
             self.btn_send.setEnabled(True)
+
+    def _paths_list_to_string(self, paths: list[Path]) -> str:
+        return "\n".join([str(path) + os.sep + "*" if path.is_dir() else str(path) for path in paths])
     
+    def _reset_selected_fies_folders(self) -> None:
+        self.selected_file_folders = None
+        self._update_selected_file_ui()
+
+    def _set_selected_files(self, selected: list[str]):
+        self.selected_file_folders = [Path(path) for path in selected]
+        self.file_selected.emit(self.selected_file_folders)
 
 
-    def _update_selected_file_ui(self, path: Path | None = None) -> None:
-        if path is None:
+
+    def _update_selected_file_ui(self, paths: list[Path] | None = None) -> None:
+        if paths is None:
             self.label_selected_file_folder.setText(self.worker.settings.tr("send:label:no_selection"))
             self.label_selected_file_folder_desc.setText(self.worker.settings.tr("send:label:please_select"))
             self.label_selected_file_folder.setToolTip(None)
+            self.label_selected_file_folder_desc.setToolTip(None)
             self.btn_clear_selected_file_folder.setEnabled(False)
             self._determine_main_button_behavior()
             return
+        
+        file_name: str = ""
+        if len(paths) == 1:
+            file_name = paths[0].name + ("/*" if paths[0].is_dir() else "")
+        else:
+            file_name = self.worker.settings.tr("send:label:multiple_files")
 
-        file_name: str = path.name + ("/*" if path.is_dir() else "")
         self.label_selected_file_folder.setText(file_name)
-        self.label_selected_file_folder.setToolTip(str(path))
-        found_files_text: str = self._determine_selected_files(path)
 
+        paths_string: str = self._paths_list_to_string(paths)
+        self.label_selected_file_folder.setToolTip(paths_string)
+        self.label_selected_file_folder_desc.setToolTip(paths_string)
+
+        found_files_text: str = self._determine_selected_files(paths)
         self.label_selected_file_folder_desc.setText(found_files_text)
+
         self.btn_clear_selected_file_folder.setEnabled(True)
         self._determine_main_button_behavior()
 
@@ -219,32 +264,36 @@ class SendWidget(QWidget):
 
 
     def _click_browse_file_button(self) -> None:
-        dialog = QFileDialog()
+        dialog = app_utils.QFileDialog(
+            self,
+            self.worker.settings.tr("file_dialog:choose_files")
+        )
 
-        dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
 
-        if dialog.exec():
-            self.selected_file_folder = Path(dialog.selectedFiles()[0])
-            self.file_selected.emit(self.selected_file_folder)
-        else:
-            self.selected_file_folder = None
-            self._update_selected_file_ui()
+        if not dialog.exec():
+            return
+        
+        selected_files: list[str] = dialog.selectedFiles()
+        self.dropped_files.emit(selected_files)
 
     def _click_browse_folder_button(self) -> None:
-        dialog = QFileDialog()
+        dialog = app_utils.MultiFolderDialog(
+            self,
+            self.worker.settings.tr("file_dialog:choose_folders")
+        )
 
-        dialog.setFileMode(QFileDialog.FileMode.Directory)
-
-        if dialog.exec():
-            self.selected_file_folder = Path(dialog.selectedFiles()[0])
-            self.file_selected.emit(self.selected_file_folder)
+        if not dialog.exec():
+            return
+        
+        selected_folders: list[str] = dialog.selectedFiles()
+        self.dropped_files.emit(selected_folders)
 
     def _click_clear_button(self) -> None:
-        self.selected_file_folder = None
-        self._update_selected_file_ui()
+        self._reset_selected_fies_folders()
 
     def _click_send_button(self) -> None:
-        if self.selected_file_folder is None:
+        if self.selected_file_folders is None:
             return
         
         is_active = self.worker.state.action not in (
@@ -259,4 +308,4 @@ class SendWidget(QWidget):
             self.worker.stop()
             return
 
-        self.worker.start_send(self.selected_file_folder)
+        self.worker.start_send(self.selected_file_folders)
