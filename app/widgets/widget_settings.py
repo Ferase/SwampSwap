@@ -97,7 +97,12 @@ class SettingsWidget(QWidget):
         self.combo_theme.setCurrentText(self.worker.settings.theme)
 
         self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
         self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+
+        self.checkbox_startup_updates_check = QCheckBox(self.worker.settings.tr("options:startup_updates_check:label"))
+        self.checkbox_startup_updates_check.setToolTip(self.worker.settings.tr("options:startup_updates_check:tooltip"))
+        self.checkbox_startup_updates_check.setChecked(self.worker.settings.startup_updates_check)
 
         layout.addWidget(self.label_lang)
         layout.addWidget(self.combo_lang)
@@ -106,6 +111,7 @@ class SettingsWidget(QWidget):
         layout.addWidget(self.combo_theme)
         layout.addSpacing(_PADDING)
         layout.addWidget(self.checkbox_startup_console)
+        layout.addWidget(self.checkbox_startup_updates_check)
 
         return self.general_group
     
@@ -272,6 +278,9 @@ class SettingsWidget(QWidget):
         self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
         self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
         self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
+        self.checkbox_startup_updates_check.setText(self.worker.settings.tr("options:startup_updates_check:label"))
+        self.checkbox_startup_updates_check.setToolTip(self.worker.settings.tr("options:startup_updates_check:tooltip"))
 
         self.relays_group.setTitle(self.worker.settings.tr("options:heading:relays"))
         self.label_relay.setText(self.worker.settings.tr("options:relay:label"))
@@ -334,6 +343,7 @@ class SettingsWidget(QWidget):
         self.combo_lang.currentIndexChanged.connect(self._mark_dirty)
         self.combo_theme.currentIndexChanged.connect(self._mark_dirty)
         self.checkbox_startup_console.toggled.connect(self._mark_dirty)
+        self.checkbox_startup_updates_check.toggled.connect(self._mark_dirty)
 
         self.lineedit_relay.textChanged.connect(self._mark_dirty)
         self.lineedit_relay6.textChanged.connect(self._mark_dirty)
@@ -366,6 +376,7 @@ class SettingsWidget(QWidget):
         self.combo_lang.setCurrentText(self.worker.settings.lang)
         self.combo_theme.setCurrentText(self.worker.settings.theme)
         self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+        self.checkbox_startup_console.setChecked(self.worker.settings.startup_updates_check)
 
         self.lineedit_relay.setText(self.worker.settings.relay)
         self.lineedit_relay6.setText(self.worker.settings.relay6)
@@ -388,6 +399,7 @@ class SettingsWidget(QWidget):
         self.worker.settings.lang = self.combo_lang.currentText()
         self.worker.settings.theme = self.combo_theme.currentText()
         self.worker.settings.startup_console = self.checkbox_startup_console.isChecked()
+        self.worker.settings.startup_updates_check = self.checkbox_startup_updates_check.isChecked()
 
         self.worker.settings.relay = self.lineedit_relay.text()
         self.worker.settings.relay6 = self.lineedit_relay6.text()
@@ -411,6 +423,7 @@ class SettingsWidget(QWidget):
             "lang": self.combo_lang.currentText(),
             "theme": self.combo_theme.currentText(),
             "startup_console": self.checkbox_startup_console.isChecked(),
+            "startup_updates_check": self.checkbox_startup_updates_check.isChecked(),
             
             "relay": self.lineedit_relay.text(),
             "relay6": self.lineedit_relay6.text(),

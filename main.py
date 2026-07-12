@@ -49,11 +49,12 @@ def main() -> None:
             lambda: _croc_not_installed(window, worker)
         )
 
-    checker = UpdateChecker(_APP_VERSION)
-    checker.update_available.connect(
-        lambda v: _new_version_available(window, worker, v)
-    )
-    checker.start()
+    if worker.settings.startup_updates_check:
+        checker = UpdateChecker(_APP_VERSION)
+        checker.update_available.connect(
+            lambda v: _new_version_available(window, worker, v)
+        )
+        checker.start()
 
     sys.exit(app.exec())
 

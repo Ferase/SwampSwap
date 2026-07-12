@@ -115,6 +115,9 @@
     "options:theme:label":                          "Theme",
     "options:theme:tooltip":                        "Set the application's color theme.",
     "options:startup_console:label":                "Show console on startup",
+    "options:startup_console:tooltip":              "If checked, the console window will always start open when the program starts.",
+    "options:startup_updates_check:label":          "Check for updates on startup",
+    "options:startup_updates_check:tooltip":        "If checked, Swamp Swap will notify you if an update is available.",
 
     "options:yes:label":                            "Auto-agree to all prompts",
     "options:yes:tooltip":                          "If checked, you will automatically accept all files being received and approve all files being sent.",
