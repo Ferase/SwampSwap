@@ -331,6 +331,7 @@ class SendWidget(QWidget):
         self._determine_main_button_behavior()
 
     def _on_finish(self, code: int) -> None:
+        self._clear_code()
         if self.are_files_selected():
             self.btn_send.setEnabled(True)
 
@@ -499,7 +500,6 @@ class SendWidget(QWidget):
 
         # Button is in cancel mode
         if is_active:
-            self._clear_code()
             self.worker.stop()
             self.worker.change_action(CrocAction.CANCELLED)
             return
