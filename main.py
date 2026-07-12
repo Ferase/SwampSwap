@@ -12,7 +12,7 @@ from app.windows.window_main import MainWindow
 from app.workers.worker_croc import CrocWorker, CrocAction
 
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.1.1"
+_APP_VERSION = "1.1.2"
 
 
 

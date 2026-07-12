@@ -92,6 +92,7 @@ class SendWidget(QWidget):
 
     selected_files_changed = pyqtSignal()
     files_added = pyqtSignal(list)
+    folders_added = pyqtSignal(list)
 
     output_line = pyqtSignal(str)
     operation_running = pyqtSignal(bool)
@@ -104,7 +105,10 @@ class SendWidget(QWidget):
         
         self.worker: CrocWorker = worker
 
-        self.selected_files_folders: list[Path] | None = None
+        self.selected_files_folders: dict[str, set[Path]] = {
+            "files": set(),
+            "folders": set()
+        }
         self.selected_files_folders_count: dict[str, int] = {
             "files": 0,
             "folders": 0
@@ -215,7 +219,9 @@ class SendWidget(QWidget):
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.selected_files_changed.connect(self._update_selected_file_ui)
+
         self.files_added.connect(self._add_selected_files)
+        self.folders_added.connect(self._add_selected_files)
 
         self.lineedit_code.textChanged.connect(self._enable_copy_code_button)
         self.lineedit_code.textChanged.connect(self._determine_main_button_behavior)
@@ -241,10 +247,13 @@ class SendWidget(QWidget):
                 self.btn_send.setText(self.worker.settings.tr("generic:send"))
 
     def _determine_main_button_behavior(self) -> None:
-        if self.worker.state.operation == CrocOperation.RECEIVING or self.selected_files_folders is None or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
+        files_selected: bool = self.are_files_selected()
+
+        if self.worker.state.operation == CrocOperation.RECEIVING or not files_selected or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
             self.btn_send.setEnabled(False)
             return
-        elif self.selected_files_folders is not None:
+        
+        elif files_selected:
             self.btn_send.setEnabled(True)
 
         is_sending: bool = self.worker.state.action not in [CrocAction.NONE, CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]
@@ -262,13 +271,12 @@ class SendWidget(QWidget):
         file_count: int = 0
         folder_count: int = 0
 
-        for path in self.selected_files_folders:
-            # Add sums to total
-            if path.is_dir():
-                file_count += sum(1 for item in path.rglob("*") if item.is_file())
-                folder_count += sum(1 for item in path.rglob("*") if item.is_dir())
-            else:
-                file_count += 1
+        for folder in self.selected_files_folders["folders"]:
+            file_count += sum(1 for item in folder.rglob("*") if item.is_file())
+            folder_count += sum(1 for item in folder.rglob("*") if item.is_dir())
+
+        for file in self.selected_files_folders["files"]:
+            file_count += 1
 
         self.selected_files_folders_count["files"] = file_count
         self.selected_files_folders_count["folders"] = folder_count
@@ -317,7 +325,7 @@ class SendWidget(QWidget):
             self.lineedit_code.setText(match.group(1).strip())
 
     def are_files_selected(self) -> bool:
-        return bool(self.selected_files_folders)
+        return any([value for value in self.selected_files_folders.values()])
 
     def _state_responses(self) -> None:
         self._determine_main_button_behavior()
@@ -326,17 +334,38 @@ class SendWidget(QWidget):
         if self.are_files_selected():
             self.btn_send.setEnabled(True)
 
-    def _paths_list_to_string(self, paths: list[Path]) -> str:
+    def _paths_set_to_string(self, paths: set[Path]) -> str:
         return "\n".join([str(path) + os.sep + "*" if path.is_dir() else str(path) for path in paths])
     
     def _reset_selected_fies_folders(self) -> None:
-        self.selected_files_folders = None
+        self.selected_files_folders["files"].clear()
+        self.selected_files_folders["folders"].clear()
         self._update_selected_file_ui()
 
+    def _flatten_selected_files(self) -> set[Path]:
+        final_list: list[Path] = self.selected_files_folders["files"].copy()
+        final_list.update(self.selected_files_folders["folders"])
+        return final_list
+    
+    def _unflatten_seleced_files(self, paths: set[Path]) -> dict[str, set[Path]]:
+        final_dict: dict[str, set[Path]] = {
+            "files": set(),
+            "folders": set()
+        }
+
+        for path in paths:
+            if path.is_dir():
+                final_dict["folders"].add(path)
+                continue
+            
+            final_dict["files"].add(path)
+
+        return final_dict
 
 
-    def _list_str_to_list_path(self, paths: list[str]) -> list[Path]:
-        return [Path(path) for path in paths]
+
+    def _list_str_to_set_path(self, paths: list[str]) -> set[Path]:
+        return set([Path(path) for path in paths])
 
     def _check_if_selected_is_dir_and_is_empty(self, path: Path) -> bool:
         if not path.is_dir():
@@ -347,36 +376,35 @@ class SendWidget(QWidget):
         
         return True
 
-    def _filter_paths(self, paths: list[Path]) -> list[Path]:
-        final_paths: list[Path] = []
+    def _filter_paths(self, paths: set[Path]) -> set[Path]:
+        final_paths: set[Path] = set()
+
+        flattened_paths: set[Path] = self._flatten_selected_files()
 
         for path in paths:
-            if self.selected_files_folders is not None and path in self.selected_files_folders:
-                continue
-
             if self._check_if_selected_is_dir_and_is_empty(path):
                 continue
 
-            final_paths.append(path)
+            final_paths.add(path)
 
         return final_paths
     
-    def _set_selected_files(self, paths: list[Path]) -> None:
-        final_paths: list[Path] = []
+    def _set_selected_files(self, paths: set[Path]) -> None:
+        final_paths: set[Path] = set()
         for path in paths:
             if not self._check_if_selected_is_dir_and_is_empty(path):
-                final_paths.append(path)
+                final_paths.add(path)
 
-        self.selected_files_folders = final_paths
+        self.selected_files_folders = self._unflatten_seleced_files(final_paths)
         self.selected_files_changed.emit()
     
     def _add_selected_files(self, paths: list[str]) -> None:
-        final_paths = self._filter_paths(self._list_str_to_list_path(paths))
-        
-        if self.selected_files_folders is None:
-            self.selected_files_folders = []
+        final_paths: set[Path] = self._filter_paths(self._list_str_to_set_path(paths))
 
-        self.selected_files_folders.extend(final_paths)
+        organized_paths: dict[str, set[Path]] = self._unflatten_seleced_files(final_paths)
+
+        self.selected_files_folders["files"].update(organized_paths["files"])
+        self.selected_files_folders["folders"].update(organized_paths["folders"])
         self.selected_files_changed.emit()
 
 
@@ -412,20 +440,6 @@ class SendWidget(QWidget):
 
 
 
-    def _click_browse_button(self) -> None:
-        dialog = app_utils.QFileDialog(
-            self,
-            self.worker.settings.tr("file_dialog:choose_files_folders")
-        )
-
-        dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
-
-        if not dialog.exec():
-            return
-        
-        selected_files: list[str] = dialog.selectedFiles()
-        self.files_added.emit(selected_files)
-
     def _click_browse_file_button(self) -> None:
         dialog = app_utils.QFileDialog(
             self,
@@ -450,7 +464,7 @@ class SendWidget(QWidget):
             return
         
         selected_folders: list[str] = dialog.selectedFiles()
-        self.files_added.emit(selected_folders)
+        self.folders_added.emit(selected_folders)
 
     def _click_view_filelist_button(self) -> None:
         result = self._window_filelist.raise_modal(self.selected_files_folders)
@@ -490,4 +504,4 @@ class SendWidget(QWidget):
             self.worker.change_action(CrocAction.CANCELLED)
             return
 
-        self.worker.start_send(self.selected_files_folders, self.lineedit_code.text())
+        self.worker.start_send(self._flatten_selected_files(), self.lineedit_code.text())

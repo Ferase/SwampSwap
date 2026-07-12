@@ -6,10 +6,11 @@ from PyQt6.QtWidgets import (
     QPushButton, QLineEdit, QLabel, QCheckBox,
     QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
     QSizePolicy, QApplication, QScrollArea, QFrame,
-    QDialog, QListWidget, QMessageBox
+    QDialog, QListWidget, QMessageBox, QListWidgetItem,
+    QStyle
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QDir, QUrl
-from PyQt6.QtGui import QFont, QPixmap, QFont, QPalette, QColor, QDesktopServices
+from PyQt6.QtGui import QIcon
 
 import app.utils as app_utils
 from app.enums import CrocState, CrocOperation, CrocAction
@@ -42,11 +43,11 @@ class FileDropList(QListWidget):
             event.ignore()
 
     def dropEvent(self, event):
-        valid_paths: list[Path] = []
+        valid_paths: set[Path] = {}
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 if url.isLocalFile():
-                    valid_paths.append(Path(url.toLocalFile()))
+                    valid_paths.add(Path(url.toLocalFile()))
             
             self.files_dropped.emit(valid_paths)
             event.acceptProposedAction()
@@ -57,7 +58,7 @@ class FileDropList(QListWidget):
 
 class FileListWindow(QDialog):
 
-    files_changed = pyqtSignal(list)
+    files_changed = pyqtSignal(dict)
     files_cleared = pyqtSignal()
 
     def __init__(self, worker: CrocWorker, parent=None) -> None:
@@ -66,7 +67,10 @@ class FileListWindow(QDialog):
 
         self.worker = worker
 
-        self._paths: list[Path] = []
+        self._paths: dict[str, set[Path]] = {
+            "files": set(),
+            "folders": set(),
+        }
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.tr("manage_send_list:window:title"))
@@ -144,6 +148,9 @@ class FileListWindow(QDialog):
 
     def _connect_signals(self) -> None:
         self.list_widget.files_dropped.connect(self._add_files)
+        self.list_widget.itemDoubleClicked.connect(
+            lambda item: app_utils.reveal_in_file_manager(item.text())
+        )
 
         self.btn_add_files.clicked.connect(self._click_add_files_button)
         self.btn_add_folder.clicked.connect(self._click_add_folder_button)
@@ -155,14 +162,33 @@ class FileListWindow(QDialog):
 
     def _populate(self):
         self._clear_list()
-        self.list_widget.addItems([str(path) for path in self._paths])
+
+        self._create_list_items(self._paths["folders"], "folders")
+        self._create_list_items(self._paths["files"], "files")
+
+    def _create_list_items(self, paths: set[Path], item_tyoe: str) -> None:
+        if item_tyoe == "folders":
+            icon: QIcon = self._get_folder_icon()
+        else:
+            icon: QIcon = self._get_file_icon()
+        
+        for path in paths:
+            list_item = QListWidgetItem(str(path))
+            list_item.setIcon(icon)
+            self.list_widget.addItem(list_item)
 
     def _clear_list(self) -> None:
         self.list_widget.clear()
+    
+    def _get_folder_icon(self) -> QIcon:
+        return QApplication.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon)
+
+    def _get_file_icon(self) -> QIcon:
+        return QApplication.style().standardIcon(QStyle.StandardPixmap.SP_FileIcon)
 
 
 
-    def raise_modal(self, paths: list[Path]) -> int:
+    def raise_modal(self, paths: dict[str, Path]) -> int:
         self._paths = paths.copy()
         self._populate()
 
@@ -174,10 +200,17 @@ class FileListWindow(QDialog):
         return result
     
 
-    def _add_files(self, paths: list[Path]):
-        final_paths: list[Path] = self._filter_paths(paths)
+    def _add_files(self, paths: set[Path]):
+        final_paths: set[Path] = self._filter_paths(paths)
 
-        self._paths.extend(final_paths)
+        self._paths["files"].update(final_paths)
+
+        self._populate()
+
+    def _add_folders(self, paths: set[Path]):
+        final_paths: set[Path] = self._filter_paths(paths)
+
+        self._paths["folders"].update(final_paths)
 
         self._populate()
 
@@ -192,7 +225,8 @@ class FileListWindow(QDialog):
             return
 
     def _clear_all(self):
-        self._paths.clear()
+        self._paths["files"] = set()
+        self._paths["folders"] = set()
         self.files_cleared.emit()
         self.accept()
 
@@ -205,8 +239,8 @@ class FileListWindow(QDialog):
         
         return True
 
-    def _filter_paths(self, paths: list[Path]) -> list[Path]:
-        final_paths: list[Path] = []
+    def _filter_paths(self, paths: set[Path]) -> set[Path]:
+        final_paths: set[Path] = set()
 
         for path in paths:
             if self._paths is not None and path in self._paths:
@@ -215,7 +249,7 @@ class FileListWindow(QDialog):
             if self._check_if_selected_is_dir_and_is_empty(path):
                 continue
 
-            final_paths.append(path)
+            final_paths.add(path)
 
         return final_paths
 
@@ -228,11 +262,11 @@ class FileListWindow(QDialog):
         if not dialog.exec():
             return
         
-        paths: list[Path] = []
+        paths: set[Path] = set()
         for path in dialog.selectedFiles():
             path = Path(path)
             if not self._check_if_selected_is_dir_and_is_empty(path):
-                paths.append(path)
+                paths.add(path)
 
         self._add_files(paths)
 
@@ -243,13 +277,13 @@ class FileListWindow(QDialog):
         if not dialog.exec():
             return
         
-        paths: list[Path] = []
+        paths: set[Path] = set()
         for path in dialog.selectedFiles():
             path = Path(path)
             if not self._check_if_selected_is_dir_and_is_empty(path):
-                paths.append(path)
+                paths.add(path)
 
-        self._add_files(paths)
+        self._add_folders(paths)
 
     def _click_remove_selected_button(self) -> None:
         self._remove_selected()

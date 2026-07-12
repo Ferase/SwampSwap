@@ -17,19 +17,19 @@ CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
 
 
 
-def reveal_in_file_manager(path: str) -> None:
-    p = Path(path)
-    if not p.exists():
+def reveal_in_file_manager(path: str | Path) -> None:
+    path = Path(path)
+    if not path.exists():
         return
 
     try:
         if sys.platform == "win32":
-            subprocess.Popen(["explorer", "/select,", str(p)])
+            subprocess.Popen(["explorer", "/select,", str(path)])
         elif sys.platform == "darwin":
-            subprocess.Popen(["open", "-R", str(p)])
+            subprocess.Popen(["open", "-R", str(path)])
         else:
-            target = str(p) if p.is_file() else str(p)
-            parent = str(p.parent) if p.is_file() else str(p)
+            target = str(path) if path.is_file() else str(path)
+            parent = str(path.parent) if path.is_file() else str(path)
             for cmd in (
                 # GNOME
                 ["nautilus", "--select", target],

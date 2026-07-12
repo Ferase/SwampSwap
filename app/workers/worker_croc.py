@@ -128,7 +128,7 @@ class CrocWorker(QThread):
             self._proc = None
             self.ended_croc.emit(self.state.operation)
 
-    def start_send(self, paths: list[Path], code: str = None) -> None:
+    def start_send(self, paths: set[Path], code: str = None) -> None:
         args = ["croc"]
         args.extend(self.settings.build_flags())
         args.append("send")
