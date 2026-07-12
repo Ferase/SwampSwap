@@ -25,6 +25,10 @@
     "template:num_folder_single":                   "{n} folder",
     "template:num_folders_multiple":                "{n} folders",
 
+    "dialog:update_available:title":                "Swamp Swap update available!",
+    "dialog:update_available:body1":                "Version {v} of Swamp Swap is now available!",
+    "dialog:update_available:body2":                "Would you like to go to the GitHub releases page to download it?",
+
     "dialog:croc_not_installed:title":              "croc not installed",
     "dialog:croc_not_installed:body1":              "It looks like croc isn't installed!",
     "dialog:croc_not_installed:body2":              "Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",

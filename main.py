@@ -1,16 +1,18 @@
 import sys
 import shutil
 from pathlib import Path
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QPalette, QColor, QIcon
-from PyQt6.QtCore import Qt, QTimer
+from packaging.version import Version
+from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtGui import QPalette, QColor, QIcon, QDesktopServices
+from PyQt6.QtCore import Qt, QUrl, QTimer
 
+from get_version import UpdateChecker
 import app.utils as app_utils
 from app.windows.window_main import MainWindow
 from app.workers.worker_croc import CrocWorker, CrocAction
 
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.0.0"
+_APP_VERSION = "1.1.0"
 
 
 
@@ -47,6 +49,12 @@ def main() -> None:
             lambda: _croc_not_installed(window, worker)
         )
 
+    checker = UpdateChecker(_APP_VERSION)
+    checker.update_available.connect(
+        lambda v: _new_version_available(window, worker, v)
+    )
+    checker.start()
+
     sys.exit(app.exec())
 
 
@@ -54,6 +62,20 @@ def main() -> None:
 def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
     worker.change_action(CrocAction.ERROR)
     window._croc_not_installed_alert()
+
+def _new_version_available(parent, worker: CrocWorker, new_version: str) -> None:
+    result = QMessageBox.information(
+        parent,
+        worker.settings.tr("dialog:update_available:title"),
+        worker.settings.tr("dialog:update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:update_available:body2"),
+        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        QMessageBox.StandardButton.Yes
+    )
+
+    if result == QMessageBox.StandardButton.Yes:
+        QDesktopServices.openUrl(
+            QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
+        )
 
 
 
