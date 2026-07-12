@@ -37,20 +37,20 @@ def main() -> None:
         QTimer.singleShot(0,
             lambda: _croc_not_installed(window, worker)
         )
+    else:
+        if worker.settings.startup_croc_updates_check:
+            croc_checker = UpdateChecker(worker.get_croc_version_number_only(), "schollz", "croc")
+            croc_checker.update_available.connect(
+                lambda v: _new_croc_version_available(window, worker, v)
+            )
+            croc_checker.start()
 
-    if worker.settings.startup_croc_updates_check:
-        croc_checker = UpdateChecker(worker.get_croc_version_number_only(), "schollz", "croc")
-        croc_checker.update_available.connect(
-            lambda v: _new_croc_version_available(window, worker, v)
-        )
-        croc_checker.start()
-
-    if worker.settings.startup_swampswap_updates_check:
-        swampswap_checker = UpdateChecker(_APP_VERSION, "Ferase", "SwampSwap")
-        swampswap_checker.update_available.connect(
-            lambda v: _new_swampswap_version_available(window, worker, v)
-        )
-        swampswap_checker.start()
+        if worker.settings.startup_swampswap_updates_check:
+            swampswap_checker = UpdateChecker(_APP_VERSION, "Ferase", "SwampSwap")
+            swampswap_checker.update_available.connect(
+                lambda v: _new_swampswap_version_available(window, worker, v)
+            )
+            swampswap_checker.start()
 
     sys.exit(app.exec())
 
