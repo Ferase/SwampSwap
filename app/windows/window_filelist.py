@@ -163,12 +163,12 @@ class FileListWindow(QDialog):
 
 
     def raise_modal(self, paths: list[Path]) -> int:
-        self._paths = paths
+        self._paths = paths.copy()
         self._populate()
 
         result = self.exec()
 
-        if not result:
+        if result == QDialog.DialogCode.Rejected:
             return
         
         return result
@@ -271,3 +271,6 @@ class FileListWindow(QDialog):
     def accept(self):
         self.files_changed.emit(list(self._paths))
         super().accept()
+
+    def reject(self):
+        super().reject()

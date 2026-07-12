@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLineEdit, QLabel, QCheckBox,
     QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
     QSizePolicy, QApplication, QStackedWidget, QFrame,
-    QStyle, QMessageBox
+    QStyle, QMessageBox, QDialog
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QDir, QSize
 from PyQt6.QtGui import QFont
@@ -455,7 +455,7 @@ class SendWidget(QWidget):
     def _click_view_filelist_button(self) -> None:
         result = self._window_filelist.raise_modal(self.selected_files_folders)
 
-        if not result:
+        if result == QDialog.DialogCode.Rejected:
             return
 
         self._update_selected_file_ui()
