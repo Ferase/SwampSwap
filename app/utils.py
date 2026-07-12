@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QApplication, QGroupBox, QComboBox, QFileDialog,
     QListView, QTreeView, QAbstractItemView, QFrame,
     QVBoxLayout, QLabel, QStyle, QPushButton,
-    QLineEdit
+    QListWidget
 )
 from PyQt6.QtGui import QWheelEvent, QFileSystemModel, QFont, QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
@@ -111,38 +111,3 @@ class MultiFolderDialog(QFileDialog):
         for view in self.findChildren((QListView, QTreeView)):
             if isinstance(view.model(), QFileSystemModel):
                 view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-
-class QGroupBoxFileDrop(QGroupBox):
-    files_dropped = pyqtSignal(list)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setAcceptDrops(True)
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-        else:
-            event.ignore()
-
-    def dragMoveEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-        else:
-            event.ignore()
-
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            file_list = self._build_file_list(event)
-            if file_list:
-                self.files_dropped.emit([str(p) for p in file_list])
-            event.acceptProposedAction()
-        else:
-            event.ignore()
-
-    def _build_file_list(self, event) -> list[Path]:
-        return [
-            Path(url.toLocalFile())
-            for url in event.mimeData().urls()
-            if url.isLocalFile()
-        ]

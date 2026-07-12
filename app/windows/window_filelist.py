@@ -18,6 +18,43 @@ from app.managers.manager_locale import SwampSwapLang, SwampSwapLanguageList
 
 
 
+class FileDropList(QListWidget):
+
+    files_dropped = pyqtSignal(list)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setAcceptDrops(True)
+        self.setDragEnabled(False)
+        self.setDefaultDropAction(Qt.DropAction.CopyAction)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        valid_paths: list[Path] = []
+        if event.mimeData().hasUrls():
+            for url in event.mimeData().urls():
+                if url.isLocalFile():
+                    valid_paths.append(Path(url.toLocalFile()))
+            
+            self.files_dropped.emit(valid_paths)
+            event.acceptProposedAction()
+        else:
+            event.ignore()
+
+
+
 class FileListWindow(QDialog):
 
     files_changed = pyqtSignal(list)
@@ -57,7 +94,7 @@ class FileListWindow(QDialog):
         group = QGroupBox()
         layout = QVBoxLayout(group)
 
-        self.list_widget = QListWidget()
+        self.list_widget = FileDropList()
         self.list_widget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
 
         btn_row = QHBoxLayout()
@@ -106,6 +143,8 @@ class FileListWindow(QDialog):
 
 
     def _connect_signals(self) -> None:
+        self.list_widget.files_dropped.connect(self._add_files)
+
         self.btn_add_files.clicked.connect(self._click_add_files_button)
         self.btn_add_folder.clicked.connect(self._click_add_folder_button)
         self.btn_remove.clicked.connect(self._click_remove_selected_button)
