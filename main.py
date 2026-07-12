@@ -16,20 +16,6 @@ _APP_VERSION = "1.1.3"
 
 
 
-def _alloc_hidden_console() -> None:
-    """Allocate a hidden console so croc's GetConsoleMode() check passes.
-    
-    Without this, croc detects it has no real stdin/stdout and either
-    suppresses output or falls back to file-based stdin (croc-stdin-* files).
-    """
-    import ctypes
-    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-    kernel32.AllocConsole()   # creates a real console attached to this process
-    hwnd = kernel32.GetConsoleWindow()
-    if hwnd:
-        user32 = ctypes.WinDLL("user32", use_last_error=True)
-        user32.ShowWindow(hwnd, 0)   # SW_HIDE = 0
-
 # Main runner
 def main() -> None:
     app = QApplication(sys.argv)
