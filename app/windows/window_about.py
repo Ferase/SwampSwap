@@ -99,7 +99,7 @@ class AboutWindow(QDialog):
         self.label_version = QLabel(f"GUI version {self.worker.settings.app_version}")
         self.label_version.setWordWrap(True)
 
-        self.label_croc_version = QLabel(self.worker.croc_version)
+        self.label_croc_version = QLabel(self.worker.get_croc_version())
         self.label_croc_version.setWordWrap(True)
 
         self.disclaimer_label = QLabel(self.worker.settings.tr("about:disclaimer"))

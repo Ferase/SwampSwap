@@ -13,7 +13,8 @@ _DEFAULTS: dict[str, Any] = {
     "lang": "English",
     "theme": "Pink",
     "startup_console": False,
-    "startup_updates_check": True,
+    "startup_croc_updates_check": True,
+    "startup_swampswap_updates_check": True,
 
     # Relay
     "relay": "178.105.79.46:9009",
@@ -71,7 +72,8 @@ class SettingsManager():
         self.lang: str | None = None
         self.theme: str | None = None
         self.startup_console: bool | None = None
-        self.startup_updates_check: bool | None = None
+        self.startup_croc_updates_check: bool | None = None
+        self.startup_swampswap_updates_check: bool | None = None
 
         # Relays
         self.relay: str | None = None

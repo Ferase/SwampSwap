@@ -7,10 +7,10 @@ from PyQt6.QtCore import QThread, pyqtSignal
 class UpdateChecker(QThread):
     update_available = pyqtSignal(str)
 
-    def __init__(self, current_version: str):
+    def __init__(self, current_version: str, user: str, repo: str):
         super().__init__()
         self._current = current_version
-        self._url = f"https://api.github.com/repos/Ferase/SwampSwap/releases/latest"
+        self._url = f"https://api.github.com/repos/{user}/{repo}/releases/latest"
 
     def run(self):
         try:

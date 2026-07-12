@@ -49,12 +49,19 @@ def main() -> None:
             lambda: _croc_not_installed(window, worker)
         )
 
-    if worker.settings.startup_updates_check:
-        checker = UpdateChecker(_APP_VERSION)
-        checker.update_available.connect(
-            lambda v: _new_version_available(window, worker, v)
+    if worker.settings.startup_croc_updates_check:
+        croc_checker = UpdateChecker("1", "schollz", "croc")
+        croc_checker.update_available.connect(
+            lambda v: _new_croc_version_available(window, worker, v)
         )
-        checker.start()
+        croc_checker.start()
+
+    if worker.settings.startup_swampswap_updates_check:
+        swampswap_checker = UpdateChecker("1", "Ferase", "SwampSwap")
+        swampswap_checker.update_available.connect(
+            lambda v: _new_swampswap_version_available(window, worker, v)
+        )
+        swampswap_checker.start()
 
     sys.exit(app.exec())
 
@@ -64,11 +71,25 @@ def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
     worker.change_action(CrocAction.ERROR)
     window._croc_not_installed_alert()
 
-def _new_version_available(parent, worker: CrocWorker, new_version: str) -> None:
+def _new_croc_version_available(parent, worker: CrocWorker, new_version: str) -> None:
     result = QMessageBox.information(
         parent,
-        worker.settings.tr("dialog:update_available:title"),
-        worker.settings.tr("dialog:update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:update_available:body2"),
+        worker.settings.tr("dialog:croc_update_available:title"),
+        worker.settings.tr("dialog:croc_update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:croc_update_available:body2") + "\n" + f"<b>{worker.settings.tr('dialog:croc_update_available:body3')}</b>",
+        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        QMessageBox.StandardButton.Yes
+    )
+
+    if result == QMessageBox.StandardButton.Yes:
+        QDesktopServices.openUrl(
+            QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
+        )
+
+def _new_swampswap_version_available(parent, worker: CrocWorker, new_version: str) -> None:
+    result = QMessageBox.information(
+        parent,
+        worker.settings.tr("dialog:swampswap_update_available:title"),
+        worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:swampswap_update_available:body2"),
         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         QMessageBox.StandardButton.Yes
     )

@@ -32,11 +32,11 @@ class CrocWorker(QThread):
         self._args: list[str] = []
         self._env: dict | None = None
 
-        self.croc_version = "croc version NULL"
+        self.croc_version: str | None = None
         try:
-            self.croc_version = subprocess.run(["croc", "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+            self.croc_version = self.get_croc_version()
         except Exception:
-            pass
+            self.croc_version = "Couldn't get croc version!"
         
         self.state: CrocState = CrocState()
 
@@ -224,3 +224,12 @@ class CrocWorker(QThread):
     def get_action_text_only(self) -> str:
         key: str = self.state.action.text[2:].strip()
         return self.settings.tr(key)
+    
+    def get_croc_version(self) -> str:
+        if self.croc_version is None:
+            return subprocess.run(["croc", "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        
+        return self.croc_version
+    
+    def get_croc_version_number_only(self) -> str:
+        return self.croc_version.split("croc version ")[1]

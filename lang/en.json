@@ -25,9 +25,14 @@
     "template:num_folder_single":                   "{n} folder",
     "template:num_folders_multiple":                "{n} folders",
 
-    "dialog:update_available:title":                "Swamp Swap update available!",
-    "dialog:update_available:body1":                "Version {v} of Swamp Swap is now available!",
-    "dialog:update_available:body2":                "Would you like to go to the GitHub releases page to download it?",
+    "dialog:croc_update_available:title":           "croc update available!",
+    "dialog:croc_update_available:body1":           "Version {v} of croc is now available!",
+    "dialog:croc_update_available:body2":           "Would you like to go to the GitHub releases page to download it?",
+    "dialog:croc_update_available:body3":           "Note: If you installed croc via your operating system's package manager, you should update it from there instead.",
+
+    "dialog:swampswap_update_available:title":      "Swamp Swap update available!",
+    "dialog:swampswap_update_available:body1":      "Version {v} of Swamp Swap is now available!",
+    "dialog:swampswap_update_available:body2":      "Would you like to go to the GitHub releases page to download it?",
 
     "dialog:croc_not_installed:title":              "croc not installed",
     "dialog:croc_not_installed:body1":              "It looks like croc isn't installed!",
@@ -116,8 +121,10 @@
     "options:theme:tooltip":                        "Set the application's color theme.",
     "options:startup_console:label":                "Show console on startup",
     "options:startup_console:tooltip":              "If checked, the console window will always start open when the program starts.",
-    "options:startup_updates_check:label":          "Check for updates on startup",
-    "options:startup_updates_check:tooltip":        "If checked, Swamp Swap will notify you if an update is available.",
+    "options:startup_croc_updates_check:label":         "Check for croc updates on startup",
+    "options:startup_croc_updates_check:tooltip":       "If checked, Swamp Swap will notify you if an update is available for croc.",
+    "options:startup_swampswap_updates_check:label":    "Check for GUI updates on startup",
+    "options:startup_swampswap_updates_check:tooltip":  "If checked, Swamp Swap will notify you if an update is available for the GUI application.",
 
     "options:yes:label":                            "Auto-agree to all prompts",
     "options:yes:tooltip":                          "If checked, you will automatically accept all files being received and approve all files being sent.",
