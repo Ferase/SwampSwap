@@ -14,7 +14,6 @@ import app.utils as app_utils
 from app.enums import CrocState, CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 
-CODE_RE = QRegularExpression(r"^([0-9]){4}(-[a-z]+){3}$")
 _ACCEPT_RE = QRegularExpression(r"Accept\s+(?:'(?P<filename>[^']+)'|(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?))\s*\((?P<size>[^)]+)\)\?")
 
 
@@ -56,7 +55,7 @@ class ReceiveWidget(QWidget):
     # Construct file group
     def _build_output_group(self) -> QGroupBox:
         group = QGroupBox()
-        layout = QGridLayout(group)
+        layout = QVBoxLayout(group)
 
         self.lineedit_path = QLineEdit()
         self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
@@ -66,12 +65,16 @@ class ReceiveWidget(QWidget):
         self.btn_open_output_path = QPushButton(self.worker.settings.tr("receive:btn:open_output_folder"))
 
         self.btn_browse_output_folder = QPushButton(self.worker.settings.tr("receive:btn:select_folder"))
-        self.btn_default_path = QPushButton(self.worker.settings.tr("receive:btn:default_folder"))
+        self.btn_browse_output_folder.setMinimumHeight(50)
 
-        layout.addWidget(self.lineedit_path, 0, 0)
-        layout.addWidget(self.btn_open_output_path, 0, 1)
-        layout.addWidget(self.btn_browse_output_folder, 1, 0, 1, -1)
-        layout.addWidget(self.btn_default_path, 2, 0, 1, -1)
+        self.btn_default_path = QPushButton(self.worker.settings.tr("receive:btn:default_folder"))
+        self.btn_default_path.setMinimumHeight(50)
+
+        layout.addWidget(self.lineedit_path)
+        layout.addWidget(self.btn_open_output_path)
+        layout.addStretch()
+        layout.addWidget(self.btn_browse_output_folder, stretch=1)
+        layout.addWidget(self.btn_default_path, stretch=1)
 
         return group
     
@@ -81,9 +84,7 @@ class ReceiveWidget(QWidget):
         layout = QVBoxLayout(group)
 
         self.lineedit_code = QLineEdit()
-        self.lineedit_code.setPlaceholderText("1234-abcd-efgh-ijkl")
-        validator = QRegularExpressionValidator(CODE_RE)
-        self.lineedit_code.setValidator(validator)
+        self.lineedit_code.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_code"))
 
         self.btn_paste_code = QPushButton(self.worker.settings.tr("receive:btn:paste_code"))
 
@@ -108,16 +109,17 @@ class ReceiveWidget(QWidget):
         box = QMessageBox.question(
             self,
             self.worker.settings.tr("dialog:accept:title"),
-            f"{self.worker.settings.tr("dialog:accept:body")} <b>{name}</b> ({size})?",
+            self.worker.settings.tr("dialog:accept:body").format(f=f"<b>{name}</b>", s=size),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
 
-        if box == QMessageBox.StandardButton.Yes:
-            self.worker.send_input("y")
+        if box == QMessageBox.StandardButton.No:
+            self.worker.send_input("n")
+            self.worker.change_action(CrocAction.CANCELLED)
             return
-    
-        self.worker.send_input("n")
+        
+        self.worker.send_input("y")
 
 
 
@@ -126,6 +128,7 @@ class ReceiveWidget(QWidget):
         self.btn_open_output_path.setText(self.worker.settings.tr("receive:btn:open_output_folder"))
         self.btn_browse_output_folder.setText(self.worker.settings.tr("receive:btn:select_folder"))
         self.btn_default_path.setText(self.worker.settings.tr("receive:btn:default_folder"))
+        self.lineedit_code.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_code"))
         self.btn_paste_code.setText(self.worker.settings.tr("receive:btn:paste_code"))
 
         self._set_button_text_by_operation()
@@ -156,13 +159,8 @@ class ReceiveWidget(QWidget):
             case _:
                 self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
 
-    def _is_code_valid(self) -> bool:
-        return CODE_RE.match(self._code).hasMatch()
-
     def _determine_main_button_behavior(self) -> None:
-        matched_code_format: bool = self._is_code_valid()
-
-        if self.worker.state.operation == CrocOperation.SENDING or not matched_code_format:
+        if self.worker.state.operation == CrocOperation.SENDING:
             self.btn_receive.setEnabled(False)
             return
         else:
@@ -177,10 +175,7 @@ class ReceiveWidget(QWidget):
 
     def _paste_code(self) -> None:
         clipboard_text: str = QApplication.clipboard().text().strip()
-        matched_code_format: bool = CODE_RE.match(clipboard_text).hasMatch()
-
-        if matched_code_format:
-            self.lineedit_code.setText(clipboard_text)
+        self.lineedit_code.setText(clipboard_text)
     
     def _read_command_line(self, line: str) -> None:
         self._test_for_accept(line)
@@ -203,8 +198,7 @@ class ReceiveWidget(QWidget):
         Path(self._output_path).mkdir(exist_ok=True)
 
     def _on_finish(self, code: int) -> None:
-        if self._is_code_valid():
-            self.btn_receive.setEnabled(True)
+        self.btn_receive.setEnabled(True)
     
 
 

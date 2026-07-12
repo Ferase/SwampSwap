@@ -1,12 +1,19 @@
-# app/utils.py
+import re
 import sys
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from PyQt6.QtWidgets import QGroupBox, QComboBox, QFileDialog, QListView, QTreeView, QAbstractItemView
-from PyQt6.QtGui import QWheelEvent, QFileSystemModel
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtWidgets import (
+    QApplication, QGroupBox, QComboBox, QFileDialog,
+    QListView, QTreeView, QAbstractItemView, QFrame,
+    QVBoxLayout, QLabel, QStyle, QPushButton,
+    QLineEdit
+)
+from PyQt6.QtGui import QWheelEvent, QFileSystemModel, QFont, QPixmap
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
+
+CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
 
 
 
@@ -80,6 +87,9 @@ def determine_received_path(folder_name: str) -> Path:
 
 def hide_group_box_border(group_box: QGroupBox) -> None:
     group_box.setStyleSheet("QGroupBox { border: 0px solid transparent; }")
+
+def regex_match(pattern: str, text: str) -> bool:
+    return not bool(re.match(pattern, text))
 
 
 

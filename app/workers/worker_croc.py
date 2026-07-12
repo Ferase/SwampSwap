@@ -128,10 +128,21 @@ class CrocWorker(QThread):
             self._proc = None
             self.ended_croc.emit(self.state.operation)
 
-    def start_send(self, paths: list[Path]) -> None:
+    def start_send(self, paths: list[Path], code: str = None) -> None:
         args = ["croc"]
         args.extend(self.settings.build_flags())
         args.append("send")
+        
+        if code:
+            if sys.platform == "win32":
+                args.extend(["--code", code])
+            else:
+                env = os.environ.copy()
+                env["CROC_SECRET"] = code
+        else:
+            if self._env is not None and "CROC_SECRET" in self._env:
+                self._env.pop("CROC_SECRET")
+
         args.extend(paths)
 
         print(args)
@@ -140,6 +151,10 @@ class CrocWorker(QThread):
         self.change_action(CrocAction.WAIT_FOR_PEER)
 
         self._args = args
+
+        if code:
+            self._env = env
+
         self.start()
 
     def start_receive(self, code: str, out_path: str, env: dict | None = None) -> None:

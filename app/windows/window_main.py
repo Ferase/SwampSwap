@@ -8,10 +8,11 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QAction, QDesktopServices, QIcon
 from PyQt6.QtCore import QUrl, pyqtSignal, QTimer
 
+import app.utils as app_utils
 from app.enums import CrocState, CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 from app.widgets.widget_send import SendWidget
-from app.widgets.widget_receive import ReceiveWidget, CODE_RE
+from app.widgets.widget_receive import ReceiveWidget
 from app.widgets.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
@@ -34,7 +35,7 @@ class MainWindow(QMainWindow):
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.app_name)
-        self.setFixedSize(325, 435)
+        self.setFixedSize(350, 460)
 
         # Build UI
         self._build_central()
@@ -60,8 +61,6 @@ class MainWindow(QMainWindow):
         self.about_action.setShortcut("Shift+A")
         self.about_action.triggered.connect(self._open_about_window)
         self.file_menu.addAction(self.about_action)
-
-        
 
         self.send_file_action = QAction(self.worker.settings.tr("menubar:actions:send_file"), self)
         self.send_file_action.setShortcut("Ctrl+S")
@@ -209,9 +208,10 @@ class MainWindow(QMainWindow):
 
     def _send_file(self) -> None:
         self.tabs.tabBar().setCurrentIndex(0)
-        self.widget_send.btn_browse_file.click()
+        self.widget_send._reset_selected_fies_folders()
+        self.widget_send.btn_add_files.click()
 
-        if not self.widget_send.is_file_selected():
+        if not self.widget_send.are_files_selected():
             return
         
         self.widget_send.btn_send.click()
@@ -219,9 +219,10 @@ class MainWindow(QMainWindow):
 
     def _send_folder(self) -> None:
         self.tabs.tabBar().setCurrentIndex(0)
-        self.widget_send.btn_browse_folder.click()
+        self.widget_send._reset_selected_fies_folders()
+        self.widget_send.btn_add_folders.click()
 
-        if not self.widget_send.is_file_selected():
+        if not self.widget_send.are_files_selected():
             return
         
         self.widget_send.btn_send.click()
@@ -239,7 +240,7 @@ class MainWindow(QMainWindow):
         if not ok_pressed:
             return
 
-        if not text or not CODE_RE.match(text).hasMatch():
+        if not text:
             QMessageBox.warning(
                 self,
                 self.worker.settings.tr("menubar:window_bad_code:title"),
