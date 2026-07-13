@@ -1,0 +1,171 @@
+{
+    "_meta": {
+        "language":     "English2",
+        "author":       "Ferase",
+        "version":      1.0
+    },
+
+    "generic:send":                                 "Send",
+    "generic:receive":                              "Receive",
+    "generic:settings":                             "Settings",
+    "generic:submit":                               "Submit",
+    "generic:ok":                                   "OK",
+    "generic:save":                                 "Save",
+    "generic:cancel":                               "Cancel",
+    "generic:clear":                                "Clear",
+    "generic:clear_list":                           "Clear list",
+    "generic:close":                                "Close",
+    "generic:error":                                "Error",
+    "generic:add_files":                            "Add files",
+    "generic:add_folders":                          "Add folders",
+    "generic:reset_defaults":                       "Reset to defaults",
+
+    "template:num_file_single":                     "{n} file",
+    "template:num_files_multiple":                  "{n} files",
+    "template:num_folder_single":                   "{n} folder",
+    "template:num_folders_multiple":                "{n} folders",
+
+    "dialog:croc_update_available:title":           "croc update available!",
+    "dialog:croc_update_available:body1":           "Version {v} of croc is now available!",
+    "dialog:croc_update_available:body2":           "Would you like to go to the GitHub releases page to download it?",
+    "dialog:croc_update_available:body3":           "Note: If you installed croc via your operating system's package manager, you should update it from there instead.",
+
+    "dialog:swampswap_update_available:title":      "Swamp Swap update available!",
+    "dialog:swampswap_update_available:body1":      "Version {v} of Swamp Swap is now available!",
+    "dialog:swampswap_update_available:body2":      "Would you like to go to the GitHub releases page to download it?",
+
+    "dialog:croc_not_installed:title":              "croc not installed",
+    "dialog:croc_not_installed:body1":              "It looks like croc isn't installed!",
+    "dialog:croc_not_installed:body2":              "Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
+
+    "dialog:accept:title":                          "Accept transfer",
+    "dialog:accept:body":                           "Will you accept {f} (Size: {s})?",
+
+    "dialog:no_receive_path:title":                 "No output path",
+    "dialog:no_receive_path:body":                  "The output folder is blank. Please enter a path.",
+
+    "dialog:invalid_receive_path:title":            "Invalid output folder",
+    "dialog:invalid_receive_path:body1":            "The output folder doesn't exist or is invalid.",
+    "dialog:invalid_receive_path:body2":            "However, Swamp Swap will create this path when receiving any files or folders <b>assuming the path is a possible path and not random text</b>. You just can't open the folder if it doesn't exist. Create it or allow Swamp Swap to do so when you receive files.",
+
+    "dialog:saved_settings:title":                  "Saved settings",
+    "dialog:saved_settings:body":                   "Your settings were saved.",
+
+    "dialog:default_settings:title":                "Reset settings",
+    "dialog:default_settings:body":                 "Are you sure you want to reset settings to default? This can't be undone!",
+
+    "dialog:settings_are_default:title":            "Settings are default",
+    "dialog:settings_are_default:body":             "All of the settings are already at their default values. No action has been performed.",
+
+    "dialog:unsaved_settings:title":                "Unsaved settings",
+    "dialog:unsaved_settings:body":                 "You have unsaved changes. WIthout saving, your custom settings will not be applied to your croc transfers.<br><br>It is advised that you save your settings before continuing.",
+
+    "dialog:clear_list_confirm:title":              "Confirm clearing",
+    "dialog:clear_list_confirm:body":               "Are you sure you want to clear the list of files you want to send?",
+
+    "file_dialog:choose_files":                     "Select files to send",
+    "file_dialog:choose_folders":                   "Select folders to send",
+
+    "state:idle":                                   "Idle",
+    "state:wait_peer":                              "Waiting for peer...",
+    "state:sending":                                "Sending...",
+    "state:connect_peer":                           "Connecting to peer...",
+    "state:await_approval":                         "Awaiting approval...",
+    "state:receiving":                              "Receiving...",
+    "state:completed":                              "Completed!",
+    "state:cancelled":                              "Cancelled",
+
+    "menubar:file":                                 "File",
+    "menubar:actions":                              "Actions",
+
+    "menubar:file:console":                         "Open console",
+    "menubar:file:about":                           "About Swamp Swap",
+
+    "menubar:actions:send_file":                    "Send file(s)...",
+    "menubar:actions:send_folder":                  "Send folder(s)...",
+    "menubar:actions:receive":                      "Receive file/folder...",
+    "menubar:actions:stop_all":                     "Stop all actions",
+
+    "menubar:window_receive_code:title":            "Enter receive code",
+    "menubar:window_receive_code:body":             "Enter your receive code:",
+
+    "menubar:window_bad_code:title":                "Invalid code",
+    "menubar:window_bad_code:body":                 "The provided code was blank or invalid.",
+
+    "send:label:drop_zone":                         "Drop files here...",
+    "send:btn:view_file_list":                      "View and manage selected items",
+    "send:label:no_files_selected":                 "Nothing selected.",
+    "send:label:please_select":                     "Select or drag-drop files or folders.",
+    "send:label:multiple_files":                    "Multiple selected (hover to see)",
+    "send:lineedit:placeholder_code":               "Send code (auto-generated if blank)",
+    "send:btn:copy_code":                           "Copy code",
+
+    "manage_send_list:window:title":                "Manage files and folders to be sent",
+    "manage_send_list:btn:remove_selected":         "Remove selected",
+
+    "receive:lineedit:placeholder_path":            "Enter a path...",
+    "receive:btn:open_output_folder":               "Open folder",
+    "receive:btn:select_folder":                    "Select output folder",
+    "receive:btn:default_folder":                   "Reset to default output path",
+    "receive:lineedit:placeholder_code":            "Paste your code here",
+    "receive:btn:paste_code":                       "Paste code",
+
+    "options:heading:general":                      "General",
+    "options:heading:relays":                       "Relays",
+    "options:heading:network":                      "Network",
+    "options:heading:flags":                        "Flags",
+
+    "options:language:label":                       "Language",
+    "options:language:tooltip":                     "Set the application's display language.",
+    "options:theme:label":                          "Theme",
+    "options:theme:tooltip":                        "Set the application's color theme.",
+    "options:startup_console:label":                "Show console on startup",
+    "options:startup_console:tooltip":              "If checked, the console window will always start open when the program starts.",
+    "options:startup_croc_updates_check:label":         "Check for croc updates on startup",
+    "options:startup_croc_updates_check:tooltip":       "If checked, Swamp Swap will notify you if an update is available for croc.",
+    "options:startup_swampswap_updates_check:label":    "Check for GUI updates on startup",
+    "options:startup_swampswap_updates_check:tooltip":  "If checked, Swamp Swap will notify you if an update is available for the GUI application.",
+
+    "options:yes:label":                            "Auto-agree to all prompts",
+    "options:yes:tooltip":                          "If checked, you will automatically accept all files being received and approve all files being sent.",
+    "options:nocompress:label":                     "Disable compression",
+    "options:nocompress:tooltip":                   "Disables compressing the files that will be sent.",
+
+    "options:relay:label":                          "IPv4 address:",
+    "options:relay:tooltip":                        "The IPv4 address of the relay. Don't change this unless you're configuring your own relay.",
+    "options:relay6:label":                         "IPv6 address:",
+    "options:relay6:tooltip":                       "The IPv6 address of the relay. Don't change this unless you're configuring your own relay.",
+    "options:password:label":                       "Password:",
+    "options:password:tooltip":                     "The password for the relay. Don't change this unless you're configuring your own relay.",
+
+    "options:curve:label":                          "Encryption curve:",
+    "options:curve:tooltip":                        "The encryption curve used when sending and receiving files.",
+    "options:ip:label":                             "Sender IP:",
+    "options:ip:tooltip":                           "Restrict received transfers to originate from a specified IP. Useful to confirm the sender's identity if their IP is known.",
+    "options:multicast:label":                      "Multicast IP:",
+    "options:multicast:tooltip":                    "Multicast IP address used for local discovery.",
+    "options:socks5:label":                         "SOCKS5 proxy:",
+    "options:socks5:tooltip":                       "Specify a SOCKS5 proxy.",
+    "options:connect:label":                        "HTTP proxy:",
+    "options:connect:tooltip":                      "Specify an HTTP proxy.",
+    "options:throttleupload:label":                 "Upload throttle:",
+    "options:throttleupload:tooltip":               "Throttle the upload speed by a specified amount.",
+
+    "options:internaldns:label":                    "Use built-in DNS solver",
+    "options:internaldns:tooltip":                  "If checked, a built-in DNS resolver will be used instead of the normal DNS resolver used by the user's machine.",
+    "options:classic:label":                        "Classic mode (unsecure)",
+    "options:classic:tooltip":                      "Uses croc's classic mode. This is less secure due to potential local attack vectors, so only use this if you know what you're doing.",
+    "options:local:label":                          "Local connections only",
+    "options:local:tooltip":                        "Only allows connections and file transfers over LAN.",
+
+    "console:window:title":                         "Console",
+    "console:input_placeholder":                    "Enter commands while croc runs...",
+
+    "about:window:title":                           "About",
+    "about:credits:croc":                           "croc by",
+    "about:credits:ui_developers":                  "User interface by",
+    "about:credits:testers":                        "Tested by",
+    "about:credits:languages":                      "Translations by",
+    
+    "about:disclaimer":                             "Swamp Swap is not affiliated with Zack Schollz or croc."
+}

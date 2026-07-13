@@ -267,22 +267,6 @@ class MainWindow(QMainWindow):
 
 
 
-    def _croc_not_installed_alert(self) -> None:
-        box = QMessageBox.warning(
-            self,
-            self.worker.settings.tr("dialog:croc_not_installed:title"),
-            self.worker.settings.tr("dialog:croc_not_installed:body1") + "\n\n" + self.worker.settings.tr("dialog:croc_not_installed:body2"),
-            QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
-            QMessageBox.StandardButton.Open
-        )
-
-        if box == QMessageBox.StandardButton.Open:
-            QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc#install"))
-
-        self.close()
-
-
-
     def _run_startup_functions(self) -> None:
         self._set_status()
         self._show_console()

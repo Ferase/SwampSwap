@@ -65,14 +65,6 @@ class AboutWindow(QDialog):
         group.setMaximumWidth(200)
         
         border_color: QColor = QApplication.palette().color(QPalette.ColorRole.Highlight).toRgb()
-        border_color_css: str = f"rgb({border_color.red()}, {border_color.green()}, {border_color.blue()})"
-
-        # group.setStyleSheet("""
-        #     QGroupBox {
-        #         border-top: 0px solid transparent;
-        #         border-left: 0px solid transparent;
-        #         border-bottom: 0px solid transparent;
-        #         border-right: 1px solid """ + border_color_css + ";}")
         
         layout.setContentsMargins(0, 0, 30, 0)
 
@@ -82,7 +74,7 @@ class AboutWindow(QDialog):
         label_icon.setFixedSize(image_size, image_size)
         label_icon.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
-        pixmap = QPixmap(app_utils.determine_icon_filepath("icon.ico", 2)).scaled(
+        pixmap = QPixmap(str(app_utils.determine_filepath("icon.ico", 2))).scaled(
             image_size, image_size,
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
@@ -138,8 +130,6 @@ class AboutWindow(QDialog):
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
-        # app_utils.hide_group_box_border(group)
-        
         credits_croc = self._build_single_credit(self.worker.settings.tr("about:credits:croc"), _CROC_DEVELOPERS)
         credits_ui_developers = self._build_single_credit(self.worker.settings.tr("about:credits:ui_developers"), _UI_DEVELOPERS)
         credits_testers = self._build_single_credit(self.worker.settings.tr("about:credits:testers"), _TESTERS)
@@ -156,8 +146,6 @@ class AboutWindow(QDialog):
     def _build_links_group(self) -> QGroupBox:
         group = QGroupBox()
         layout = QVBoxLayout(group)
-        
-        # app_utils.hide_group_box_border(group)
         
         self.btn_github_croc = QPushButton("GitHub (croc)")
         self.btn_github_croc.setMinimumHeight(50)
@@ -184,8 +172,6 @@ class AboutWindow(QDialog):
     def _build_single_credit(self, label_key: str, credits_list: list[str]) -> QGroupBox:
         group = QGroupBox()
         layout = QVBoxLayout(group)
-        
-        # app_utils.hide_group_box_border(group)
         
         label = QLabel(label_key)
         label.setFont(self.bold_font)

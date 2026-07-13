@@ -1,15 +1,18 @@
-from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum, auto
 
 
 
 class CrocOperation(Enum):
+    """Enum for CrocWorker operation mode."""
+
     IDLE = auto()
     SENDING = auto()
     RECEIVING = auto()
 
 class CrocAction(Enum):
+    """Enum for CrocWorker action state."""
+
     NONE = ("⚫️ state:idle",)
 
     WAIT_FOR_PEER = ("🔵 state:wait_peer",)
@@ -28,5 +31,7 @@ class CrocAction(Enum):
 
 @dataclass
 class CrocState():
+    """Dataclass housing the current operation and action states of CrocWorker."""
+
     operation: CrocOperation = CrocOperation.IDLE
     action: CrocAction = CrocAction.NONE

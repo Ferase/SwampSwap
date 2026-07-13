@@ -1,56 +1,66 @@
 import re
 import sys
 import subprocess
-from dataclasses import dataclass
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
-    QApplication, QGroupBox, QComboBox, QFileDialog,
-    QListView, QTreeView, QAbstractItemView, QFrame,
-    QVBoxLayout, QLabel, QStyle, QPushButton,
-    QListWidget
+    QGroupBox, QComboBox, QFileDialog, QListView,
+    QTreeView, QAbstractItemView
 )
-from PyQt6.QtGui import QWheelEvent, QFileSystemModel, QFont, QPixmap
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtGui import QWheelEvent, QFileSystemModel
 
+# Regex used to see if a string matches the formatting of croc's auto-generated codes
 CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
 
 
 
 def reveal_in_file_manager(path: str | Path) -> None:
+    """Opens the user's file manager to the specified path."""
+
     path = Path(path)
+
+    # Do nothing if the path is invalid
     if not path.exists():
         return
 
     try:
-        if sys.platform == "win32":
-            subprocess.Popen(["explorer", "/select,", str(path)])
-        elif sys.platform == "darwin":
-            subprocess.Popen(["open", "-R", str(path)])
-        else:
-            target = str(path) if path.is_file() else str(path)
-            parent = str(path.parent) if path.is_file() else str(path)
-            for cmd in (
-                # GNOME
-                ["nautilus", "--select", target],
+        match sys.platform:
+            # Windows: Use explorer directly
+            case "win32":
+                subprocess.Popen(["explorer", "/select,", str(path)])
 
-                # KDE
-                ["dolphin", "--select", target],
+            # macOS: Open via native commands
+            case "darwin":
+                subprocess.Popen(["open", "-R", str(path)])
 
-                # Cinnamon
-                ["nemo", target],
+            # Linux/Other:  Try various options for different distros
+            case _:
+                # Get the target file/fodler and its parent
+                target = str(path)
+                parent = str(path.parent) if path.is_file() else str(path)
 
-                # XFCE
-                ["thunar", parent],
+                # Run through different options until one works
+                for cmd in (
+                    # GNOME
+                    ["nautilus", "--select", target],
 
-                # Fallback
-                ["xdg-open", parent]
-            ):
-                try:
-                    subprocess.Popen(cmd)
-                    return
-                except FileNotFoundError:
-                    continue
+                    # KDE
+                    ["dolphin", "--select", target],
+
+                    # Cinnamon
+                    ["nemo", target],
+
+                    # XFCE
+                    ["thunar", parent],
+
+                    # Fallback
+                    ["xdg-open", parent]
+                ):
+                    try:
+                        subprocess.Popen(cmd)
+                        return
+                    except FileNotFoundError:
+                        continue
 
     except Exception:
         pass
@@ -58,56 +68,62 @@ def reveal_in_file_manager(path: str | Path) -> None:
 
 
 def determine_filepath(filename: str, parent_levels: int = 0) -> Path:
+    """Determines the path of a file relative to Swamp Swap. Will function accurately regardless of if the program is run in script form or as a frozen executable."""
+
+    # If the application is a frozen executable, get the sys._MEIPASS folder
     if getattr(sys, "frozen", False):
         base_path = Path(sys._MEIPASS)
+
+    # If the application is a script, calcualte the path differently
     else:
+        # Get the base path
         base_path = Path(__file__).resolve()
 
+        # Move up by the given amount of levels
         for _ in range(parent_levels):
             base_path = base_path.parent
 
     return base_path / filename
 
-def determine_icon_filepath(file_name: str, levels_up: int) -> Path:
-    if getattr(sys, "frozen", False):
-        base = Path(sys._MEIPASS)
-    else:
-        base: Path = Path(__file__)
-        for _ in range(levels_up):
-            base = base.parent
-    return str(base / file_name)
-
 def determine_received_path(folder_name: str) -> Path:
+    """Determines the path of the default receive folder. Will function accurately regardless of if the program is run in script form or as a frozen executable."""
+
+    # If the application is a frozen executable, mark it relative to the executable
     if getattr(sys, "frozen", False):
         base_dir = Path(sys.executable).resolve().parent
+
+    # If the application is a script, mark it relative to the script
     else:
         base_dir = Path(__file__).resolve().parent.parent
 
     return base_dir / folder_name
 
-def hide_group_box_border(group_box: QGroupBox) -> None:
-    group_box.setStyleSheet("QGroupBox { border: 0px solid transparent; }")
-
 def regex_match(pattern: str, text: str) -> bool:
+    """Basic regex match"""
+
     return not bool(re.match(pattern, text))
 
 
 
 class NoScrollComboBox(QComboBox):
+    """A variant of QComboBox that does not allow using scroll wheel to change the selected item."""
+
     def wheelEvent(self, event: QWheelEvent):
         event.ignore()
 
 class MultiFolderDialog(QFileDialog):
+    """Custom QFileDialog that allows selecting multiple folders"""
+
     def __init__(self, parent=None, caption="Select Folders", directory=""):
         super().__init__(parent, caption, directory)
         
-        # 1. Enforce non-native dialog (Required to modify child widgets)
+        # Make the dialog non-native
         self.setOption(QFileDialog.Option.DontUseNativeDialog, True)
         
-        # 2. Tell the dialog it should look for Directories
+        # Filter valid selection to only directories
         self.setFileMode(QFileDialog.FileMode.Directory)
         
-        # 3. Target internal list views and tree views to allow multi-selection
+        # Allow multi-folder selection
         for view in self.findChildren((QListView, QTreeView)):
             if isinstance(view.model(), QFileSystemModel):
                 view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)

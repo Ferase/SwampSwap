@@ -1,10 +1,12 @@
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QWheelEvent, QPalette, QColor
-from PyQt6.QtCore import Qt, QObject, pyqtSignal
+from PyQt6.QtGui import QPalette, QColor
+from PyQt6.QtCore import QObject
 
 
 
 class SwampSwapPalette():
+    """A wrapper class that makes creating palettes for Swamp Swap slightly easier."""
+
     def __init__(
             self,
             name: str,
@@ -17,8 +19,10 @@ class SwampSwapPalette():
             text_placeholder: QColor
         ):
 
+        # Palette display name
         self.name = name
 
+        # Palette object and colors
         self.palette = QPalette()
         self.bg_front: QColor = bg_front
         self.bg_back: QColor = bg_back
@@ -28,6 +32,7 @@ class SwampSwapPalette():
         self.disabled: QColor = disabled
         self.text_placeholder: QColor = text_placeholder
 
+        # Pass init values to palette
         self.palette.setColor(QPalette.ColorRole.Window, self.bg_front)
         self.palette.setColor(QPalette.ColorRole.WindowText, self.text)
         self.palette.setColor(QPalette.ColorRole.Base, self.bg_back)
@@ -55,6 +60,7 @@ class SwampSwapPalette():
 
 
 
+# The list of palettes used by Swamp Swap
 _PALETTES: list[SwampSwapPalette] = [
     SwampSwapPalette(
         name="Deep Dark",
@@ -121,24 +127,34 @@ _PALETTES: list[SwampSwapPalette] = [
 
 
 class SwampSwapPaletteList(list):
+    """A subclass of list that handles containing SwampSwapPalette instances."""
+
     def __init__(self):
         super().__init__()
 
     def __getitem__(self, palette_name: str) -> SwampSwapPalette:
+        """Get the palette by name."""
+
         return next((l for l in self if l.name.lower() == palette_name.lower()), None)
     
     def has_palette(self, palette_name: str) -> bool:
+        """Check if the given palette exists in the list."""
+
         if self.__getitem__(palette_name):
             return True
         
         return False
     
     def get_list(self) -> list[str]:
+        """Return the full list of all of the currently loaded palettes."""
+
         return [palette.name for palette in self]
 
 
 
 class ThemeManager(QObject):
+    """The main manager object for Swamp Swap's themes. It handles loading in each theme as well aschanging the program's styles in real time."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -148,19 +164,28 @@ class ThemeManager(QObject):
         self._define_palettes()
 
     def _define_palettes(self) -> None:
+        """Load palettes from the _PALETTES constant."""
+
         for pallete in _PALETTES:
             self.palettes.append(pallete)
 
 
 
     def select_theme(self, palette_name: str) -> None:
+        """Applies the specified theme to the application's stylesheet."""
+
+        # Get the theme
         theme = self.palettes[palette_name]
 
+        # Fall back to the Pink theme if we somehow try to load an nonexistent theme
         if theme is None:
-            theme = self.langs["Dark"]
+            theme = self.langs["Pink"]
 
+        # Save to self and then apply via the application
         self.selected_palette = theme
         QApplication.setPalette(self.selected_palette.palette)
     
     def get_theme_list(self) -> list[str]:
+        """Returns a full list of all of the loaded palettes."""
+
         return self.palettes.get_list()
