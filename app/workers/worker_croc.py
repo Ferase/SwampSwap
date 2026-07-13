@@ -9,6 +9,11 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from app.enums import CrocState, CrocOperation, CrocAction
 from app.managers.manager_settings import SettingsManager
 
+_PROGRESS_RE = re.compile(
+    r"^(Hashing\s+)?(.+?)\s+(\d+)%\s+\|",
+    re.IGNORECASE
+)
+
 
 
 class CrocWorker(QThread):
@@ -21,8 +26,11 @@ class CrocWorker(QThread):
     line_received = pyqtSignal(str)
     state_changed = pyqtSignal(CrocState)
     error_state = pyqtSignal(str)
-    finished = pyqtSignal(int)
+    finished = pyqtSignal(int, CrocOperation)
     error = pyqtSignal(str)
+
+    # Percentage transferred, filename (truncated), and whetehr it's being hashed
+    progress_update = pyqtSignal(int, str, bool)
 
     # Initialize
     def __init__(self, app_name: str, app_version: str):
@@ -60,6 +68,9 @@ class CrocWorker(QThread):
     def _process_line(self, line: str) -> None:
         """Process the current line output from croc."""
 
+        # Check for progress to pass
+        self._check_for_progress(line)
+
         # Emit the line, then update status
         self.line_received.emit(line)
         self._update_state_from_line(line)
@@ -83,9 +94,28 @@ class CrocWorker(QThread):
             if re.search(pattern, line, re.IGNORECASE):
                 self.change_action(action)
                 return
+            
+    def _check_for_progress(self, line: str) -> bool:
+        """Parse a progress line and emit progress. Returns True if it there's a match."""
+
+        # Test for a match, and return False if not
+        match = _PROGRESS_RE.match(line.strip())
+        if not match:
+            return False
+        
+        # Get the values from the message
+        is_hashing = bool(match.group(1))
+        filename = match.group(2).strip()
+        percent = int(match.group(3))
+
+        # Return True
+        self.progress_update.emit(percent, filename, is_hashing)
+        return True
     
     def run(self) -> None:
         """Run croc and pipe outputs to be processed"""
+
+        current_operation: CrocOperation = self.state.operation
 
         try:
             # Alert other scripts that corc is starting, then actually start it
@@ -137,7 +167,7 @@ class CrocWorker(QThread):
                     self.error_state.emit(buffer.strip())
 
             # Alert all scripts that croc is finishing, then return to idle
-            self.finished.emit(self._proc.returncode)
+            self.finished.emit(self._proc.returncode, current_operation)
             self.change_operation(CrocOperation.IDLE)
 
         # Guard except for if the user somehow starts a transfer without croc installed

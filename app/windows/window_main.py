@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.app_name)
-        self.setFixedSize(360, 475)
+        self.setFixedSize(375, 525)
 
         # Build UI
         self._build_central()

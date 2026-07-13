@@ -75,11 +75,12 @@
     "file_dialog:choose_folders":                       "Select folders to send",
 
     "state:idle":                                       "Idle",
-    "state:wait_peer":                                  "Waiting for peer...",
-    "state:sending":                                    "Sending...",
-    "state:connect_peer":                               "Connecting to peer...",
-    "state:await_approval":                             "Awaiting approval...",
-    "state:receiving":                                  "Receiving...",
+    "state:hashing":                                    "Hashing",
+    "state:wait_peer":                                  "Waiting for peer",
+    "state:sending":                                    "Sending",
+    "state:connect_peer":                               "Connecting to peer",
+    "state:await_approval":                             "Awaiting approval",
+    "state:receiving":                                  "Receiving",
     "state:completed":                                  "Completed!",
     "state:cancelled":                                  "Cancelled",
 

@@ -2,7 +2,8 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QLineEdit,
-    QGroupBox, QFileDialog, QApplication, QMessageBox
+    QGroupBox, QFileDialog, QApplication, QMessageBox,
+    QProgressBar
 )
 from PyQt6.QtCore import pyqtSignal, QRegularExpression
 
@@ -84,6 +85,10 @@ class ReceiveWidget(QWidget):
 
         self.btn_paste_code = QPushButton(self.worker.settings.tr("receive:btn:paste_code"))
 
+        receive_btn_group = QGroupBox()
+        receive_btn_layout = QVBoxLayout()
+        receive_btn_group.setLayout(receive_btn_layout)
+
         self.btn_receive = QPushButton(self.worker.settings.tr("generic:receive"))
         self.btn_receive.setMinimumHeight(80)
         self.btn_receive.setEnabled(False)
@@ -91,9 +96,17 @@ class ReceiveWidget(QWidget):
         font.setPointSize(24)
         self.btn_receive.setFont(font)
 
+        self.progressbar_receive = QProgressBar()
+        self.progressbar_receive.setRange(0, 100)
+        self.progressbar_receive.setValue(0)
+
         layout.addWidget(self.lineedit_code)
         layout.addWidget(self.btn_paste_code)
-        layout.addWidget(self.btn_receive)
+
+        layout.addWidget(receive_btn_group)
+        receive_btn_layout.addWidget(self.btn_receive)
+        receive_btn_layout.addWidget(self.progressbar_receive)
+
 
         return group
     
@@ -152,6 +165,8 @@ class ReceiveWidget(QWidget):
         self.btn_paste_code.clicked.connect(self._paste_code)
         self.btn_receive.clicked.connect(self._click_receive_button)
 
+        self.worker.progress_update.connect(self._on_progress_update)
+
     def _set_button_text_by_operation(self) -> None:
         match self.worker.state.operation:
             case CrocOperation.RECEIVING:
@@ -197,7 +212,11 @@ class ReceiveWidget(QWidget):
     def _create_output_directory(self) -> None:
         Path(self._output_path).mkdir(exist_ok=True)
 
-    def _on_finish(self, code: int) -> None:
+    def _on_finish(self, code: int, operation: CrocOperation) -> None:
+        if operation != CrocOperation.RECEIVING:
+            return
+
+        self._reset_progress_bar()
         self.btn_receive.setEnabled(True)
     
 
@@ -245,6 +264,7 @@ class ReceiveWidget(QWidget):
 
         self._create_output_directory()
         self.worker.start_receive(self._code, self._output_path)
+        self._reset_progress_bar()
 
     def _click_open_output_folder_button(self) -> None:
         if not self._output_path:
@@ -270,3 +290,30 @@ class ReceiveWidget(QWidget):
             return
 
         app_utils.reveal_in_file_manager(self._output_path)
+
+    def _on_progress_update(self, percent: int, filename: str, is_hashing: bool) -> None:
+        """Handle progress bar updating."""
+
+        # Only run on receive tab
+        if self.worker.state.operation != CrocOperation.RECEIVING:
+            return
+
+        # Create hashing text
+        prefix = self.worker.settings.tr("state:hashing") + " " if is_hashing else ""
+
+        # Fixes the issue of hashing (which is generally a fast process) stopping at 99 percent even when it's actually done
+        if prefix:
+            percent = 100 if percent == 99 else percent
+
+        self.progressbar_receive.setValue(percent)
+        self.progressbar_receive.setFormat(f"{prefix}{filename}  {percent}%")
+
+    def _reset_progress_bar(self) -> None:
+        """Handle progress bar display when an operation ends."""
+
+        # Reset the format to remove the other text
+        self.progressbar_receive.resetFormat()
+
+        # 100% if completed, 0% otherwise (starting, cancelling, error, etc.)
+        value: int = 100 if self.worker.state.action == CrocAction.COMPLETED else 0
+        self.progressbar_receive.setValue(value)

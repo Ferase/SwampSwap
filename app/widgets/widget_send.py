@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QDialog,
     QPushButton, QLineEdit, QLabel, QMessageBox,
     QGroupBox, QFileDialog, QApplication, QFrame,
-    QStyle
+    QStyle, QProgressBar
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QFont
@@ -173,6 +173,10 @@ class SendWidget(QWidget):
         group = QGroupBox()
         layout = QVBoxLayout(group)
 
+        send_btn_group = QGroupBox()
+        send_btn_layout = QVBoxLayout()
+        send_btn_group.setLayout(send_btn_layout)
+
         self.btn_send = QPushButton(self.worker.settings.tr("generic:send"))
         self.btn_send.setMinimumHeight(80)
         self.btn_send.setEnabled(False)
@@ -180,13 +184,20 @@ class SendWidget(QWidget):
         font.setPointSize(24)
         self.btn_send.setFont(font)
 
+        self.progressbar_send = QProgressBar()
+        self.progressbar_send.setRange(0, 100)
+        self.progressbar_send.setValue(0)
+
         self.lineedit_code = QLineEdit()
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
 
         self.btn_copy_code = QPushButton(self.worker.settings.tr("send:btn:copy_code"))
         self.btn_copy_code.setEnabled(False)
 
-        layout.addWidget(self.btn_send)
+        send_btn_layout.addWidget(self.btn_send)
+        send_btn_layout.addWidget(self.progressbar_send)
+
+        layout.addWidget(send_btn_group)
         layout.addWidget(self.lineedit_code)
         layout.addWidget(self.btn_copy_code)
 
@@ -237,6 +248,8 @@ class SendWidget(QWidget):
 
         self.btn_copy_code.clicked.connect(self._copy_code)
         self.btn_send.clicked.connect(self._click_send_button)
+
+        self.worker.progress_update.connect(self._on_progress_update)
 
         self.window_filelist.files_changed.connect(self._set_selected_files)
         self.window_filelist.files_cleared.connect(self._reset_selected_fies_folders)
@@ -332,7 +345,11 @@ class SendWidget(QWidget):
     def _state_responses(self) -> None:
         self._determine_main_button_behavior()
 
-    def _on_finish(self, code: int) -> None:
+    def _on_finish(self, code: int, operation: CrocOperation) -> None:
+        if operation != CrocOperation.SENDING:
+            return
+
+        self._reset_progress_bar()
         self._clear_code()
         if self.are_files_selected():
             self.btn_send.setEnabled(True)
@@ -509,3 +526,32 @@ class SendWidget(QWidget):
             return
 
         self.worker.start_send(self._flatten_selected_files(), self.lineedit_code.text())
+        self._reset_progress_bar()
+
+    def _on_progress_update(self, percent: int, filename: str, is_hashing: bool) -> None:
+        """Handle progress bar updating."""
+
+        # Only run on send tab
+        if self.worker.state.operation != CrocOperation.SENDING:
+            return
+
+        # Create hashing text
+        prefix = self.worker.settings.tr("state:hashing") + " " if is_hashing else ""
+
+        # Fixes the issue of hashing (which is generally a fast process) stopping at 99 percent even when it's actually done
+        if prefix:
+            percent = 100 if percent == 99 else percent
+
+        self.progressbar_send.setValue(percent)
+        self.progressbar_send.setFormat(f"{prefix}{filename}  {percent}%")
+
+    def _reset_progress_bar(self) -> None:
+        """Handle progress bar display when an operation ends."""
+
+        # Reset the format to remove the other text
+        self.progressbar_send.resetFormat()
+
+        # 100% if completed, 0% otherwise (starting, cancelling, error, etc.)
+        value: int = 100 if self.worker.state.action == CrocAction.COMPLETED else 0
+        self.progressbar_send.setValue(value)
+            
