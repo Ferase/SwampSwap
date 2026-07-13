@@ -18,6 +18,8 @@ from app.windows.window_about import AboutWindow
 
 # Main window
 class MainWindow(QMainWindow):
+    """The main window for the application which persists through the app's life. If the main window is killed, the program and all other child windows terminate."""
+
     # Init
     def __init__(self, worker: CrocWorker) -> None:
         # Run base init
@@ -25,6 +27,7 @@ class MainWindow(QMainWindow):
 
         self.worker = worker
 
+        # Instantiate other windows
         self._window_console = ConsoleWindow(self.worker)
         self._window_about = AboutWindow(self.worker, self)
 
@@ -123,9 +126,13 @@ class MainWindow(QMainWindow):
 
 
     def _open_console_window(self) -> None:
+        """Shows the console window"""
+
         self._window_console.show()
 
     def _open_about_window(self) -> None:
+        """Shows the about window. It is raised as a modal and will block actions on the main window until closed."""
+
         self._window_about.exec()
 
     
@@ -159,32 +166,42 @@ class MainWindow(QMainWindow):
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
         self.widget_settings.settings_changed.connect(self._apply_asterisk_to_unsaved_settings)
 
-        self.tabs.currentChanged.connect(self._check_settings)
+        self.tabs.currentChanged.connect(self._check_settings_have_changed_on_tab_switch)
 
         self.btn_console.clicked.connect(self._open_console_window)
         self.btn_about.clicked.connect(self._open_about_window)
 
     def _set_status(self):
+        """Set the status bar text on the bottom left of the window."""
+
+        # A label is used instead of self.statusBar().showMessage() because of a Windows bug
         self.label_status.setText(self.worker.get_action_text())
         self.label_status.setToolTip(self.worker.get_action_text_only())
 
     def _append_error_to_status(self, error: str) -> None:
+        """Will append an error to the status tootlip if there's an error to report."""
+
+        # We msut be in an error state to do this
         if not self.worker.state.action == CrocAction.ERROR:
             return
         
+        # Do nothing if the error text is empty
         if not error:
             return
         
+        # Combine text adn output
         text: str = f"{self.worker.state.action.text}: {error}"
-        
-        self.label_status.setText(text)
         self.label_status.setToolTip(text[1:].strip())
 
-    def _check_settings(self, index: int) -> None:
+    def _check_settings_have_changed_on_tab_switch(self, index: int) -> None:
+        """Blocks the user from switching off of the settings tab unless they save their changes."""
+
+        # Monitor the current tab index
         if not self._current_selected_tab_index == 2:
             self._current_selected_tab_index = index
             return
 
+        # If settings aren't dirty, do nothing
         if not self.widget_settings.dirty:
             self._current_selected_tab_index = index
             return
@@ -197,23 +214,34 @@ class MainWindow(QMainWindow):
             QMessageBox.StandardButton.Save
         )
 
+        # Click the save button for the user
         if box == QMessageBox.StandardButton.Save:
             self.widget_settings.btn_save.click()
 
         self._current_selected_tab_index = index
 
     def _apply_asterisk_to_unsaved_settings(self, dirty: bool) -> None:
+        """Adds an asterisk to the settings tab name when settings ahve been modified."""
+
         text: str = self.worker.settings.tr("generic:settings")
         if dirty:
             text += "*"
 
         self.tabs.setTabText(2, text)
-
+    
+    def _is_operation_running(self) -> bool:
+        if self.worker.state.operation == CrocOperation.IDLE:
+            return False
+        
+        return True
 
 
     def _send_file(self) -> None:
+        """Qucik send files function used for the top menu bar."""
+
         self.tabs.tabBar().setCurrentIndex(0)
 
+        # Warn the user that they will lose the list of files they've queued to send
         if self.widget_send.are_files_selected():
             box = QMessageBox.information(
                 self,
@@ -233,11 +261,16 @@ class MainWindow(QMainWindow):
             return
         
         self.widget_send.btn_send.click()
+
+        # Wait a moment before copying the code
         QTimer.singleShot(20, self.widget_send.btn_copy_code.click)
 
     def _send_folder(self) -> None:
+        """Qucik send folders function used for the top menu bar."""
+
         self.tabs.tabBar().setCurrentIndex(0)
 
+        # Warn the user that they will lose the list of files they've queued to send
         if self.widget_send.are_files_selected():
             box = QMessageBox.information(
                 self,
@@ -257,20 +290,27 @@ class MainWindow(QMainWindow):
             return
         
         self.widget_send.btn_send.click()
+
+        # Wait a moment before copying the code
         QTimer.singleShot(20, self.widget_send.btn_copy_code.click)
 
     def _receive(self) -> None:
+        """Qucik receive files/folders function used for the top menu bar."""
+
         self.tabs.tabBar().setCurrentIndex(1)
 
+        # Entery textbox for the code
         text, ok_pressed = QInputDialog.getText(
             self,
             self.worker.settings.tr("menubar:window_receive_code:title"),
             self.worker.settings.tr("menubar:window_receive_code:body")
         )
 
+        # Do nothing if the user cancelled
         if not ok_pressed:
             return
 
+        # If the user entered no text, warn them and then cancel
         if not text:
             QMessageBox.warning(
                 self,
@@ -286,6 +326,9 @@ class MainWindow(QMainWindow):
         self.widget_receive.btn_receive.click()
 
     def _stop_all(self) -> None:
+        """Stops/cancels any currently active operations and kills the worker."""
+
+        # Check if an operation is running and, if so, stop it gracefully
         match self.worker.state.operation:
             case CrocOperation.SENDING:
                 self.widget_send.btn_send.click()
@@ -299,16 +342,39 @@ class MainWindow(QMainWindow):
 
 
     def _run_startup_functions(self) -> None:
+        """Executes a collection of functions at startup."""
+
         self._set_status()
         self._show_console()
 
     def _show_console(self) -> None:
+        """If the user has enabled the setting to start the console on startup, this function will open the console window."""
+
         if self.worker.settings.startup_console:
             self._window_console.show()
 
 
 
     def closeEvent(self, event):
+        """Kills all child windows, stops the worker, and terminates the program. Will prompt the user first if an operation is running."""
+
+        if self._is_operation_running():
+            box = QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:close_warning:title"),
+                self.worker.settings.tr("dialog:close_warning:body"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+
+            if box == QMessageBox.StandardButton.No:
+                event.ignore()
+                return
+            
+            event.accept()
+
         self._window_console.close()
         self._window_about.close()
+        self.widget_send.window_filelist.close()
+        self.worker.stop()
         super().closeEvent(event)

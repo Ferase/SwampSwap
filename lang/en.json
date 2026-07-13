@@ -68,6 +68,9 @@
     "dialog:quick_send_warning:title":                  "Clear current selected files list?",
     "dialog:quick_send_warning:body":                   "Doing a quick send will clear your currently selected files list before queueing up what you'd like to quick send. Are you sure you wish to proceed?",
 
+    "dialog:close_warning:title":                       "An operation is running",
+    "dialog:close_warning:body":                        "An operation is currently running. If you close Swamp Swap, it will be terminated. Are you sure you wish to proceed?",
+
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
 

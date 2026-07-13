@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from PyQt6.QtWidgets import (
     QMessageBox, QPushButton, QGroupBox, QVBoxLayout,
     QScrollArea, QLabel, QWidget, QLineEdit,

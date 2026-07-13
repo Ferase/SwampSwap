@@ -112,7 +112,7 @@ class SendWidget(QWidget):
             "folders": 0
         }
 
-        self._window_filelist = FileListWindow(self.worker, self)
+        self.window_filelist = FileListWindow(self.worker, self)
 
         # Build UI
         self._build_central()
@@ -238,8 +238,8 @@ class SendWidget(QWidget):
         self.btn_copy_code.clicked.connect(self._copy_code)
         self.btn_send.clicked.connect(self._click_send_button)
 
-        self._window_filelist.files_changed.connect(self._set_selected_files)
-        self._window_filelist.files_cleared.connect(self._reset_selected_fies_folders)
+        self.window_filelist.files_changed.connect(self._set_selected_files)
+        self.window_filelist.files_cleared.connect(self._reset_selected_fies_folders)
 
     def _set_button_text_by_operation(self) -> None:
         match self.worker.state.operation:
@@ -472,7 +472,7 @@ class SendWidget(QWidget):
         self.folders_added.emit(selected_folders)
 
     def _click_view_filelist_button(self) -> None:
-        result = self._window_filelist.raise_modal(self.selected_files_folders)
+        result = self.window_filelist.raise_modal(self.selected_files_folders)
 
         if result == QDialog.DialogCode.Rejected:
             return
