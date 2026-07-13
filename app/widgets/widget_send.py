@@ -197,6 +197,8 @@ class SendWidget(QWidget):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.drop_zone.label_browse_drop.setText(self.worker.settings.tr("send:label:drop_zone"))
         self.btn_add_files.setText(self.worker.settings.tr("generic:add_files"))
         self.btn_add_folders.setText(self.worker.settings.tr("generic:add_folders"))
@@ -212,6 +214,8 @@ class SendWidget(QWidget):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.state_changed.connect(self._state_responses)
         self.worker.line_received.connect(self._read_command_line)
         self.worker.finished.connect(self._on_finish)

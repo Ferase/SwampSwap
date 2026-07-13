@@ -130,6 +130,8 @@ class MainWindow(QMainWindow):
     
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.tabs.setTabText(0, self.worker.settings.tr("generic:send"))
         self.tabs.setTabText(1, self.worker.settings.tr("generic:receive"))
         self._apply_asterisk_to_unsaved_settings(self.widget_settings.dirty)
@@ -148,6 +150,8 @@ class MainWindow(QMainWindow):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.state_changed.connect(self._set_status)
         self.worker.error_state.connect(self._append_error_to_status)
 

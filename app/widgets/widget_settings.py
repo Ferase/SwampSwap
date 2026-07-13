@@ -273,6 +273,8 @@ class SettingsWidget(QWidget):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.setWindowTitle(self.worker.settings.tr("options:window:title"))
 
         self.general_group.setTitle(self.worker.settings.tr("options:heading:general"))
@@ -338,6 +340,8 @@ class SettingsWidget(QWidget):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.combo_lang.currentTextChanged.connect(self._change_language)

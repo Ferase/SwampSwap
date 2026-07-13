@@ -90,6 +90,8 @@ class ConsoleWindow(QMainWindow):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.setWindowTitle(self.worker.settings.tr("console:window:title"))
         self.btn_clear.setText(self.worker.settings.tr("generic:clear"))
         self.btn_submit.setText(self.worker.settings.tr("generic:submit"))
@@ -98,6 +100,8 @@ class ConsoleWindow(QMainWindow):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.worker.line_received.connect(self._output_line)

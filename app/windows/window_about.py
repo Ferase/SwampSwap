@@ -23,6 +23,7 @@ _TESTERS = ["OctoToon"]
 
 
 class AboutWindow(QDialog):
+    """Swamp Swap's About window."""
 
     def __init__(self, worker: CrocWorker, parent=None) -> None:
         # Run base init
@@ -45,6 +46,8 @@ class AboutWindow(QDialog):
 
     # Construct the UI
     def _build_central(self) -> None:
+        """Build central UI."""
+
         # Create box layout container
         root = QGridLayout(self)
         root.setSpacing(8)
@@ -59,13 +62,11 @@ class AboutWindow(QDialog):
         root.addWidget(buttons_group, 1, 0, 1, -1)
 
     def _build_hero_group(self) -> QScrollArea:
+        """Build left hero group."""
+
         group = QGroupBox()
         layout = QVBoxLayout(group)
-
         group.setMaximumWidth(200)
-        
-        border_color: QColor = QApplication.palette().color(QPalette.ColorRole.Highlight).toRgb()
-        
         layout.setContentsMargins(0, 0, 30, 0)
 
         image_size: int = 128
@@ -107,6 +108,8 @@ class AboutWindow(QDialog):
         return group
 
     def _build_scrollable_group(self) -> QScrollArea:
+        """Build right scrollable info group."""
+
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
 
@@ -125,8 +128,9 @@ class AboutWindow(QDialog):
 
         return scroll
     
-    # Credits
     def _build_credits_group(self) -> QGroupBox:
+        """Dynamically build the credits group."""
+        
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
@@ -142,8 +146,9 @@ class AboutWindow(QDialog):
 
         return group
     
-    # Links
     def _build_links_group(self) -> QGroupBox:
+        """Build the links group."""
+
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
@@ -159,6 +164,8 @@ class AboutWindow(QDialog):
         return group
     
     def _build_buttons(self) -> QWidget:
+        """Build bottom-right buttons."""
+
         widget = QWidget()
         layout = QHBoxLayout(widget)
 
@@ -170,6 +177,8 @@ class AboutWindow(QDialog):
         return widget
     
     def _build_single_credit(self, label_key: str, credits_list: list[str]) -> QGroupBox:
+        """Dynamic function to build a single credit."""
+
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
@@ -188,6 +197,8 @@ class AboutWindow(QDialog):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.btn_close.setText(self.worker.settings.tr("generic:close"))
 
         self.disclaimer_label.setText(self.worker.settings.tr("about:disclaimer"))
@@ -198,6 +209,8 @@ class AboutWindow(QDialog):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.btn_github_croc.clicked.connect(
@@ -210,6 +223,8 @@ class AboutWindow(QDialog):
         self.btn_close.clicked.connect(self.reject)
 
     def _get_language_credits_list(self) -> list[str]:
+        """Dynamically create the credits list for the languages."""
+
         languages: SwampSwapLanguageList = self.worker.settings.locale_manager.langs
 
         lang_credits: list[str] = []

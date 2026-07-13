@@ -134,6 +134,8 @@ class FileListWindow(QDialog):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.setWindowTitle(self.worker.settings.tr("manage_send_list:window:title"))
 
         self.btn_add_files.setText(self.worker.settings.tr("generic:add_files"))
@@ -147,6 +149,10 @@ class FileListWindow(QDialog):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
+        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
         self.list_widget.files_dropped.connect(self._add_files)
         self.list_widget.itemDoubleClicked.connect(
             lambda item: app_utils.reveal_in_file_manager(item.text())

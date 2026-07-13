@@ -124,6 +124,8 @@ class ReceiveWidget(QWidget):
 
 
     def _retranslate(self) -> None:
+        """Retranslate everything on language change."""
+
         self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
         self.btn_open_output_path.setText(self.worker.settings.tr("receive:btn:open_output_folder"))
         self.btn_browse_output_folder.setText(self.worker.settings.tr("receive:btn:select_folder"))
@@ -137,6 +139,8 @@ class ReceiveWidget(QWidget):
 
 
     def _connect_signals(self) -> None:
+        """Connect all necessary Qt signals."""
+
         self.worker.state_changed.connect(self._state_responses)
         self.worker.line_received.connect(self._read_command_line)
         self.worker.finished.connect(self._on_finish)
