@@ -1,15 +1,12 @@
-import subprocess
 from PyQt6.QtWidgets import (
     QMainWindow, QTabWidget, QStatusBar, QMessageBox,
-    QMenuBar, QMenu, QApplication, QPushButton,
-    QGroupBox, QVBoxLayout, QToolButton, QStyle,
-    QInputDialog
+    QMenuBar, QMenu, QLabel, QInputDialog,
+    QToolButton, QStyle
 )
-from PyQt6.QtGui import QAction, QDesktopServices, QIcon
-from PyQt6.QtCore import QUrl, pyqtSignal, QTimer
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtCore import QTimer
 
-import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
+from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 from app.widgets.widget_send import SendWidget
 from app.widgets.widget_receive import ReceiveWidget
@@ -103,6 +100,9 @@ class MainWindow(QMainWindow):
         # Set status bar and text
         self.setStatusBar(QStatusBar())
         self.statusBar().setSizeGripEnabled(False)
+        self.statusBar().setContentsMargins(7, 0, 7, 0)
+
+        self.label_status = QLabel()
 
         console_fallback_icon = self.style().standardIcon(QStyle.StandardPixmap.SP_CommandLink)
         console_icon = QIcon.fromTheme("utilities-terminal", console_fallback_icon)
@@ -116,6 +116,7 @@ class MainWindow(QMainWindow):
         self.btn_about = QToolButton()
         self.btn_about.setIcon(about_icon)
 
+        self.statusBar().addWidget(self.label_status)
         self.statusBar().addPermanentWidget(self.btn_console)
         self.statusBar().addPermanentWidget(self.btn_about)
 
@@ -164,8 +165,8 @@ class MainWindow(QMainWindow):
         self.btn_about.clicked.connect(self._open_about_window)
 
     def _set_status(self):
-        self.statusBar().showMessage(self.worker.get_action_text())
-        self.statusBar().setToolTip(self.worker.get_action_text_only())
+        self.label_status.setText(self.worker.get_action_text())
+        self.label_status.setToolTip(self.worker.get_action_text_only())
 
     def _append_error_to_status(self, error: str) -> None:
         if not self.worker.state.action == CrocAction.ERROR:
@@ -176,8 +177,8 @@ class MainWindow(QMainWindow):
         
         text: str = f"{self.worker.state.action.text}: {error}"
         
-        self.statusBar().showMessage(text)
-        self.statusBar().setToolTip(text[1:].strip())
+        self.label_status.setText(text)
+        self.label_status.setToolTip(text[1:].strip())
 
     def _check_settings(self, index: int) -> None:
         if not self._current_selected_tab_index == 2:
@@ -212,6 +213,19 @@ class MainWindow(QMainWindow):
 
     def _send_file(self) -> None:
         self.tabs.tabBar().setCurrentIndex(0)
+
+        if self.widget_send.are_files_selected():
+            box = QMessageBox.information(
+                self,
+                self.worker.settings.tr("dialog:quick_send_warning:title"),
+                self.worker.settings.tr("dialog:quick_send_warning:body"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+
+            if box == QMessageBox.StandardButton.No:
+                return
+
         self.widget_send._reset_selected_fies_folders()
         self.widget_send.btn_add_files.click()
 
@@ -223,6 +237,19 @@ class MainWindow(QMainWindow):
 
     def _send_folder(self) -> None:
         self.tabs.tabBar().setCurrentIndex(0)
+
+        if self.widget_send.are_files_selected():
+            box = QMessageBox.information(
+                self,
+                self.worker.settings.tr("dialog:quick_send_warning:title"),
+                self.worker.settings.tr("dialog:quick_send_warning:body"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+
+            if box == QMessageBox.StandardButton.No:
+                return
+
         self.widget_send._reset_selected_fies_folders()
         self.widget_send.btn_add_folders.click()
 

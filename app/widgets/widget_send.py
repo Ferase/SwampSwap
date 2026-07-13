@@ -1,20 +1,18 @@
 import os
 import re
 from pathlib import Path
-from typing import Iterator
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QCheckBox,
-    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
-    QSizePolicy, QApplication, QStackedWidget, QFrame,
-    QStyle, QMessageBox, QDialog
+    QWidget, QVBoxLayout, QHBoxLayout, QDialog,
+    QPushButton, QLineEdit, QLabel, QMessageBox,
+    QGroupBox, QFileDialog, QApplication, QFrame,
+    QStyle
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QDir, QSize
+from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QFont
 
 import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
+from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 from app.windows.window_filelist import FileListWindow
 
@@ -347,12 +345,12 @@ class SendWidget(QWidget):
         self.selected_files_folders["folders"].clear()
         self._update_selected_file_ui()
 
-    def _flatten_selected_files(self) -> set[Path]:
-        final_list: list[Path] = self.selected_files_folders["files"].copy()
-        final_list.update(self.selected_files_folders["folders"])
+    def _flatten_paths_dict(self, paths_dict: dict[str, Path]) -> set[Path]:
+        final_list: set[Path] = paths_dict["files"].copy()
+        final_list.update(paths_dict["folders"])
         return final_list
-    
-    def _unflatten_seleced_files(self, paths: set[Path]) -> dict[str, set[Path]]:
+
+    def _unflatten_paths_set(self, paths: set[Path]) -> dict[str, Path]:
         final_dict: dict[str, set[Path]] = {
             "files": set(),
             "folders": set()
@@ -366,6 +364,12 @@ class SendWidget(QWidget):
             final_dict["files"].add(path)
 
         return final_dict
+
+    def _flatten_selected_files(self) -> set[Path]:
+        return self._flatten_paths_dict(self.selected_files_folders)
+    
+    def _unflatten_selected_files(self) -> dict[str, set[Path]]:
+        return self._unflatten_paths_set(self.selected_files_folders)
 
 
 
@@ -384,9 +388,8 @@ class SendWidget(QWidget):
     def _filter_paths(self, paths: set[Path]) -> set[Path]:
         final_paths: set[Path] = set()
 
-        flattened_paths: set[Path] = self._flatten_selected_files()
-
         for path in paths:
+            path = Path(path)
             if self._check_if_selected_is_dir_and_is_empty(path):
                 continue
 
@@ -394,19 +397,16 @@ class SendWidget(QWidget):
 
         return final_paths
     
-    def _set_selected_files(self, paths: set[Path]) -> None:
-        final_paths: set[Path] = set()
-        for path in paths:
-            if not self._check_if_selected_is_dir_and_is_empty(path):
-                final_paths.add(path)
+    def _set_selected_files(self, paths_dict: dict[str, set[Path]]) -> None:
+        final_paths: set[Path] = self._filter_paths(self._flatten_paths_dict(paths_dict))
 
-        self.selected_files_folders = self._unflatten_seleced_files(final_paths)
+        self.selected_files_folders = self._unflatten_paths_set(final_paths)
         self.selected_files_changed.emit()
     
     def _add_selected_files(self, paths: list[str]) -> None:
         final_paths: set[Path] = self._filter_paths(self._list_str_to_set_path(paths))
 
-        organized_paths: dict[str, set[Path]] = self._unflatten_seleced_files(final_paths)
+        organized_paths: dict[str, set[Path]] = self._unflatten_paths_set(final_paths)
 
         self.selected_files_folders["files"].update(organized_paths["files"])
         self.selected_files_folders["folders"].update(organized_paths["folders"])

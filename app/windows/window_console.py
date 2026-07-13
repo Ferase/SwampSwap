@@ -1,24 +1,17 @@
-import re
-from pathlib import Path
-
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QCheckBox,
-    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
-    QSizePolicy, QApplication, QScrollArea, QFrame,
-    QMainWindow
+    QMainWindow, QVBoxLayout, QHBoxLayout, QTextEdit,
+    QPushButton, QSizePolicy, QLineEdit, QGroupBox
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QDir, QUrl
-from PyQt6.QtGui import QFont, QPixmap, QFont, QPalette, QColor, QDesktopServices
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 
-import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
+from app.enums import CrocOperation
 from app.workers.worker_croc import CrocWorker
-from app.managers.manager_locale import SwampSwapLang, SwampSwapLanguageList
 
 
 
 class ConsoleWindow(QMainWindow):
+    """Simple console window that shows output from croc that would normally appear in a terminal."""
 
     def __init__(self, worker: CrocWorker, parent=None) -> None:
         # Run base init
@@ -114,9 +107,13 @@ class ConsoleWindow(QMainWindow):
         self.lineedit_input.returnPressed.connect(self._clicked_submit_button)
 
     def _output_line(self, line: str) -> None:
+        """Output a line to the console window text area."""
+
         self.textedit_console.append(line)
 
     def _toggle_input(self, operation: CrocOperation = None) -> None:
+        """Enables the input box only when croc is running."""
+
         if operation is not None:
             not_idle: bool = operation != CrocOperation.IDLE
         else:
@@ -128,9 +125,13 @@ class ConsoleWindow(QMainWindow):
 
 
     def _clicked_clear_button(self) -> None:
+        """Clears the console."""
+
         self.textedit_console.clear()
 
     def _clicked_submit_button(self) -> None:
+        """Submits the typed text to the current running croc instance."""
+
         text: str = self.lineedit_input.text()
 
         if text:

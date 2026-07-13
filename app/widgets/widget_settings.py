@@ -1,21 +1,14 @@
 from copy import deepcopy
-from typing import Any
 
 from PyQt6.QtWidgets import (
-    QDialog, QTabWidget, QStatusBar, QMessageBox,
-    QMenuBar, QMenu, QApplication, QPushButton,
-    QGroupBox, QVBoxLayout, QHBoxLayout, QStyle,
-    QGridLayout, QScrollArea, QLabel, QWidget,
-    QComboBox, QLineEdit, QCheckBox
+    QMessageBox, QPushButton, QGroupBox, QVBoxLayout,
+    QScrollArea, QLabel, QWidget, QLineEdit,
+    QCheckBox
 )
-from PyQt6.QtGui import QAction, QDesktopServices, QIcon, QRegularExpressionValidator
-from PyQt6.QtCore import QUrl, QRegularExpression, pyqtSignal
+from PyQt6.QtCore import pyqtSignal
 
 import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
-from app.widgets.widget_send import SendWidget
-from app.widgets.widget_receive import ReceiveWidget
 
 _PADDING: int = 10
 
@@ -432,7 +425,7 @@ class SettingsWidget(QWidget):
         self.worker.settings.nocompress = self.checkbox_nocompress.isChecked()
         self.worker.settings.local = self.checkbox_local.isChecked()
 
-    def _ui_settings_to_dict(self) -> dict[str, Any]:
+    def _ui_settings_to_dict(self) -> dict[str, bool | str]:
         return {
             "lang": self.combo_lang.currentText(),
             "theme": self.combo_theme.currentText(),
@@ -459,8 +452,8 @@ class SettingsWidget(QWidget):
         }
 
     def _mark_dirty(self):
-        saved_settings: dict[str, Any] = self.worker.settings.serialize_to_dict()
-        ui_settings: dict[str, Any] = self._ui_settings_to_dict()
+        saved_settings: dict[str, bool | str] = self.worker.settings.serialize_to_dict()
+        ui_settings: dict[str, bool | str] = self._ui_settings_to_dict()
 
         for setting, value in saved_settings.items():
             if ui_settings[setting] == value:

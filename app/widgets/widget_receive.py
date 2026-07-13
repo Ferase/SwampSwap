@@ -1,17 +1,13 @@
-import re
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QCheckBox,
-    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
-    QSizePolicy, QApplication, QMessageBox
+    QWidget, QVBoxLayout, QPushButton, QLineEdit,
+    QGroupBox, QFileDialog, QApplication, QMessageBox
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QRegularExpression
-from PyQt6.QtGui import QFont, QRegularExpressionValidator
+from PyQt6.QtCore import pyqtSignal, QRegularExpression
 
 import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
+from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 
 _ACCEPT_RE = QRegularExpression(r"Accept\s+(?:'(?P<filename>[^']+)'|(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?))\s*\((?P<size>[^)]+)\)\?")

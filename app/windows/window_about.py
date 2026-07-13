@@ -1,20 +1,14 @@
-import re
-from pathlib import Path
-
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QCheckBox,
-    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
-    QSizePolicy, QApplication, QScrollArea, QFrame,
+    QPushButton, QLabel, QGroupBox, QScrollArea,
     QDialog
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QDir, QUrl
-from PyQt6.QtGui import QFont, QPixmap, QFont, QPalette, QColor, QDesktopServices
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QFont, QPixmap, QFont, QDesktopServices
 
 import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
-from app.managers.manager_locale import SwampSwapLang, SwampSwapLanguageList
+from app.managers.manager_locale import SwampSwapLanguageList
 
 _CROC_DEVELOPERS = ["Zack Schollz"]
 _UI_DEVELOPERS = ["Ferase"]
@@ -46,8 +40,6 @@ class AboutWindow(QDialog):
 
     # Construct the UI
     def _build_central(self) -> None:
-        """Build central UI."""
-
         # Create box layout container
         root = QGridLayout(self)
         root.setSpacing(8)
@@ -62,8 +54,6 @@ class AboutWindow(QDialog):
         root.addWidget(buttons_group, 1, 0, 1, -1)
 
     def _build_hero_group(self) -> QScrollArea:
-        """Build left hero group."""
-
         group = QGroupBox()
         layout = QVBoxLayout(group)
         group.setMaximumWidth(200)
@@ -108,8 +98,6 @@ class AboutWindow(QDialog):
         return group
 
     def _build_scrollable_group(self) -> QScrollArea:
-        """Build right scrollable info group."""
-
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
 
@@ -129,8 +117,6 @@ class AboutWindow(QDialog):
         return scroll
     
     def _build_credits_group(self) -> QGroupBox:
-        """Dynamically build the credits group."""
-        
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
@@ -147,8 +133,6 @@ class AboutWindow(QDialog):
         return group
     
     def _build_links_group(self) -> QGroupBox:
-        """Build the links group."""
-
         group = QGroupBox()
         layout = QVBoxLayout(group)
         
@@ -164,8 +148,6 @@ class AboutWindow(QDialog):
         return group
     
     def _build_buttons(self) -> QWidget:
-        """Build bottom-right buttons."""
-
         widget = QWidget()
         layout = QHBoxLayout(widget)
 
@@ -177,8 +159,6 @@ class AboutWindow(QDialog):
         return widget
     
     def _build_single_credit(self, label_key: str, credits_list: list[str]) -> QGroupBox:
-        """Dynamic function to build a single credit."""
-
         group = QGroupBox()
         layout = QVBoxLayout(group)
         

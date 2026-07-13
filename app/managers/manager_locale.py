@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Any
 
 from PyQt6.QtCore import QObject, pyqtSignal
 
@@ -11,20 +10,19 @@ import app.utils as app_utils
 class SwampSwapLang():
     """A class for storing language strings from a dictionary and making them callable via subscripting. Also stores metadata about the translation."""
 
-    def __init__(self, dictionary: dict[str, Any] | None = None):
+    def __init__(self, dictionary: dict[str, dict[str, str] | str] | None = None):
         if dictionary is None:
             return
         
         self.load(dictionary)
 
-    def load(self, dictionary: dict[str, Any]) -> None:
+    def load(self, dictionary: dict[str, dict[str, str] | str]) -> None:
         """Loads a provided dictionary of language strings and store metadata for this translation."""
 
         # Pop off the metadata and pass it into class variables
         meta = dictionary.pop("_meta")
         self.language: str = meta["language"]
         self.author: str = meta["author"]
-        self.version: str = meta["version"]
 
         self._locale_dict: dict[str, str] = dictionary
     
@@ -86,7 +84,7 @@ class LocaleManager(QObject):
         lang_files: list[Path] = list(self._lang_path.glob("*.json"))
         for lang_file in lang_files:
             with open(lang_file, "r") as l:
-                json_data: dict[str, Any] = json.load(l)
+                json_data: dict[str, dict[str, dict[str, str] | str]] = json.load(l)
                 ss_language = SwampSwapLang(json_data)
                 self.langs.append(ss_language)
 

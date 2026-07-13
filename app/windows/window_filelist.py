@@ -1,27 +1,23 @@
-import re
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QLineEdit, QLabel, QCheckBox,
-    QGroupBox, QFileDialog, QTextEdit, QAbstractItemView,
-    QSizePolicy, QApplication, QScrollArea, QFrame,
-    QDialog, QListWidget, QMessageBox, QListWidgetItem,
-    QStyle
+    QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
+    QGroupBox, QFileDialog, QAbstractItemView,
+    QApplication, QDialog, QListWidget, QMessageBox,
+    QListWidgetItem, QStyle
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QDir, QUrl
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon
 
 import app.utils as app_utils
-from app.enums import CrocState, CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
-from app.managers.manager_locale import SwampSwapLang, SwampSwapLanguageList
 
 
 
 class FileDropList(QListWidget):
+    """A subclass of QListWidget that accepts dropped files and pipes them out with a signal."""
 
-    files_dropped = pyqtSignal(list)
+    files_dropped = pyqtSignal(set)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,6 +53,7 @@ class FileDropList(QListWidget):
 
 
 class FileListWindow(QDialog):
+    """An extended window for managing the files you wish to send."""
 
     files_changed = pyqtSignal(dict)
     files_cleared = pyqtSignal()
@@ -67,6 +64,7 @@ class FileListWindow(QDialog):
 
         self.worker = worker
 
+        self._dirty: bool = False
         self._paths: dict[str, set[Path]] = {
             "files": set(),
             "folders": set(),
@@ -164,15 +162,20 @@ class FileListWindow(QDialog):
         self.btn_clear.clicked.connect(self._click_clear_all_button)
 
         self.btn_ok.clicked.connect(self.accept)
-        self.btn_cancel.clicked.connect(self.reject)
+        self.btn_cancel.clicked.connect(self._click_cancel_button)
 
     def _populate(self):
+        """Populate the file list with the contents of FileListWindow._paths."""
+
         self._clear_list()
 
+        # Pass folders first, then files
         self._create_list_items(self._paths["folders"], "folders")
         self._create_list_items(self._paths["files"], "files")
 
     def _create_list_items(self, paths: set[Path], item_tyoe: str) -> None:
+        """Create QListWidgetItem objects that will be used to populate the main list."""
+
         if item_tyoe == "folders":
             icon: QIcon = self._get_folder_icon()
         else:
@@ -195,35 +198,73 @@ class FileListWindow(QDialog):
 
 
     def raise_modal(self, paths: dict[str, Path]) -> int:
+        """Raise this window as a modal and handle passing of the current paths more directly."""
+
+        # Copy the paths so we don't alter the passed paths list directly
         self._paths = paths.copy()
         self._populate()
 
         result = self.exec()
 
+        # If the user chooses cancel, their changes will not be sent back to the main window
         if result == QDialog.DialogCode.Rejected:
             return
         
         return result
     
 
-    def _add_files(self, paths: set[Path]):
+    def _add_files(self, paths: set[str]):
+        """Add files to the list."""
+
+        # Filter out paths
         final_paths: set[Path] = self._filter_paths(paths)
 
-        self._paths["files"].update(final_paths)
+        # Do nothing if no valid files were added
+        if not final_paths:
+            return
+        
+        # Mark dirty
+        self._mark_dirty()
 
+        # Update and populate
+        self._paths["files"].update(final_paths)
         self._populate()
 
-    def _add_folders(self, paths: set[Path]):
+    def _add_folders(self, paths: set[str]):
+        """Add folders to the list."""
+
+        # Filter out paths
         final_paths: set[Path] = self._filter_paths(paths)
 
-        self._paths["folders"].update(final_paths)
+        # Do nothing if no valid folders were added
+        if not final_paths:
+            return
+        
+        # Mark dirty
+        self._mark_dirty()
 
+        # Update and populate
+        self._paths["folders"].update(final_paths)
         self._populate()
 
     def _remove_selected(self):
-        selected_texts = {item.text() for item in self.list_widget.selectedItems()}
+        """Removes the selected list items from the list."""
 
-        self._paths = [path for path in self._paths if str(path) not in selected_texts]
+        # Determine selected items
+        selected_items: set[str] = {item.text() for item in self.list_widget.selectedItems()}
+
+        # Do nothing if nothing was selected
+        if not selected_items:
+            return
+        
+        # Mark dirty
+        self._mark_dirty()
+
+        # Update the dictionary
+        self._paths["folders"] = set([path for path in self._paths["folders"] if str(path) not in selected_items])
+        self._paths["files"] = set([path for path in self._paths["files"] if str(path) not in selected_items])
+
+        # Repopulate
         self._populate()
 
         if not self._paths:
@@ -231,33 +272,52 @@ class FileListWindow(QDialog):
             return
 
     def _clear_all(self):
+        """Clear all of the files from the file list by reverting them to empty sets, then emit a signal alerting other listening scripts that all files were cleared."""
+
+        # Replace both values with empty sets
         self._paths["files"] = set()
         self._paths["folders"] = set()
+
         self.files_cleared.emit()
         self.accept()
 
     def _check_if_selected_is_dir_and_is_empty(self, path: Path) -> bool:
+        """Checks if a path is a directory and if it's empty. Empty directories will be filtered out elsewhere becasue croc can't do anything with them."""
+
+        # If the path isn't a directory
         if not path.is_dir():
             return False
         
+        # If the path contains nothing
         if any(path.iterdir()):
             return False
         
         return True
 
-    def _filter_paths(self, paths: set[Path]) -> set[Path]:
+    def _filter_paths(self, paths: set[str]) -> set[Path]:
+        """Filter out paths that are invalid and return a clean set."""
+
         final_paths: set[Path] = set()
 
+        # Check each path for unwanted things before adding it to the final set
         for path in paths:
-            if self._paths is not None and path in self._paths:
-                continue
-
+            path = Path(path)
             if self._check_if_selected_is_dir_and_is_empty(path):
                 continue
 
             final_paths.add(path)
 
         return final_paths
+    
+    def _mark_dirty(self) -> None:
+        """Marks the current list dirty and will prevent the user from cancelling unless they confirm."""
+
+        self._dirty = True
+    
+    def _clear_dirty(self) -> None:
+        """Clears the dirty state."""
+
+        self._dirty = False
 
 
 
@@ -265,31 +325,22 @@ class FileListWindow(QDialog):
         dialog = QFileDialog(self, self.worker.settings.tr("file_dialog:choose_files"))
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
 
+        # Do nothing if the dialog was cancelled
         if not dialog.exec():
             return
-        
-        paths: set[Path] = set()
-        for path in dialog.selectedFiles():
-            path = Path(path)
-            if not self._check_if_selected_is_dir_and_is_empty(path):
-                paths.add(path)
 
-        self._add_files(paths)
+        # Pass paths as strings to be added
+        self._add_files(dialog.selectedFiles())
 
     def _click_add_folder_button(self) -> None:
-        dialog = QFileDialog(self, self.worker.settings.tr("file_dialog:choose_folders"))
-        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog = app_utils.MultiFolderDialog(self, self.worker.settings.tr("file_dialog:choose_folders"))
 
+        # Do nothing if the dialog was cancelled
         if not dialog.exec():
             return
-        
-        paths: set[Path] = set()
-        for path in dialog.selectedFiles():
-            path = Path(path)
-            if not self._check_if_selected_is_dir_and_is_empty(path):
-                paths.add(path)
 
-        self._add_folders(paths)
+        # Pass paths as strings to be added
+        self._add_folders(dialog.selectedFiles())
 
     def _click_remove_selected_button(self) -> None:
         self._remove_selected()
@@ -306,11 +357,29 @@ class FileListWindow(QDialog):
         if result == QMessageBox.StandardButton.Yes:
             self._clear_all()
 
+    def _click_cancel_button(self) -> None:
+        if not self._dirty:
+            self.reject()
+            return
+
+        result = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:cancel_path_change_confirm:title"),
+            self.worker.settings.tr("dialog:cancel_path_change_confirm:body"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if result == QMessageBox.StandardButton.Yes:
+            self.reject()
+
 
 
     def accept(self):
-        self.files_changed.emit(list(self._paths))
+        self.files_changed.emit(self._paths)
+        self._clear_dirty()
         super().accept()
 
     def reject(self):
+        self._clear_dirty()
         super().reject()
