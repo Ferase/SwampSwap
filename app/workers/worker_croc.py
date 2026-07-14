@@ -54,13 +54,20 @@ class CrocWorker(QThread):
     def _create_croc_process(self, operation: CrocOperation, args: list[str]) -> subprocess.Popen:
         """Spawns the croc process with the provided arguments."""
 
+        kwargs = {}
+        if sys.platform == "win32":
+            kwargs["stdin"] = subprocess.PIPE
+            kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+        else:
+            kwargs["stdin"] = subprocess.PIPE if operation == CrocOperation.RECEIVING else subprocess.DEVNULL
+
         process = subprocess.Popen(
             args,
-            stdin=subprocess.PIPE if operation == CrocOperation.RECEIVING else subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             env=self._env,
+            **kwargs
         )
 
         return process
@@ -218,7 +225,7 @@ class CrocWorker(QThread):
         self._args = args
 
         # Pass the code to the env if the code is custom
-        if code:
+        if code and sys.platform != "win32":
             self._env = env
 
         self.start()

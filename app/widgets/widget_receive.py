@@ -175,7 +175,7 @@ class ReceiveWidget(QWidget):
                 self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
 
     def _determine_main_button_behavior(self) -> None:
-        if self.worker.state.operation == CrocOperation.SENDING:
+        if self.worker.state.operation == CrocOperation.SENDING or not self.lineedit_code.text():
             self.btn_receive.setEnabled(False)
             return
         else:
