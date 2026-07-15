@@ -122,6 +122,15 @@ def regex_match(pattern: str, text: str) -> bool:
 
     return not bool(re.match(pattern, text))
 
+def backpedal_paths_to_existing_path(path: Path) -> Path:
+    """Backpedals a path if the specified path doesn't exist."""
+
+    final_path: Path = path if path.exists() else backpedal_paths_to_existing_path(path.parent)
+
+    return final_path
+    
+
+
 
 
 class NoScrollComboBox(QComboBox):

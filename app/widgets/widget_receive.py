@@ -262,7 +262,7 @@ class ReceiveWidget(QWidget):
             )
             return
 
-        path = Path(self._output_path)
+        path: Path = app_utils.backpedal_paths_to_existing_path(Path(self._output_path))
 
         if not path.exists():
             QMessageBox.warning(
@@ -274,4 +274,4 @@ class ReceiveWidget(QWidget):
             )
             return
 
-        app_utils.reveal_in_file_manager(self._output_path)
+        app_utils.reveal_in_file_manager(path)

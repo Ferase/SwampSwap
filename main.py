@@ -11,7 +11,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.2.1"
+_APP_VERSION = "1.2.2"
 
 
 
