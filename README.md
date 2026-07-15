@@ -1,5 +1,10 @@
 <div align="center">
     <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="Swamp Swap icon">
+    <div align="center" float="left">
+        <img src="/assets/gif/wait_for_peer.gif" width="250px" border="0" alt="croc and bird sending files">
+        <img src="/assets/gif/idle.gif" width="250px" border="0" alt="croc and bird waiting idle">
+        <img src="/assets/gif/connecting_to_peer.gif" width="250px" border="0" alt="croc and bird looking for files to receive">
+    </div>
     <br>
     <h1>Swamp Swap</h1>
 </div>
