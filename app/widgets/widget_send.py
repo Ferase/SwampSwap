@@ -532,6 +532,7 @@ class SendWidget(QWidget):
         if self.worker.state.operation == CrocOperation.SENDING:
             block_all = True
         
+        self.drop_zone.setDisabled(block_all)
         self.btn_add_files.setDisabled(block_all)
         self.btn_add_folders.setDisabled(block_all)
         self.btn_view_file_list.setDisabled(block_all or can_send_no_files)
