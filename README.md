@@ -1,12 +1,12 @@
 <div align="center">
     <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="Swamp Swap icon">
+    <br>
+    <h1>Swamp Swap</h1>
     <div align="center" float="left">
         <img src="/assets/gif/wait_for_peer.gif" width="250px" border="0" alt="croc and bird sending files">
         <img src="/assets/gif/idle.gif" width="250px" border="0" alt="croc and bird waiting idle">
         <img src="/assets/gif/connecting_to_peer.gif" width="250px" border="0" alt="croc and bird looking for files to receive">
     </div>
-    <br>
-    <h1>Swamp Swap</h1>
 </div>
 <p align="center">A graphical user interface that controls the command line file transfer program <a href="https://github.com/schollz/croc" target="_blank">croc by Zack Shollz</a>.</p>
 <div align="center" float="left">
