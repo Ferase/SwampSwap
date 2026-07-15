@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QTabWidget, QStatusBar, QMessageBox,
     QMenuBar, QMenu, QLabel, QInputDialog,
-    QToolButton, QStyle
+    QToolButton, QStyle, QProgressBar, QWidget,
+    QVBoxLayout, QGroupBox
 )
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtCore import QTimer
+from PyQt6.QtGui import QAction, QIcon, QMovie
+from PyQt6.QtCore import Qt, QTimer
 
 from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
@@ -13,6 +14,7 @@ from app.widgets.widget_receive import ReceiveWidget
 from app.widgets.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
+from app.managers.manager_animation import AnimationManager
 
 
 
@@ -31,11 +33,13 @@ class MainWindow(QMainWindow):
         self._window_console = ConsoleWindow(self.worker)
         self._window_about = AboutWindow(self.worker, self)
 
+        self.animation_manager = AnimationManager()
+
         self._current_selected_tab_index: int = 0
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.app_name)
-        self.setFixedSize(375, 525)
+        self.setFixedSize(375, 610)
 
         # Build UI
         self._build_central()
@@ -84,10 +88,15 @@ class MainWindow(QMainWindow):
 
     # Construct main UI
     def _build_central(self) -> None:
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.setCentralWidget(container)
+
         self.tabs = QTabWidget()
         self.tabs.tabBar().setExpanding(True)
         self.tabs.tabBar().setUsesScrollButtons(False)
-        self.setCentralWidget(self.tabs)
 
         self.widget_send = SendWidget(self.worker)
         self.tabs.addTab(self.widget_send, self.worker.settings.tr("generic:send"))
@@ -97,6 +106,33 @@ class MainWindow(QMainWindow):
 
         self.widget_settings = SettingsWidget(self.worker)
         self.tabs.addTab(self.widget_settings, self.worker.settings.tr("generic:settings"))
+
+        animation_group = self._build_animation_group()
+
+        layout.addWidget(self.tabs)
+        layout.addWidget(animation_group)
+
+    # Build animation group
+    def _build_animation_group(self) -> QGroupBox:
+        group = QGroupBox()
+        layout = QVBoxLayout(group)
+
+        group.setContentsMargins(5, 0, 5, 5)
+
+        self.label_animation = QLabel()
+        self.label_animation.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
+
+        layout.addWidget(self.label_animation)
+        layout.addSpacing(8)
+        layout.addWidget(self.progress_bar)
+
+        return group
+        
+
 
     # Construct status bar UI
     def _build_statusbar(self) -> None:
@@ -162,6 +198,8 @@ class MainWindow(QMainWindow):
 
         self.worker.state_changed.connect(self._set_status)
         self.worker.error_state.connect(self._append_error_to_status)
+        self.worker.progress_update.connect(self._on_progress_update)
+        self.worker.finished.connect(self._reset_progress_bar)
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
         self.widget_settings.settings_changed.connect(self._apply_asterisk_to_unsaved_settings)
@@ -171,12 +209,16 @@ class MainWindow(QMainWindow):
         self.btn_console.clicked.connect(self._open_console_window)
         self.btn_about.clicked.connect(self._open_about_window)
 
+        self.animation_manager.animation_changed.connect(self._change_animation)
+
     def _set_status(self):
         """Set the status bar text on the bottom left of the window."""
 
         # A label is used instead of self.statusBar().showMessage() because of a Windows bug
         self.label_status.setText(self.worker.get_action_text())
         self.label_status.setToolTip(self.worker.get_action_text_only())
+
+        self.animation_manager.status_changed.emit(self.worker.get_operation(), self.worker.get_action())
 
     def _append_error_to_status(self, error: str) -> None:
         """Will append an error to the status tootlip if there's an error to report."""
@@ -378,3 +420,37 @@ class MainWindow(QMainWindow):
         self.widget_send.window_filelist.close()
         self.worker.stop()
         super().closeEvent(event)
+
+    def _on_progress_update(self, percent: int, filename: str, is_hashing: bool) -> None:
+        """Handle progress bar updating."""
+
+        is_sending: bool = self.worker.state.operation == CrocOperation.SENDING
+
+        # Create prefix; if we're hashing, just say hashing, otherwise display sending or receiving text
+        if is_hashing:
+            prefix = self.worker.settings.tr("state:hashing")
+        else:
+            prefix = self.worker.settings.tr("state:sending") if is_sending else self.worker.settings.tr("state:receiving")
+
+        # Fixes the issue of hashing (which is generally a fast process) stopping at 99 percent even when it's actually done
+        if prefix:
+            percent = 100 if percent == 99 else percent
+
+        self.progress_bar.setValue(percent)
+        self.progress_bar.setFormat(f"{prefix} {filename}  {percent}%")
+
+    def _reset_progress_bar(self) -> None:
+        """Handle progress bar display when an operation ends."""
+
+        # Reset the format to remove the other text
+        self.progress_bar.resetFormat()
+
+        # 100% if completed, 0% otherwise (starting, cancelling, error, etc.)
+        value: int = 100 if self.worker.state.action == CrocAction.COMPLETED else 0
+        self.progress_bar.setValue(value)
+
+    def _change_animation(self) -> None:
+        """Change the animation on the lower part of the window"""
+
+        self.label_animation.setMovie(self.animation_manager.current_anim)
+        self.animation_manager.current_anim.start()

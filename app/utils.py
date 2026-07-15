@@ -66,12 +66,16 @@ def reveal_in_file_manager(path: str | Path) -> None:
         pass
 
 
+def is_executable() -> bool:
+    """Returns true if Swamp Swap is being run as an executable."""
 
-def determine_filepath(filename: str, parent_levels: int = 0) -> Path:
-    """Determines the path of a file relative to Swamp Swap. Will function accurately regardless of if the program is run in script form or as a frozen executable."""
+    return bool(getattr(sys, "frozen", False))
+
+def get_running_path() -> Path:
+    """Get the path in which the script/executable is being run from"""
 
     # If the application is a frozen executable, get the sys._MEIPASS folder
-    if getattr(sys, "frozen", False):
+    if is_executable():
         base_path = Path(sys._MEIPASS)
 
     # If the application is a script, calcualte the path differently
@@ -79,11 +83,26 @@ def determine_filepath(filename: str, parent_levels: int = 0) -> Path:
         # Get the base path
         base_path = Path(__file__).resolve()
 
-        # Move up by the given amount of levels
-        for _ in range(parent_levels):
-            base_path = base_path.parent
+    return base_path
 
-    return base_path / filename
+def get_true_path() -> Path:
+    """Determine the true base path regardless of if Swamp Swap is a script or executable."""
+
+    base_path: Path = get_running_path()
+
+    if not is_executable():
+        base_path = base_path.parent.parent
+
+    return base_path
+
+def determine_filepath(filename: str | Path, parent_levels: int = 2) -> Path:
+    """Determines the path of a file relative to Swamp Swap. Will function accurately regardless of if the program is run in script form or as a frozen executable."""
+
+    return get_true_path() / filename
+
+def get_assets_path() -> Path:
+
+    return get_true_path() / "assets"
 
 def determine_received_path(folder_name: str) -> Path:
     """Determines the path of the default receive folder. Will function accurately regardless of if the program is run in script form or as a frozen executable."""
