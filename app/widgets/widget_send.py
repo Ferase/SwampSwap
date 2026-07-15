@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 from pathlib import Path
 
@@ -39,7 +40,10 @@ class DropZone(QFrame):
 
         pixmap_enum = QStyle.StandardPixmap.SP_DirIcon
         icon = style.standardIcon(pixmap_enum)
-        pixmap = icon.pixmap(QSize(48, 48))
+        if sys.platform == "win32":
+            pixmap = icon.pixmap(QSize(40, 40))
+        else:
+            pixmap = icon.pixmap(QSize(48, 48))
         
         self.label_icon = QLabel()
         self.label_icon.setPixmap(pixmap)
