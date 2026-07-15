@@ -56,13 +56,11 @@ class CrocWorker(QThread):
 
         kwargs = {}
         if sys.platform == "win32":
-            kwargs["stdin"] = subprocess.PIPE
             kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
-        else:
-            kwargs["stdin"] = subprocess.PIPE if operation == CrocOperation.RECEIVING else subprocess.DEVNULL
 
         process = subprocess.Popen(
             args,
+            stdin=subprocess.PIPE if operation == CrocOperation.RECEIVING else subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
