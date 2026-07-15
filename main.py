@@ -102,7 +102,7 @@ def _new_croc_version_available(parent, worker: CrocWorker, new_version: str) ->
     # If they do, open the GitHub
     if result == QMessageBox.StandardButton.Yes:
         QDesktopServices.openUrl(
-            QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
+            QUrl("https://github.com/schollz/croc/releases/latest")
         )
 
 def _new_swampswap_version_available(parent, worker: CrocWorker, new_version: str) -> None:
