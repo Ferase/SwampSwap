@@ -2,13 +2,13 @@
     <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="Swamp Swap icon">
     <br>
     <h1>Swamp Swap</h1>
-    <div align="center" float="left">
-        <img src="/assets/gif/wait_for_peer.gif" width="250px" border="0" alt="croc and bird sending files">
-        <img src="/assets/gif/idle.gif" width="250px" border="0" alt="croc and bird waiting idle">
-        <img src="/assets/gif/connecting_to_peer.gif" width="250px" border="0" alt="croc and bird looking for files to receive">
-    </div>
 </div>
 <p align="center">A graphical user interface that controls the command line file transfer program <a href="https://github.com/schollz/croc" target="_blank">croc by Zack Shollz</a>.</p>
+<div align="center" float="left">
+    <img src="/assets/gif/wait_for_peer.gif" width="250px" border="0" alt="croc and bird sending files">
+    <img src="/assets/gif/idle.gif" width="250px" border="0" alt="croc and bird waiting idle">
+    <img src="/assets/gif/connecting_to_peer.gif" width="250px" border="0" alt="croc and bird looking for files to receive">
+</div>
 <div align="center" float="left">
     <img src="/images/SwampSwap_Window_ThemePink.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme on the send tab">
     <img src="/images/SwampSwap_Window_ThemeDeepDark.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme on the receive tab">
