@@ -9,7 +9,7 @@ import app.utils as app_utils
 _DEFAULTS: dict[str, bool | str] = {
     # General
     "lang": "English",
-    "theme": "Pink",
+    "theme": "Swamp",
     "startup_console": False,
     "startup_croc_updates_check": True,
     "startup_swampswap_updates_check": True,
