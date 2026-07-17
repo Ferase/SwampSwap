@@ -1,0 +1,135 @@
+[
+    {
+        "name": "Swamp",
+
+        "bg_front": [31, 50, 60],
+        "bg_back": [17, 23, 10],
+        "text": [255, 255, 255],
+        "highlight": [141, 192, 86],
+        "text_highlight": [0, 0, 0],
+        "disabled": [128, 128, 180],
+        "text_placeholder": [244, 206, 132],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 255, 255],
+        "anim_water": [123, 203, 239],
+        "anim_box": [246, 241, 216],
+        "anim_croc": [141, 192, 86],
+        "anim_bird": [244, 206, 132],
+        "anim_folder": [192, 142, 86]
+    },
+    {
+        "name": "Deep Dark",
+
+        "bg_front": [22, 22, 22],
+        "bg_back": [8, 8, 8],
+        "text": [255, 255, 255],
+        "highlight": [170, 30, 128],
+        "text_highlight": [255, 255, 255],
+        "disabled": [60, 60, 60],
+        "text_placeholder": [180, 180, 180],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 255, 255],
+        "anim_water": [128, 128, 128],
+        "anim_box": [192, 192, 192],
+        "anim_croc": [255, 255, 255],
+        "anim_bird": [255, 255, 255],
+        "anim_folder": [64, 64, 64]
+    },
+    {
+        "name": "Dark",
+
+        "bg_front": [45, 45, 45],
+        "bg_back": [30, 30, 30],
+        "text": [220, 220, 220],
+        "highlight": [170, 30, 128],
+        "text_highlight": [255, 255, 255],
+        "disabled": [120, 120, 120],
+        "text_placeholder": [120, 120, 120],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [128, 128, 128],
+        "anim_water": [64, 101, 120],
+        "anim_box": [163, 161, 108],
+        "anim_croc": [101, 142, 43],
+        "anim_bird": [182, 163, 66],
+        "anim_folder": [96, 71, 43]
+    },
+    {
+        "name": "Light",
+
+        "bg_front": [215, 215, 215],
+        "bg_back": [220, 220, 220],
+        "text": [30, 30, 30],
+        "highlight": [170, 30, 128],
+        "text_highlight": [255, 255, 255],
+        "disabled": [120, 120, 120],
+        "text_placeholder": [60, 60, 60],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 255, 255],
+        "anim_water": [0, 255, 255],
+        "anim_box": [255, 255, 0],
+        "anim_croc": [0, 255, 0],
+        "anim_bird": [255, 128, 0],
+        "anim_folder": [255, 128, 0]
+    },
+    {
+        "name": "Steam 1.0",
+
+        "bg_front": [75, 88, 68],
+        "bg_back": [62, 70, 55],
+        "text": [222, 223, 214],
+        "highlight": [196, 181, 80],
+        "text_highlight": [0, 0, 0],
+        "disabled": [41, 44, 33],
+        "text_placeholder": [216, 222, 211],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 255, 255],
+        "anim_water": [131, 204, 175],
+        "anim_box": [174, 95, 88],
+        "anim_croc": [224, 221, 99],
+        "anim_bird": [248, 155, 128],
+        "anim_folder": [44, 52, 41]
+    },
+    {
+        "name": "Pink",
+
+        "bg_front": [50, 0, 34],
+        "bg_back": [36, 0, 23],
+        "text": [255, 233, 255],
+        "highlight": [170, 30, 128],
+        "text_highlight": [255, 255, 255],
+        "disabled": [206, 144, 182],
+        "text_placeholder": [206, 144, 182],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 200, 255],
+        "anim_water": [200, 60, 150],
+        "anim_box": [130, 40, 108],
+        "anim_croc": [250, 110, 208],
+        "anim_bird": [250, 110, 208],
+        "anim_folder": [150, 63, 124]
+    },
+    {
+        "name": "Red",
+
+        "bg_front": [50, 0, 0],
+        "bg_back": [36, 0, 0],
+        "text": [255, 233, 255],
+        "highlight": [170, 30, 30],
+        "text_highlight": [255, 255, 255],
+        "disabled": [206, 144, 144],
+        "text_placeholder": [206, 144, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 200, 200],
+        "anim_water": [200, 60, 60],
+        "anim_box": [130, 40, 40],
+        "anim_croc": [250, 110, 110],
+        "anim_bird": [250, 110, 110],
+        "anim_folder": [150, 63, 63]
+    }
+]

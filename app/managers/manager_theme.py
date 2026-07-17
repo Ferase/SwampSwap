@@ -1,6 +1,13 @@
+import json
+from pathlib import Path
+
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import QObject
+
+from app.managers.manager_animation import AnimationManager
+
+THEMES_FILE_PATH = Path.cwd() / "themes.json"
 
 
 
@@ -10,13 +17,21 @@ class SwampSwapPalette():
     def __init__(
             self,
             name: str,
-            bg_front: QColor,
-            bg_back: QColor,
-            text: QColor,
-            highlight: QColor,
-            text_highlight: QColor,
-            disabled: QColor,
-            text_placeholder: QColor
+            bg_front: list[int],
+            bg_back: list[int],
+            text: list[int],
+            highlight: list[int],
+            text_highlight: list[int],
+            disabled: list[int],
+            text_placeholder: list[int],
+
+            anim_black: list[int],
+            anim_white: list[int],
+            anim_water: list[int],
+            anim_box: list[int],
+            anim_croc: list[int],
+            anim_bird: list[int],
+            anim_folder: list[int]
         ):
 
         # Palette display name
@@ -24,13 +39,22 @@ class SwampSwapPalette():
 
         # Palette object and colors
         self.palette = QPalette()
-        self.bg_front: QColor = bg_front
-        self.bg_back: QColor = bg_back
-        self.text: QColor = text
-        self.highlight: QColor = highlight
-        self.text_highlight: QColor = text_highlight
-        self.disabled: QColor = disabled
-        self.text_placeholder: QColor = text_placeholder
+        self.bg_front = QColor(*bg_front)
+        self.bg_back = QColor(*bg_back)
+        self.text = QColor(*text)
+        self.highlight = QColor(*highlight)
+        self.text_highlight = QColor(*text_highlight)
+        self.disabled = QColor(*disabled)
+        self.text_placeholder = QColor(*text_placeholder)
+
+        # croc and bird palettes
+        self.anim_black = QColor(*anim_black)
+        self.anim_white = QColor(*anim_white)
+        self.anim_water = QColor(*anim_water)
+        self.anim_box = QColor(*anim_box)
+        self.anim_croc = QColor(*anim_croc)
+        self.anim_bird = QColor(*anim_bird)
+        self.anim_folder = QColor(*anim_folder)
 
         # Pass init values to palette
         self.palette.setColor(QPalette.ColorRole.Window, self.bg_front)
@@ -57,72 +81,6 @@ class SwampSwapPalette():
             QPalette.ColorRole.ButtonText,
             self.disabled
         )
-
-
-
-# The list of palettes used by Swamp Swap
-_PALETTES: list[SwampSwapPalette] = [
-    SwampSwapPalette(
-        name="Deep Dark",
-        bg_front=QColor(22, 22, 22),
-        bg_back=QColor(8, 8, 8),
-        text=QColor(255, 255, 255),
-        highlight=QColor(170, 30, 128),
-        text_highlight=QColor(255, 255, 255),
-        disabled=QColor(60, 60, 60),
-        text_placeholder=QColor(180, 180, 180)
-    ),
-    SwampSwapPalette(
-        name="Dark",
-        bg_front=QColor(45, 45, 45),
-        bg_back=QColor(30, 30, 30),
-        text=QColor(220, 220, 220),
-        highlight=QColor(170, 30, 128),
-        text_highlight=QColor(255, 255, 255),
-        disabled=QColor(120, 120, 120),
-        text_placeholder=QColor(120, 120, 120)
-    ),
-    SwampSwapPalette(
-        name="Light",
-        bg_front=QColor(215, 215, 215),
-        bg_back=QColor(220, 220, 220),
-        text=QColor(30, 30, 30),
-        highlight=QColor(170, 30, 128),
-        text_highlight=QColor(255, 255, 255),
-        disabled=QColor(120, 120, 120),
-        text_placeholder=QColor(60, 60, 60)
-    ),
-    SwampSwapPalette(
-        name="Steam 1.0",
-        bg_front=QColor(75, 88, 68),
-        bg_back=QColor(62, 70, 55),
-        text=QColor(222, 223, 214),
-        highlight=QColor(196, 181, 80),
-        text_highlight=QColor(0, 0, 0),
-        disabled=QColor(41, 44, 33),
-        text_placeholder=QColor(216, 222, 211)
-    ),
-    SwampSwapPalette(
-        name="Pink",
-        bg_front=QColor(50, 0, 34),
-        bg_back=QColor(36, 0, 23),
-        text=QColor(255, 233, 255),
-        highlight=QColor(170, 30, 128),
-        text_highlight=QColor(255, 255, 255),
-        disabled=QColor(206, 144, 182),
-        text_placeholder=QColor(206, 144, 182)
-    ),
-    SwampSwapPalette(
-        name="Red",
-        bg_front=QColor(50, 0, 0),
-        bg_back=QColor(36, 0, 0),
-        text=QColor(255, 233, 255),
-        highlight=QColor(170, 30, 30),
-        text_highlight=QColor(255, 255, 255),
-        disabled=QColor(206, 144, 144),
-        text_placeholder=QColor(206, 144, 144)
-    )
-]
 
 
 
@@ -158,16 +116,20 @@ class ThemeManager(QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.animation_manager = AnimationManager()
+
         self.palettes = SwampSwapPaletteList()
         self.selected_palette: SwampSwapPalette | None = None
 
-        self._define_palettes()
+        self._load_palettes()
 
-    def _define_palettes(self) -> None:
+    def _load_palettes(self) -> None:
         """Load palettes from the _PALETTES constant."""
 
-        for pallete in _PALETTES:
-            self.palettes.append(pallete)
+        with open(THEMES_FILE_PATH, "r") as t:
+            json_data = json.load(t)
+            for palette in json_data:
+                self.palettes.append(SwampSwapPalette(**palette))
 
 
 
@@ -179,11 +141,26 @@ class ThemeManager(QObject):
 
         # Fall back to the Pink theme if we somehow try to load an nonexistent theme
         if theme is None:
-            theme = self.langs["Pink"]
+            theme = self.palettes["Swamp"]
 
         # Save to self and then apply via the application
         self.selected_palette = theme
         QApplication.setPalette(self.selected_palette.palette)
+
+        self.animation_manager.apply_theme_colors(self._build_animation_color_map(theme))
+
+    def _build_animation_color_map(self, theme: SwampSwapPalette) -> dict:
+        """Maps GIF color slots to the given theme's color values."""
+
+        return {
+            "anim_black": theme.anim_black,
+            "anim_white": theme.anim_white,
+            "anim_water": theme.anim_water,
+            "anim_box": theme.anim_box,
+            "anim_croc": theme.anim_croc,
+            "anim_bird": theme.anim_bird,
+            "anim_folder": theme.anim_folder,
+        }
     
     def get_theme_list(self) -> list[str]:
         """Returns a full list of all of the loaded palettes."""

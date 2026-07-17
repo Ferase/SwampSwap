@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QToolButton, QStyle, QProgressBar, QWidget,
     QVBoxLayout, QGroupBox
 )
-from PyQt6.QtGui import QAction, QIcon, QMovie
+from PyQt6.QtGui import QAction, QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
 
 from app.enums import CrocOperation, CrocAction
@@ -14,7 +14,6 @@ from app.widgets.widget_receive import ReceiveWidget
 from app.widgets.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
-from app.managers.manager_animation import AnimationManager
 
 
 
@@ -32,8 +31,6 @@ class MainWindow(QMainWindow):
         # Instantiate other windows
         self._window_console = ConsoleWindow(self.worker)
         self._window_about = AboutWindow(self.worker, self)
-
-        self.animation_manager = AnimationManager()
 
         self._current_selected_tab_index: int = 0
 
@@ -209,7 +206,7 @@ class MainWindow(QMainWindow):
         self.btn_console.clicked.connect(self._open_console_window)
         self.btn_about.clicked.connect(self._open_about_window)
 
-        self.animation_manager.animation_changed.connect(self._change_animation)
+        self.worker.settings.theme_manager.animation_manager.frame_ready.connect(self._on_animation_frame)
 
     def _set_status(self):
         """Set the status bar text on the bottom left of the window."""
@@ -218,7 +215,7 @@ class MainWindow(QMainWindow):
         self.label_status.setText(self.worker.get_action_text())
         self.label_status.setToolTip(self.worker.get_action_text_only())
 
-        self.animation_manager.status_changed.emit(self.worker.get_operation(), self.worker.get_action())
+        self.worker.settings.theme_manager.animation_manager.status_changed.emit(self.worker.get_operation(), self.worker.get_action())
 
     def _append_error_to_status(self, error: str) -> None:
         """Will append an error to the status tootlip if there's an error to report."""
@@ -452,5 +449,10 @@ class MainWindow(QMainWindow):
     def _change_animation(self) -> None:
         """Change the animation on the lower part of the window"""
 
-        self.label_animation.setMovie(self.animation_manager.current_anim)
-        self.animation_manager.current_anim.start()
+        self.label_animation.setMovie(self.worker.settings.theme_manager.animation_manager.current_anim)
+        self.worker.settings.theme_manager.animation_manager.current_anim.start()
+
+    def _on_animation_frame(self, pixmap: QPixmap) -> None:
+        """Display the latest recolored animation frame."""
+
+        self.label_animation.setPixmap(pixmap)
