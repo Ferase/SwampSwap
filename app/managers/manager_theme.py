@@ -5,9 +5,8 @@ from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import QObject
 
+import app.utils as app_utils
 from app.managers.manager_animation import AnimationManager
-
-THEMES_FILE_PATH = Path.cwd() / "themes.json"
 
 
 
@@ -126,7 +125,7 @@ class ThemeManager(QObject):
     def _load_palettes(self) -> None:
         """Load palettes from the _PALETTES constant."""
 
-        with open(THEMES_FILE_PATH, "r") as t:
+        with open(app_utils.determine_filepath("themes.json", 2), "r") as t:
             json_data = json.load(t)
             for palette in json_data:
                 self.palettes.append(SwampSwapPalette(**palette))
