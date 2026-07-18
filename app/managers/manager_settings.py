@@ -6,13 +6,18 @@ from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
 
 # Default settings
-_DEFAULTS: dict[str, bool | str] = {
+_DEFAULTS: dict[str, bool | str | float] = {
     # General
-    "lang": "English",
-    "theme": "Swamp",
     "startup_console": False,
     "startup_croc_updates_check": True,
     "startup_swampswap_updates_check": True,
+
+    # UI
+    "lang": "English",
+    "theme": "Swamp",
+    "animation_matches_theme": True,
+    "enable_sound": True,
+    "sound_volume": 0.5,
 
     # Relay
     "relay": "178.105.79.46:9009",
@@ -70,11 +75,16 @@ class SettingsManager():
         self.app_version = app_version
 
         # General
-        self.lang: str | None = None
-        self.theme: str | None = None
         self.startup_console: bool | None = None
         self.startup_croc_updates_check: bool | None = None
         self.startup_swampswap_updates_check: bool | None = None
+
+        # General
+        self.lang: str | None = None
+        self.theme: str | None = None
+        self.animation_matches_theme: bool | None = None
+        self.enable_sound: bool | None = None
+        self.sound_volume: float | None = None
 
         # Relays
         self.relay: str | None = None
@@ -117,12 +127,12 @@ class SettingsManager():
 
         # Open settings.json and pull out changed settings
         with open(self._settings_file_path, "r") as s:
-            json_data: dict[str, bool | str] = json.load(s)
+            json_data: dict[str, bool | str | float] = json.load(s)
             self.set_all_from_dict(json_data)
 
 
 
-    def set_all_from_dict(self, dictionary: dict[str, bool | str]) -> None:
+    def set_all_from_dict(self, dictionary: dict[str, bool | str | float]) -> None:
         """Runs through all of the settings in the provided dictionary and changes any matching attributes of this manager to the values present in the dictionary."""
 
         # If this manager has the attribute, set it using the value in the dictionary
@@ -132,16 +142,17 @@ class SettingsManager():
 
         self.change_language()
         self.change_theme()
+        self.change_animation_matches_theme()
 
     def set_defaults(self) -> None:
         """Passes the _DEFAULTS constant to set_all_from_dict(), resetting all settings to default."""
 
         self.set_all_from_dict(_DEFAULTS)
 
-    def serialize_to_dict(self) -> dict[str, bool | str]:
-        """Serialize the settings to a dict[str, bool | str]."""
+    def serialize_to_dict(self) -> dict[str, bool | str | float]:
+        """Serialize the settings to a dict[str, bool | str | float]."""
 
-        new_dict: dict[str, bool | str] = {}
+        new_dict: dict[str, bool | str | float] = {}
 
         # Iterate through the keys of the default settings since they contain all possible settings
         for key in _DEFAULTS.keys():
@@ -161,23 +172,23 @@ class SettingsManager():
     def save_settings(self) -> None:
         """Serializes settings and then saves all settings to a new settings.json file."""
 
-        new_dict: dict[str, bool | str] = self.serialize_to_dict()
+        new_dict: dict[str, bool | str | float] = self.serialize_to_dict()
 
         # Open the settings file and write the dictionary to it
         with open(self._settings_file_path, "w") as s:
             json.dump(new_dict, s, indent=4, ensure_ascii=False)
 
-    def save_single_setting(self, key: str, value: bool | str) -> None:
+    def save_single_setting(self, key: str, value: bool | str | float) -> None:
         """Save a single setting into settings.json"""
 
-        setting: dict[str, bool | str] = {
+        setting: dict[str, bool | str | float] = {
             key: value
         }
 
         # Try to re-read the JSON file if it exists, otherwise just write it
         try:
             with open(self._settings_file_path, "r") as s1:
-                data: dict[str, bool | str] = json.load(s1)
+                data: dict[str, bool | str | float] = json.load(s1)
                 data.update(setting)
                 setting = data
         except FileNotFoundError:
@@ -253,3 +264,8 @@ class SettingsManager():
         """Tell the theme manager to change the current theme."""
 
         self.theme_manager.select_theme(self.theme)
+
+    def change_animation_matches_theme(self) -> None:
+        """Tell the theme manager whether animations should be recolored to match the theme."""
+
+        self.theme_manager.set_animation_matches_theme(self.animation_matches_theme)

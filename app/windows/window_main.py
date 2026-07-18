@@ -394,30 +394,6 @@ class MainWindow(QMainWindow):
 
 
 
-    def closeEvent(self, event):
-        """Kills all child windows, stops the worker, and terminates the program. Will prompt the user first if an operation is running."""
-
-        if self._is_operation_running():
-            box = QMessageBox.warning(
-                self,
-                self.worker.settings.tr("dialog:close_warning:title"),
-                self.worker.settings.tr("dialog:close_warning:body"),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No
-            )
-
-            if box == QMessageBox.StandardButton.No:
-                event.ignore()
-                return
-            
-            event.accept()
-
-        self._window_console.close()
-        self._window_about.close()
-        self.widget_send.window_filelist.close()
-        self.worker.stop()
-        super().closeEvent(event)
-
     def _on_progress_update(self, percent: int, filename: str, is_hashing: bool) -> None:
         """Handle progress bar updating."""
 
@@ -456,3 +432,47 @@ class MainWindow(QMainWindow):
         """Display the latest recolored animation frame."""
 
         self.label_animation.setPixmap(pixmap)
+
+
+
+    def closeEvent(self, event):
+        """Kills all child windows, stops the worker, and terminates the program. Will prompt the user first if an operation is running."""
+
+        if self.widget_settings.dirty:
+            box = QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:close_warning_settings:title"),
+                self.worker.settings.tr("dialog:close_warning_settings:body"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel,
+                QMessageBox.StandardButton.Cancel
+            )
+
+            if box == QMessageBox.StandardButton.Cancel:
+                event.ignore()
+                return
+            
+            elif box == QMessageBox.StandardButton.Yes:
+                self.worker.settings.save_settings()
+
+        if self._is_operation_running():
+            box2 = QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:close_warning_operation:title"),
+                self.worker.settings.tr("dialog:close_warning_operation:body"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
+            )
+
+            if box2 == QMessageBox.StandardButton.No:
+                event.ignore()
+                return
+            
+        event.accept()
+
+        self.worker.sound_manager.silence_all()
+
+        self._window_console.close()
+        self._window_about.close()
+        self.widget_send.window_filelist.close()
+        self.worker.stop()
+        super().closeEvent(event)

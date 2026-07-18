@@ -4,10 +4,12 @@ import re
 import subprocess
 from pathlib import Path
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 
-from app.enums import CrocState, CrocOperation, CrocAction
+import app.utils as app_utils
+from app.enums import CrocState, CrocOperation, CrocAction, CrocWAV
 from app.managers.manager_settings import SettingsManager
+from app.managers.manager_sound import SoundManager
 
 _PROGRESS_RE = re.compile(
     r"^(Hashing\s+)?(.+?)\s+(\d+)%\s+\|",
@@ -49,6 +51,9 @@ class CrocWorker(QThread):
         self.state: CrocState = CrocState()
 
         self.settings = SettingsManager(app_name, app_version)
+        self.sound_manager = SoundManager(self.settings)
+
+        self.state_changed.connect(self.sound_manager.on_state_change)
 
     # Create and return croc process
     def _create_croc_process(self, operation: CrocOperation, args: list[str]) -> subprocess.Popen:

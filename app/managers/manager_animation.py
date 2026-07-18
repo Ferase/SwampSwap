@@ -45,12 +45,9 @@ class AnimationManager(QObject):
         self.animations: dict[CrocAction, QMovie] = {}
 
         self._theme_colors: dict[str, QColor] = {}
-        self._movie_slot_index_cache: dict[int, dict[str, int]] = {}
+        self._recolor_enabled: bool = True
 
         self._load_animations()
-
-        self.current_anim: QMovie = self.animations[CrocAction.NONE]
-        self._connect_signals()
 
         self.current_anim: QMovie = self.animations[CrocAction.NONE]
         self._connect_signals()
@@ -134,12 +131,6 @@ class AnimationManager(QObject):
 
         self._change_animation(CrocOperation.IDLE, CrocAction.NONE)
 
-    def apply_theme_colors(self, theme_colors: dict[str, QColor]) -> None:
-        """Apply the current theme's colors to the frame."""
-
-        self._theme_colors = theme_colors
-        self._emit_recolored_frame(self.current_anim)
-
     def _on_frame_changed(self, frame_number: int) -> None:
         """Whenever the QMoive object changes frame, push out the recolored frame."""
 
@@ -172,7 +163,7 @@ class AnimationManager(QObject):
     def _recolor_frame(self, image: QImage) -> QImage:
         """Recolor a frame of the current animation using the theme colors as the palette."""
 
-        if not self._theme_colors:
+        if not self._recolor_enabled or not self._theme_colors:
             return image
 
         image = image.convertToFormat(QImage.Format.Format_ARGB32).copy()
@@ -227,3 +218,17 @@ class AnimationManager(QObject):
 
         self._movie_slot_index_cache[cache_key] = slot_index_map
         return slot_index_map
+    
+    def set_recolor_enabled(self, enabled: bool) -> None:
+        """Enable or disable recoloring the gif animations to match the theme."""
+
+        self._recolor_enabled = enabled
+        self._emit_recolored_frame(self.current_anim)
+
+
+
+    def apply_theme_colors(self, theme_colors: dict[str, QColor]) -> None:
+        """Apply the current theme's colors to the frame."""
+
+        self._theme_colors = theme_colors
+        self._emit_recolored_frame(self.current_anim)

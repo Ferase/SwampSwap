@@ -68,8 +68,11 @@
     "dialog:quick_send_warning:title":                  "Clear current selected files list?",
     "dialog:quick_send_warning:body":                   "Doing a quick send will clear your currently selected files list before queueing up what you'd like to quick send. Are you sure you wish to proceed?",
 
-    "dialog:close_warning:title":                       "An operation is running",
-    "dialog:close_warning:body":                        "An operation is currently running. If you close Swamp Swap, it will be terminated. Are you sure you wish to proceed?",
+    "dialog:close_warning_settings:title":              "Unsaved settings",
+    "dialog:close_warning_settings:body":               "You have unsaved settings. Would you like to save them before closing the program?",
+
+    "dialog:close_warning_operation:title":             "An operation is running",
+    "dialog:close_warning_operation:body":              "An operation is currently running. If you close Swamp Swap, it will be terminated. Are you sure you wish to proceed?",
 
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
@@ -120,20 +123,28 @@
     "receive:btn:paste_code":                           "Paste code",
 
     "options:heading:general":                          "General",
+    "options:heading:ui":                               "User Interface",
     "options:heading:relays":                           "Relays",
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
 
-    "options:language:label":                           "Language",
-    "options:language:tooltip":                         "Set the application's display language.",
-    "options:theme:label":                              "Theme",
-    "options:theme:tooltip":                            "Set the application's color theme.",
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",
     "options:startup_croc_updates_check:label":         "Check for croc updates on startup",
     "options:startup_croc_updates_check:tooltip":       "If checked, Swamp Swap will notify you if an update is available for croc.",
     "options:startup_swampswap_updates_check:label":    "Check for GUI updates on startup",
     "options:startup_swampswap_updates_check:tooltip":  "If checked, Swamp Swap will notify you if an update is available for the GUI application.",
+
+    "options:language:label":                           "Language",
+    "options:language:tooltip":                         "Set the application's display language.",
+    "options:theme:label":                              "Theme",
+    "options:theme:tooltip":                            "Set the application's color theme.",
+    "options:animation_matches_theme:label":            "Enable animation theming",
+    "options:animation_matches_theme:tooltip":          "If enabled, the croc animations at the bottom of the window will swap palettes based on the currently selected theme.",
+    "options:enable_sound:label":                       "Enable sound",
+    "options:enable_sound:tooltip":                     "If true, sounds will be enabled in the program.",
+    "options:sound_volume:label":                       "Sound volume",
+    "options:sound_volume:tooltip":                     "Determines the volume of the program's sound effects.",
 
     "options:yes:label":                                "Auto-agree to all prompts",
     "options:yes:tooltip":                              "If checked, you will automatically accept all files being received and approve all files being sent.",

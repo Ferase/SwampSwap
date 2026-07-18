@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import (
     QMessageBox, QPushButton, QGroupBox, QVBoxLayout,
     QScrollArea, QLabel, QWidget, QLineEdit,
-    QCheckBox
+    QCheckBox, QSlider, QDoubleSpinBox, QHBoxLayout
 )
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker
@@ -16,6 +16,7 @@ _PADDING: int = 10
 class SettingsWidget(QWidget):
 
     settings_changed = pyqtSignal(bool)
+    volume_chaged = pyqtSignal(float)
 
     # Init
     def __init__(self, worker: CrocWorker, parent=None) -> None:
@@ -27,8 +28,9 @@ class SettingsWidget(QWidget):
 
         # Build UI
         self._build_central()
-
+        self._load_from_settings()
         self._connect_signals()
+        self._enable_disable_settings()
 
     # Construct main UI
     def _build_central(self) -> None:
@@ -49,11 +51,14 @@ class SettingsWidget(QWidget):
 
         # Example content
         group_general_settings = self._build_general_settings_group()
+        group_ui_settings = self._build_ui_settings_group()
         group_relay_settings = self._build_relay_settings_group()
         group_network_settings = self._build_network_settings_group()
         group_flags_settings = self._build_flags_settings_group()
 
         layout.addWidget(group_general_settings)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(group_ui_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_relay_settings)
         layout.addSpacing(_PADDING)
@@ -70,6 +75,28 @@ class SettingsWidget(QWidget):
     def _build_general_settings_group(self) -> QGroupBox:
         self.general_group = QGroupBox(self.worker.settings.tr("options:heading:general"))
         layout = QVBoxLayout(self.general_group)
+
+        self.checkbox_startup_croc_updates_check = QCheckBox(self.worker.settings.tr("options:startup_croc_updates_check:label"))
+        self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
+        self.checkbox_startup_croc_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
+
+        self.checkbox_startup_swampswap_updates_check = QCheckBox(self.worker.settings.tr("options:startup_swampswap_updates_check:label"))
+        self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
+        self.checkbox_startup_swampswap_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
+
+        self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
+        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+
+        layout.addWidget(self.checkbox_startup_console)
+        layout.addWidget(self.checkbox_startup_croc_updates_check)
+        layout.addWidget(self.checkbox_startup_swampswap_updates_check)
+
+        return self.general_group
+    
+    def _build_ui_settings_group(self) -> QGroupBox:
+        self.ui_group = QGroupBox(self.worker.settings.tr("options:heading:ui"))
+        layout = QVBoxLayout(self.ui_group)
         
         self.label_lang = QLabel(self.worker.settings.tr("options:language:label"))
         self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
@@ -87,17 +114,26 @@ class SettingsWidget(QWidget):
         self.combo_theme.addItems(self.worker.settings.theme_list)
         self.combo_theme.setCurrentText(self.worker.settings.theme)
 
-        self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
-        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
-        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+        self.checkbox_animation_matches_theme = QCheckBox(self.worker.settings.tr("options:animation_matches_theme:label"))
+        self.checkbox_animation_matches_theme.setToolTip(self.worker.settings.tr("options:animation_matches_theme:tooltip"))
+        self.checkbox_animation_matches_theme.setChecked(self.worker.settings.animation_matches_theme)
 
-        self.checkbox_startup_croc_updates_check = QCheckBox(self.worker.settings.tr("options:startup_croc_updates_check:label"))
-        self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
-        self.checkbox_startup_croc_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
+        self.checkbox_enable_sound = QCheckBox(self.worker.settings.tr("options:enable_sound:label"))
+        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
+        self.checkbox_enable_sound.setChecked(self.worker.settings.enable_sound)
 
-        self.checkbox_startup_swampswap_updates_check = QCheckBox(self.worker.settings.tr("options:startup_swampswap_updates_check:label"))
-        self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
-        self.checkbox_startup_swampswap_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
+        self.label_sound_volume = QLabel(self.worker.settings.tr("options:sound_volume:label"))
+        self.label_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
+        self.slider_sound_volume = app_utils.ClickableSlider()
+        self.slider_sound_volume = QSlider(Qt.Orientation.Horizontal)
+        self.slider_sound_volume.setRange(0, 100)
+        self.slider_sound_volume.setPageStep(1)
+        self.slider_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
+        self.spinbox_sound_volume = QDoubleSpinBox()
+        self.spinbox_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
+        self.spinbox_sound_volume.setMinimum(0.0)
+        self.spinbox_sound_volume.setMaximum(1.0)
+        self.spinbox_sound_volume.setSingleStep(0.05)
 
         layout.addWidget(self.label_lang)
         layout.addWidget(self.combo_lang)
@@ -105,11 +141,20 @@ class SettingsWidget(QWidget):
         layout.addWidget(self.label_theme)
         layout.addWidget(self.combo_theme)
         layout.addSpacing(_PADDING)
-        layout.addWidget(self.checkbox_startup_console)
-        layout.addWidget(self.checkbox_startup_croc_updates_check)
-        layout.addWidget(self.checkbox_startup_swampswap_updates_check)
+        layout.addWidget(self.checkbox_animation_matches_theme)
+        layout.addWidget(self.checkbox_enable_sound)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(self.label_sound_volume)
 
-        return self.general_group
+        layout_volume_slider = QHBoxLayout()
+        layout_volume_slider.addWidget(self.slider_sound_volume)
+        layout_volume_slider.addWidget(self.spinbox_sound_volume)
+        layout_volume_slider.setStretch(0, 3)
+        layout_volume_slider.setStretch(1, 1)
+
+        layout.addLayout(layout_volume_slider)
+
+        return self.ui_group
     
     def _build_relay_settings_group(self) -> QGroupBox:
         self.relays_group = QGroupBox(self.worker.settings.tr("options:heading:relays"))
@@ -269,18 +314,28 @@ class SettingsWidget(QWidget):
         self.setWindowTitle(self.worker.settings.tr("options:window:title"))
 
         self.general_group.setTitle(self.worker.settings.tr("options:heading:general"))
+        self.checkbox_startup_croc_updates_check.setText(self.worker.settings.tr("options:startup_croc_updates_check:label"))
+        self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
+        self.checkbox_startup_swampswap_updates_check.setText(self.worker.settings.tr("options:startup_swampswap_updates_check:label"))
+        self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
+        self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
+
+        self.ui_group.setTitle(self.worker.settings.tr("options:heading:ui"))
         self.label_lang.setText(self.worker.settings.tr("options:language:label"))
         self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
         self.combo_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
         self.label_theme.setText(self.worker.settings.tr("options:theme:label"))
         self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
         self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
-        self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
-        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
-        self.checkbox_startup_croc_updates_check.setText(self.worker.settings.tr("options:startup_croc_updates_check:label"))
-        self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
-        self.checkbox_startup_swampswap_updates_check.setText(self.worker.settings.tr("options:startup_swampswap_updates_check:label"))
-        self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
+        self.checkbox_animation_matches_theme.setText(self.worker.settings.tr("options:animation_matches_theme:label"))
+        self.checkbox_animation_matches_theme.setToolTip(self.worker.settings.tr("options:animation_matches_theme:tooltip"))
+        self.checkbox_enable_sound.setText(self.worker.settings.tr("options:enable_sound:label"))
+        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
+        self.label_sound_volume.setText(self.worker.settings.tr("options:sound_volume:label"))
+        self.label_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
+        self.slider_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
+        self.spinbox_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
 
         self.relays_group.setTitle(self.worker.settings.tr("options:heading:relays"))
         self.label_relay.setText(self.worker.settings.tr("options:relay:label"))
@@ -337,16 +392,27 @@ class SettingsWidget(QWidget):
 
         self.combo_lang.currentTextChanged.connect(self._change_language)
         self.combo_theme.currentTextChanged.connect(self._change_theme)
+        self.checkbox_animation_matches_theme.toggled.connect(self._on_animation_matches_theme_toggled)
+        self.checkbox_enable_sound.clicked.connect(self._toggle_volume_controls)
+
+        self.slider_sound_volume.valueChanged.connect(self._on_slider_volume_changed)
+        self.slider_sound_volume.sliderReleased.connect(self._play_enable_sound)
+        self.spinbox_sound_volume.valueChanged.connect(self._on_spinbox_volume_changed)
 
         self.btn_reset.clicked.connect(self._click_reset_button)
         self.btn_save.clicked.connect(self._click_save_button)
 
         # Mark changed settings as dirty
-        self.combo_lang.currentIndexChanged.connect(self._mark_dirty)
-        self.combo_theme.currentIndexChanged.connect(self._mark_dirty)
-        self.checkbox_startup_console.toggled.connect(self._mark_dirty)
         self.checkbox_startup_croc_updates_check.toggled.connect(self._mark_dirty)
         self.checkbox_startup_swampswap_updates_check.toggled.connect(self._mark_dirty)
+        self.checkbox_startup_console.toggled.connect(self._mark_dirty)
+
+        self.combo_lang.currentIndexChanged.connect(self._mark_dirty)
+        self.combo_theme.currentIndexChanged.connect(self._mark_dirty)
+        self.checkbox_animation_matches_theme.toggled.connect(self._mark_dirty)
+        self.checkbox_enable_sound.toggled.connect(self._mark_dirty)
+        self.slider_sound_volume.valueChanged.connect(self._mark_dirty)
+        self.spinbox_sound_volume.valueChanged.connect(self._mark_dirty)
 
         self.lineedit_relay.textChanged.connect(self._mark_dirty)
         self.lineedit_relay6.textChanged.connect(self._mark_dirty)
@@ -375,12 +441,26 @@ class SettingsWidget(QWidget):
         self.worker.settings.theme = text
         self.worker.settings.change_theme()
 
+    def _on_animation_matches_theme_toggled(self, checked: bool) -> None:
+        self.worker.settings.animation_matches_theme = checked
+        self.worker.settings.change_animation_matches_theme()
+
     def _load_from_settings(self) -> None:
-        self.combo_lang.setCurrentText(self.worker.settings.lang)
-        self.combo_theme.setCurrentText(self.worker.settings.theme)
-        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
         self.checkbox_startup_croc_updates_check.setChecked(self.worker.settings.startup_croc_updates_check)
         self.checkbox_startup_swampswap_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
+        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+
+        self.combo_lang.setCurrentText(self.worker.settings.lang)
+        self.combo_theme.setCurrentText(self.worker.settings.theme)
+        self.checkbox_animation_matches_theme.setChecked(self.worker.settings.animation_matches_theme)
+        self.checkbox_enable_sound.setChecked(self.worker.settings.enable_sound)
+
+        self.slider_sound_volume.blockSignals(True)
+        self.spinbox_sound_volume.blockSignals(True)
+        self.slider_sound_volume.setValue(round(self.worker.settings.sound_volume * 100))
+        self.spinbox_sound_volume.setValue(self.worker.settings.sound_volume)
+        self.slider_sound_volume.blockSignals(False)
+        self.spinbox_sound_volume.blockSignals(False)
 
         self.lineedit_relay.setText(self.worker.settings.relay)
         self.lineedit_relay6.setText(self.worker.settings.relay6)
@@ -400,11 +480,15 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setChecked(self.worker.settings.local)
 
     def _save_to_settings(self) -> None:
-        self.worker.settings.lang = self.combo_lang.currentText()
-        self.worker.settings.theme = self.combo_theme.currentText()
-        self.worker.settings.startup_console = self.checkbox_startup_console.isChecked()
         self.worker.settings.startup_croc_updates_check = self.checkbox_startup_croc_updates_check.isChecked()
         self.worker.settings.startup_swampswap_updates_check = self.checkbox_startup_swampswap_updates_check.isChecked()
+        self.worker.settings.startup_console = self.checkbox_startup_console.isChecked()
+
+        self.worker.settings.lang = self.combo_lang.currentText()
+        self.worker.settings.theme = self.combo_theme.currentText()
+        self.worker.settings.animation_matches_theme = self.checkbox_animation_matches_theme.isChecked()
+        self.worker.settings.enable_sound = self.checkbox_enable_sound.isChecked()
+        self.worker.settings.sound_volume = self.spinbox_sound_volume.value()
 
         self.worker.settings.relay = self.lineedit_relay.text()
         self.worker.settings.relay6 = self.lineedit_relay6.text()
@@ -425,11 +509,15 @@ class SettingsWidget(QWidget):
 
     def _ui_settings_to_dict(self) -> dict[str, bool | str]:
         return {
-            "lang": self.combo_lang.currentText(),
-            "theme": self.combo_theme.currentText(),
-            "startup_console": self.checkbox_startup_console.isChecked(),
             "startup_croc_updates_check": self.checkbox_startup_croc_updates_check.isChecked(),
             "startup_swampswap_updates_check": self.checkbox_startup_swampswap_updates_check.isChecked(),
+            "startup_console": self.checkbox_startup_console.isChecked(),
+
+            "lang": self.combo_lang.currentText(),
+            "theme": self.combo_theme.currentText(),
+            "animation_matches_theme": self.checkbox_animation_matches_theme.isChecked(),
+            "enable_sound": self.checkbox_enable_sound.isChecked(),
+            "sound_volume": self.slider_sound_volume.value(),
             
             "relay": self.lineedit_relay.text(),
             "relay6": self.lineedit_relay6.text(),
@@ -448,6 +536,13 @@ class SettingsWidget(QWidget):
             "nocompress": self.checkbox_nocompress.isChecked(),
             "local": self.checkbox_local.isChecked()
         }
+    
+    def _set_defaults(self) -> None:
+        self.worker.settings.set_defaults()
+        self._load_from_settings()
+        self.worker.sound_manager.set_volume(self.worker.settings.sound_volume)
+        self.worker.settings.theme_manager.select_theme(self.worker.settings.theme)
+        self.worker.settings.save_settings()
 
     def _mark_dirty(self):
         saved_settings: dict[str, bool | str] = self.worker.settings.serialize_to_dict()
@@ -489,9 +584,7 @@ class SettingsWidget(QWidget):
         )
 
         if box2 == QMessageBox.StandardButton.Yes:
-            self.worker.settings.set_defaults()
-            self._load_from_settings()
-            self.worker.settings.save_settings()
+            self._set_defaults()
 
     def _click_save_button(self) -> None:
         self._save_to_settings()
@@ -505,3 +598,35 @@ class SettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok,
             QMessageBox.StandardButton.Ok
         )
+
+
+
+    def _on_slider_volume_changed(self, value: int) -> None:
+        volume = value / 100.0
+
+        self.spinbox_sound_volume.blockSignals(True)
+        self.spinbox_sound_volume.setValue(volume)
+        self.spinbox_sound_volume.blockSignals(False)
+
+        self.worker.sound_manager.set_volume(volume)
+
+    def _on_spinbox_volume_changed(self, value: float) -> None:
+        self.slider_sound_volume.blockSignals(True)
+        self.slider_sound_volume.setValue(round(value * 100))
+        self.slider_sound_volume.blockSignals(False)
+
+        self.worker.sound_manager.set_volume(value)
+
+    def _play_enable_sound(self) -> None:
+        self.worker.sound_manager.play_enable_sound()
+
+    def _toggle_volume_controls(self, sound_enabled: bool, play_sound: bool = True) -> None:
+        if sound_enabled and play_sound:
+            self._play_enable_sound()
+
+        self.label_sound_volume.setEnabled(sound_enabled)
+        self.slider_sound_volume.setEnabled(sound_enabled)
+        self.spinbox_sound_volume.setEnabled(sound_enabled)
+
+    def _enable_disable_settings(self) -> None:
+        self._toggle_volume_controls(self.worker.settings.enable_sound, False)

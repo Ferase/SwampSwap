@@ -5,9 +5,11 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import (
     QGroupBox, QComboBox, QFileDialog, QListView,
-    QTreeView, QAbstractItemView
+    QTreeView, QAbstractItemView, QStyleOptionSlider, QStyle,
+    QSlider
 )
 from PyQt6.QtGui import QWheelEvent, QFileSystemModel
+from PyQt6.QtCore import Qt
 
 # Regex used to see if a string matches the formatting of croc's auto-generated codes
 CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
@@ -155,3 +157,33 @@ class MultiFolderDialog(QFileDialog):
         for view in self.findChildren((QListView, QTreeView)):
             if isinstance(view.model(), QFileSystemModel):
                 view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+
+
+
+class ClickableSlider(QSlider):
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            opt = QStyleOptionSlider()
+            self.initStyleOption(opt)
+            sr = self.style().subControlRect(
+                QStyle.ComplexControl.CC_Slider, 
+                opt, 
+                QStyle.SubControl.SC_SliderGroove, 
+                self
+            )
+
+            if self.orientation() == Qt.Orientation.Horizontal:
+                slider_length = sr.width()
+                slider_pos = event.position().x() - sr.x()
+            else:
+                slider_length = sr.height()
+                slider_pos = sr.bottom() - event.position().y()
+
+            if slider_length > 0:
+                percentage = max(0.0, min(1.0, slider_pos / slider_length))
+                new_value = self.minimum() + int(percentage * (self.maximum() - self.minimum()))
+                self.setValue(new_value)
+                
+            event.accept()
+        
+        super().mousePressEvent(event)

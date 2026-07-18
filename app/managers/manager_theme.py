@@ -165,3 +165,8 @@ class ThemeManager(QObject):
         """Returns a full list of all of the loaded palettes."""
 
         return self.palettes.get_list()
+
+    def set_animation_matches_theme(self, enabled: bool) -> None:
+        """Enable or disable recoloring the gif animations to match the current theme."""
+
+        self.animation_manager.set_recolor_enabled(enabled)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
 
 
 
@@ -28,6 +28,13 @@ class CrocAction(Enum):
 
     def __init__(self, text: str):
         self.text = text
+
+class CrocWAV(StrEnum):
+    START = "start"
+    ERROR = "error"
+    CANCEL = "cancel"
+    AWAITING_APPROVAL = "awaiting_approval"
+    COMPLETE = "complete"
 
 @dataclass
 class CrocState():
