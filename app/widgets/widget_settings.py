@@ -302,14 +302,23 @@ class SettingsWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         self.btn_save = QPushButton(self.worker.settings.tr("generic:save"))
-        self.btn_revert = QPushButton(self.worker.settings.tr("options:revert_settings"))
-        self.btn_reset = QPushButton(self.worker.settings.tr("generic:reset_defaults"))
+
+        btn_row = QHBoxLayout()
+
+        self.btn_revert = QPushButton(self.worker.settings.tr("options:btn:revert_settings"))
+        self.btn_reset = QPushButton(self.worker.settings.tr("options:btn:reset_defaults"))
 
         self.btn_revert.setEnabled(False)
+        self.btn_reset.setEnabled(not self.worker.settings.are_settings_default())
 
         layout.addWidget(self.btn_save)
-        layout.addWidget(self.btn_revert)
-        layout.addWidget(self.btn_reset)
+
+        layout.addLayout(btn_row)
+        btn_row.addWidget(self.btn_revert)
+        btn_row.addWidget(self.btn_reset)
+
+        btn_row.setStretch(0, 1)
+        btn_row.setStretch(1, 1)
 
         return widget
     
@@ -388,8 +397,8 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setToolTip(self.worker.settings.tr("options:local:tooltip"))
 
         self.btn_reset.setText(self.worker.settings.tr("generic:reset_defaults"))
-        self.btn_revert.setText(self.worker.settings.tr("options:revert_settings"))
-        self.btn_save.setText(self.worker.settings.tr("generic:save"))
+        self.btn_revert.setText(self.worker.settings.tr("options:btn:revert_settings"))
+        self.btn_save.setText(self.worker.settings.tr("options:btn:save"))
 
 
 
@@ -573,6 +582,8 @@ class SettingsWidget(QWidget):
     def _clear_dirty(self):
         self.dirty = False
         self.btn_revert.setEnabled(False)
+        self.btn_reset.setEnabled(not self.worker.settings.are_settings_default())
+
         self.settings_changed.emit(False)
 
 

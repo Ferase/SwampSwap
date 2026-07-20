@@ -17,7 +17,6 @@
     "generic:error":                                    "Error",
     "generic:add_files":                                "Add files",
     "generic:add_folders":                              "Add folders",
-    "generic:reset_defaults":                           "Reset to defaults",
 
     "template:num_file_single":                         "{n} file",
     "template:num_files_multiple":                      "{n} files",
@@ -135,7 +134,8 @@
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
 
-    "options:revert_settings":                          "Revert settings",
+    "options:btn:reset_defaults":                       "Reset to defaults",
+    "options:btn:revert_settings":                      "Revert changes",
 
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",
