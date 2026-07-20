@@ -50,14 +50,18 @@
     "dialog:saved_settings:title":                      "Saved settings",
     "dialog:saved_settings:body":                       "Your settings were saved.",
 
-    "dialog:default_settings:title":                    "Reset settings",
-    "dialog:default_settings:body":                     "Are you sure you want to reset settings to default? This can't be undone!",
+    "dialog:reset_settings:title":                      "Reset settings",
+    "dialog:reset_settings:body":                       "Are you sure you want to reset settings to default? This can't be undone!",
+
+    "dialog:revert_settings:title":                     "Revert settings",
+    "dialog:revert_settings:body":                      "You are about to return your settings to how they were before you started editing them. Are you sure you want to proceed?",
 
     "dialog:settings_are_default:title":                "Settings are default",
     "dialog:settings_are_default:body":                 "All of the settings are already at their default values. No action has been performed.",
 
     "dialog:unsaved_settings:title":                    "Unsaved settings",
-    "dialog:unsaved_settings:body":                     "You have unsaved changes. WIthout saving, your custom settings will not be applied to your croc transfers.<br><br>It is advised that you save your settings before continuing.",
+    "dialog:unsaved_settings:body1":                    "You have unsaved changes. WIthout saving, your settings will not be applied to your croc transfers.",
+    "dialog:unsaved_settings:body2":                    "You can either save or discard your settings, abort switching tabs to continue editing them, or ignore to switch tabs without saving or reverting your settings.",
 
     "dialog:clear_list_confirm:title":                  "Confirm clearing",
     "dialog:clear_list_confirm:body":                   "Are you sure you want to clear the list of files you want to send?",
@@ -86,6 +90,9 @@
     "state:receiving":                                  "Receiving",
     "state:completed":                                  "Completed!",
     "state:cancelled":                                  "Cancelled",
+
+    "statusbar:console:tooltip":                        "Show the console",
+    "statusbar:about:tooltip":                          "Show the about window",
 
     "menubar:file":                                     "File",
     "menubar:actions":                                  "Actions",
@@ -127,6 +134,8 @@
     "options:heading:relays":                           "Relays",
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
+
+    "options:revert_settings":                          "Revert settings",
 
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",

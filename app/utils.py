@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
-    QGroupBox, QComboBox, QFileDialog, QListView,
+    QDoubleSpinBox, QComboBox, QFileDialog, QListView,
     QTreeView, QAbstractItemView, QStyleOptionSlider, QStyle,
     QSlider
 )
@@ -187,3 +187,10 @@ class ClickableSlider(QSlider):
             event.accept()
         
         super().mousePressEvent(event)
+
+    def wheelEvent(self, event: QWheelEvent):
+        event.ignore()
+
+class NoScrollDoubleSpinBox(QDoubleSpinBox):
+    def wheelEvent(self, event: QWheelEvent):
+        event.ignore()

@@ -23,6 +23,8 @@ class SettingsWidget(QWidget):
         # Run base init
         super().__init__(parent)
 
+        self._previous_settings: dict[str, str | bool | float] | None = None
+
         self.worker: CrocWorker = worker
         self.dirty = False
 
@@ -31,6 +33,7 @@ class SettingsWidget(QWidget):
         self._load_from_settings()
         self._connect_signals()
         self._enable_disable_settings()
+        self._set_previous_settings()
 
     # Construct main UI
     def _build_central(self) -> None:
@@ -129,7 +132,7 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.setRange(0, 100)
         self.slider_sound_volume.setPageStep(1)
         self.slider_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
-        self.spinbox_sound_volume = QDoubleSpinBox()
+        self.spinbox_sound_volume = app_utils.NoScrollDoubleSpinBox()
         self.spinbox_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
         self.spinbox_sound_volume.setMinimum(0.0)
         self.spinbox_sound_volume.setMaximum(1.0)
@@ -299,9 +302,13 @@ class SettingsWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         self.btn_save = QPushButton(self.worker.settings.tr("generic:save"))
+        self.btn_revert = QPushButton(self.worker.settings.tr("options:revert_settings"))
         self.btn_reset = QPushButton(self.worker.settings.tr("generic:reset_defaults"))
 
+        self.btn_revert.setEnabled(False)
+
         layout.addWidget(self.btn_save)
+        layout.addWidget(self.btn_revert)
         layout.addWidget(self.btn_reset)
 
         return widget
@@ -381,6 +388,7 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setToolTip(self.worker.settings.tr("options:local:tooltip"))
 
         self.btn_reset.setText(self.worker.settings.tr("generic:reset_defaults"))
+        self.btn_revert.setText(self.worker.settings.tr("options:revert_settings"))
         self.btn_save.setText(self.worker.settings.tr("generic:save"))
 
 
@@ -393,13 +401,14 @@ class SettingsWidget(QWidget):
         self.combo_lang.currentTextChanged.connect(self._change_language)
         self.combo_theme.currentTextChanged.connect(self._change_theme)
         self.checkbox_animation_matches_theme.toggled.connect(self._on_animation_matches_theme_toggled)
-        self.checkbox_enable_sound.clicked.connect(self._toggle_volume_controls)
+        self.checkbox_enable_sound.toggled.connect(self._toggle_volume_controls)
 
         self.slider_sound_volume.valueChanged.connect(self._on_slider_volume_changed)
         self.slider_sound_volume.sliderReleased.connect(self._play_enable_sound)
         self.spinbox_sound_volume.valueChanged.connect(self._on_spinbox_volume_changed)
 
         self.btn_reset.clicked.connect(self._click_reset_button)
+        self.btn_revert.clicked.connect(self._click_revert_button)
         self.btn_save.clicked.connect(self._click_save_button)
 
         # Mark changed settings as dirty
@@ -507,6 +516,8 @@ class SettingsWidget(QWidget):
         self.worker.settings.nocompress = self.checkbox_nocompress.isChecked()
         self.worker.settings.local = self.checkbox_local.isChecked()
 
+        self._set_previous_settings()
+
     def _ui_settings_to_dict(self) -> dict[str, bool | str]:
         return {
             "startup_croc_updates_check": self.checkbox_startup_croc_updates_check.isChecked(),
@@ -517,7 +528,7 @@ class SettingsWidget(QWidget):
             "theme": self.combo_theme.currentText(),
             "animation_matches_theme": self.checkbox_animation_matches_theme.isChecked(),
             "enable_sound": self.checkbox_enable_sound.isChecked(),
-            "sound_volume": self.slider_sound_volume.value(),
+            "sound_volume": self.spinbox_sound_volume.value(),
             
             "relay": self.lineedit_relay.text(),
             "relay6": self.lineedit_relay6.text(),
@@ -548,11 +559,12 @@ class SettingsWidget(QWidget):
         saved_settings: dict[str, bool | str] = self.worker.settings.serialize_to_dict()
         ui_settings: dict[str, bool | str] = self._ui_settings_to_dict()
 
-        for setting, value in saved_settings.items():
+        for setting, value in self._previous_settings.items():
             if ui_settings[setting] == value:
                 continue
 
             self.dirty = True
+            self.btn_revert.setEnabled(True)
             self.settings_changed.emit(True)
             return
         
@@ -560,6 +572,7 @@ class SettingsWidget(QWidget):
 
     def _clear_dirty(self):
         self.dirty = False
+        self.btn_revert.setEnabled(False)
         self.settings_changed.emit(False)
 
 
@@ -577,8 +590,8 @@ class SettingsWidget(QWidget):
 
         box2 = QMessageBox.question(
             self,
-            self.worker.settings.tr("dialog:default_settings:title"),
-            self.worker.settings.tr("dialog:default_settings:body"),
+            self.worker.settings.tr("dialog:reset_settings:title"),
+            self.worker.settings.tr("dialog:reset_settings:body"),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
@@ -598,6 +611,20 @@ class SettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok,
             QMessageBox.StandardButton.Ok
         )
+
+    def _click_revert_button(self) -> None:
+        box = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:revert_settings:title"),
+            self.worker.settings.tr("dialog:revert_settings:body"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            return
+        
+        self.restore_previous_settings()
 
 
 
@@ -630,3 +657,13 @@ class SettingsWidget(QWidget):
 
     def _enable_disable_settings(self) -> None:
         self._toggle_volume_controls(self.worker.settings.enable_sound, False)
+
+    def _set_previous_settings(self) -> None:
+        self._previous_settings = self._ui_settings_to_dict()
+
+    def restore_previous_settings(self) -> None:
+        if self._previous_settings is None:
+            return
+        
+        self.worker.settings.set_all_from_dict(self._previous_settings)
+        self._load_from_settings()

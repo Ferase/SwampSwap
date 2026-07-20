@@ -75,7 +75,7 @@ def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
     box = QMessageBox.warning(
         window,
         worker.settings.tr("dialog:croc_not_installed:title"),
-        worker.settings.tr("dialog:croc_not_installed:body1") + "\n\n" + worker.settings.tr("dialog:croc_not_installed:body2"),
+        worker.settings.tr("dialog:croc_not_installed:body1") + "<br><br>" + worker.settings.tr("dialog:croc_not_installed:body2"),
         QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
         QMessageBox.StandardButton.Open
     )
@@ -94,7 +94,7 @@ def _new_croc_version_available(parent, worker: CrocWorker, new_version: str) ->
     result = QMessageBox.information(
         parent,
         worker.settings.tr("dialog:croc_update_available:title"),
-        worker.settings.tr("dialog:croc_update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:croc_update_available:body2") + "\n" + f"<b>{worker.settings.tr('dialog:croc_update_available:body3')}</b>",
+        worker.settings.tr("dialog:croc_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:croc_update_available:body2") + "<br><br>" + f"<b>{worker.settings.tr('dialog:croc_update_available:body3')}</b>",
         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         QMessageBox.StandardButton.Yes
     )
@@ -112,7 +112,7 @@ def _new_swampswap_version_available(parent, worker: CrocWorker, new_version: st
     result = QMessageBox.information(
         parent,
         worker.settings.tr("dialog:swampswap_update_available:title"),
-        worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "\n" + worker.settings.tr("dialog:swampswap_update_available:body2"),
+        worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:swampswap_update_available:body2"),
         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         QMessageBox.StandardButton.Yes
     )

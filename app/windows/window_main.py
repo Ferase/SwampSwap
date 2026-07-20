@@ -148,9 +148,11 @@ class MainWindow(QMainWindow):
 
         self.btn_console = QToolButton()
         self.btn_console.setIcon(console_icon)
+        self.btn_console.setToolTip(self.worker.settings.tr("statusbar:console:tooltip"))
 
         self.btn_about = QToolButton()
         self.btn_about.setIcon(about_icon)
+        self.btn_about.setToolTip(self.worker.settings.tr("statusbar:about:tooltip"))
 
         self.statusBar().addWidget(self.label_status)
         self.statusBar().addPermanentWidget(self.btn_console)
@@ -187,6 +189,8 @@ class MainWindow(QMainWindow):
         self.send_folder_action.setText(self.worker.settings.tr("menubar:actions:send_folder"))
         self.receive_action.setText(self.worker.settings.tr("menubar:actions:receive"))
         self.stop_actopm.setText(self.worker.settings.tr("menubar:actions:stop_all"))
+        self.btn_console.setToolTip(self.worker.settings.tr("statusbar:console:tooltip"))
+        self.btn_about.setToolTip(self.worker.settings.tr("statusbar:about:tooltip"))
 
 
 
@@ -248,14 +252,24 @@ class MainWindow(QMainWindow):
         box = QMessageBox.information(
             self,
             self.worker.settings.tr("dialog:unsaved_settings:title"),
-            self.worker.settings.tr("dialog:unsaved_settings:body"),
-            QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Ignore,
-            QMessageBox.StandardButton.Save
+            self.worker.settings.tr("dialog:unsaved_settings:body1") + "<br><br>" + self.worker.settings.tr("dialog:unsaved_settings:body2"),
+            QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ignore,
+            QMessageBox.StandardButton.Abort
         )
 
         # Click the save button for the user
-        if box == QMessageBox.StandardButton.Save:
-            self.widget_settings.btn_save.click()
+        match box:
+            case QMessageBox.StandardButton.Save:
+                self.widget_settings.btn_save.click()
+            case QMessageBox.StandardButton.Discard:
+                self.widget_settings.restore_previous_settings()
+            case QMessageBox.StandardButton.Abort:
+                self.tabs.blockSignals(True)
+                self.tabs.tabBar().setCurrentIndex(2)
+                self.tabs.blockSignals(False)
+                return
+            case _:
+                pass
 
         self._current_selected_tab_index = index
 
