@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
     QSlider
 )
 from PyQt6.QtGui import QWheelEvent, QFileSystemModel
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QEvent, QObject
 
 # Regex used to see if a string matches the formatting of croc's auto-generated codes
 CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
@@ -185,6 +185,7 @@ class ClickableSlider(QSlider):
                 self.setValue(new_value)
                 
             event.accept()
+            return
         
         super().mousePressEvent(event)
 

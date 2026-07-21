@@ -565,7 +565,6 @@ class SettingsWidget(QWidget):
         self.worker.settings.save_settings()
 
     def _mark_dirty(self):
-        saved_settings: dict[str, bool | str] = self.worker.settings.serialize_to_dict()
         ui_settings: dict[str, bool | str] = self._ui_settings_to_dict()
 
         for setting, value in self._previous_settings.items():
@@ -678,3 +677,4 @@ class SettingsWidget(QWidget):
         
         self.worker.settings.set_all_from_dict(self._previous_settings)
         self._load_from_settings()
+        self._clear_dirty()

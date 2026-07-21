@@ -34,6 +34,8 @@ class CrocWAV(StrEnum):
     ERROR = "error"
     CANCEL = "cancel"
     AWAITING_APPROVAL = "awaiting_approval"
+    SENDING = "sending"
+    RECEIVING = "receiving"
     COMPLETE = "complete"
 
 @dataclass

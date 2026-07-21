@@ -55,6 +55,10 @@ class SoundManager(QObject):
                 wav = CrocWAV.CANCEL
             case CrocAction.WAIT_FOR_APPROVAL:
                 wav = CrocWAV.AWAITING_APPROVAL
+            case CrocAction.SEND_IN_PROGRESS:
+                wav = CrocWAV.SENDING
+            case CrocAction.RECEIVE_IN_PROGRESS:
+                wav = CrocWAV.RECEIVING
             case CrocAction.COMPLETED:
                 wav = CrocWAV.COMPLETE
             case _:

@@ -8,7 +8,7 @@
         "highlight": [141, 192, 86],
         "text_highlight": [0, 0, 0],
         "disabled": [128, 128, 180],
-        "text_placeholder": [244, 206, 132],
+        "text_placeholder": [112, 153, 64],
 
         "anim_black": [0, 0, 0],
         "anim_white": [255, 255, 255],
