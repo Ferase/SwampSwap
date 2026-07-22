@@ -7,13 +7,13 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QDialog,
     QPushButton, QLineEdit, QLabel, QMessageBox,
     QGroupBox, QFileDialog, QApplication, QFrame,
-    QStyle
+    QStyle, QTabWidget, QTextEdit
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QFont
 
 import app.utils as app_utils
-from app.enums import CrocOperation, CrocAction
+from app.enums import CrocOperation, CrocAction, SendType
 from app.workers.worker_croc import CrocWorker
 from app.windows.window_filelist import FileListWindow
 
@@ -90,6 +90,94 @@ class DropZone(QFrame):
 
 
 
+class SendFilesWidget(QWidget):
+    def __init__(self, worker: CrocWorker, parent=None) -> None:
+        # Run base init
+        super().__init__(parent)
+
+        self.worker = worker
+
+        # Build UI
+        self._build_central()
+        self._connect_signals()
+
+    def _build_central(self) -> None:
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        self.drop_zone = DropZone()
+        self.drop_zone.label_browse_drop.setText(self.worker.settings.tr("send:label:drop_zone"))
+        self.drop_zone.label_file_count.setText(self.worker.settings.tr("send:label:no_files_selected"))
+
+        btn_row = QHBoxLayout()
+
+        self.btn_add_files = QPushButton(self.worker.settings.tr("generic:add_files"))
+        self.btn_add_files.setMinimumHeight(35)
+
+        self.btn_add_folders = QPushButton(self.worker.settings.tr("generic:add_folders"))
+        self.btn_add_folders.setMinimumHeight(35)
+
+        self.btn_view_file_list = QPushButton(self.worker.settings.tr("send:btn:view_file_list"))
+        self.btn_view_file_list.setMinimumHeight(35)
+
+        self.btn_clear_list = QPushButton(self.worker.settings.tr("generic:clear_list"))
+
+        root.addWidget(self.drop_zone)
+
+        root.addLayout(btn_row)
+        btn_row.addWidget(self.btn_add_files)
+        btn_row.addWidget(self.btn_add_folders)
+
+        root.addWidget(self.btn_view_file_list)
+        root.addWidget(self.btn_clear_list)
+
+        self.btn_view_file_list.setEnabled(False)
+        self.btn_clear_list.setEnabled(False)
+
+    def _retranslate(self) -> None:
+        self.drop_zone.label_browse_drop.setText(self.worker.settings.tr("send:label:drop_zone"))
+        self.drop_zone.label_file_count.setText(self.worker.settings.tr("send:label:no_files_selected"))
+        self.btn_add_files.setText(self.worker.settings.tr("generic:add_files"))
+        self.btn_add_folders.setText(self.worker.settings.tr("generic:add_folders"))
+        self.btn_view_file_list.setText(self.worker.settings.tr("send:btn:view_file_list"))
+        self.btn_clear_list.setText(self.worker.settings.tr("generic:clear_list"))
+
+    def _connect_signals(self) -> None:
+        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
+
+
+class SendTextWidget(QWidget):
+    def __init__(self, worker: CrocWorker, parent=None) -> None:
+        # Run base init
+        super().__init__(parent)
+
+        self.worker = worker
+
+        # Build UI
+        self._build_central()
+        self._connect_signals()
+
+    def _build_central(self) -> None:
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        self.label_text = QLabel(self.worker.settings.tr("send:label:send_text"))
+
+        self.textedit_text = QTextEdit()
+        self.textedit_text.setPlaceholderText(self.worker.settings.tr("send:textedit:send_text"))
+
+        root.addWidget(self.label_text)
+        root.addWidget(self.textedit_text)
+
+    def _retranslate(self) -> None:
+        self.textedit_text.setPlaceholderText(self.worker.settings.tr("send:textedit:send_text"))
+
+    def _connect_signals(self) -> None:
+        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
+
+
 class SendWidget(QWidget):
 
     selected_files_changed = pyqtSignal()
@@ -104,6 +192,8 @@ class SendWidget(QWidget):
     def __init__(self, worker: CrocWorker, parent=None) -> None:
         # Run base init
         super().__init__(parent)
+
+        self._send_type: SendType = SendType.FILES
         
         self.worker: CrocWorker = worker
 
@@ -138,39 +228,17 @@ class SendWidget(QWidget):
 
     # Construct file group
     def _build_file_group(self) -> QGroupBox:
-        group = QGroupBox()
-        layout = QVBoxLayout(group)
+        self.tabs = QTabWidget()
+        self.tabs.tabBar().setExpanding(True)
+        self.tabs.tabBar().setUsesScrollButtons(False)
 
-        self.drop_zone = DropZone()
-        self.drop_zone.label_browse_drop.setText(self.worker.settings.tr("send:label:drop_zone"))
-        self.drop_zone.label_file_count.setText(self.worker.settings.tr("send:label:no_files_selected"))
+        self.widget_files = SendFilesWidget(self.worker)
+        self.tabs.addTab(self.widget_files, self.worker.settings.tr("send:tab:files"))
 
-        btn_row = QHBoxLayout()
+        self.widget_text = SendTextWidget(self.worker)
+        self.tabs.addTab(self.widget_text, self.worker.settings.tr("send:tab:text"))
 
-        self.btn_add_files = QPushButton(self.worker.settings.tr("generic:add_files"))
-        self.btn_add_files.setMinimumHeight(35)
-
-        self.btn_add_folders = QPushButton(self.worker.settings.tr("generic:add_folders"))
-        self.btn_add_folders.setMinimumHeight(35)
-
-        self.btn_view_file_list = QPushButton(self.worker.settings.tr("send:btn:view_file_list"))
-        self.btn_view_file_list.setMinimumHeight(35)
-
-        self.btn_clear_list = QPushButton(self.worker.settings.tr("generic:clear_list"))
-
-        layout.addWidget(self.drop_zone)
-
-        layout.addLayout(btn_row)
-        btn_row.addWidget(self.btn_add_files)
-        btn_row.addWidget(self.btn_add_folders)
-
-        layout.addWidget(self.btn_view_file_list)
-        layout.addWidget(self.btn_clear_list)
-
-        self.btn_view_file_list.setEnabled(False)
-        self.btn_clear_list.setEnabled(False)
-
-        return group
+        return self.tabs
     
     # Send controls
     def _build_controls_group(self) -> QGroupBox:
@@ -201,17 +269,11 @@ class SendWidget(QWidget):
     def _retranslate(self) -> None:
         """Retranslate everything on language change."""
 
-        self.drop_zone.label_browse_drop.setText(self.worker.settings.tr("send:label:drop_zone"))
-        self.btn_add_files.setText(self.worker.settings.tr("generic:add_files"))
-        self.btn_add_folders.setText(self.worker.settings.tr("generic:add_folders"))
-        self.btn_view_file_list.setText(self.worker.settings.tr("send:btn:view_file_list"))
-        self.btn_clear_list.setText(self.worker.settings.tr("generic:clear_list"))
-
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
         self.btn_copy_code.setText(self.worker.settings.tr("send:btn:copy_code"))
 
         self._set_button_text_by_operation()
-        self.drop_zone.label_file_count.setText(self._create_file_folder_count_text())
+        self.widget_files.drop_zone.label_file_count.setText(self._create_file_folder_count_text())
         
 
 
@@ -224,6 +286,13 @@ class SendWidget(QWidget):
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
+        self.tabs.currentChanged.connect(
+            lambda i: self._mark_send_type(SendType(i))
+        )
+        self.tabs.currentChanged.connect(self._determine_main_button_behavior)
+
+        self.widget_text.textedit_text.textChanged.connect(self._determine_main_button_behavior)
+
         self.selected_files_changed.connect(self._update_selected_file_ui)
 
         self.files_added.connect(self._add_selected_files)
@@ -232,12 +301,12 @@ class SendWidget(QWidget):
         self.lineedit_code.textChanged.connect(self._enable_copy_code_button)
         self.lineedit_code.textChanged.connect(self._determine_main_button_behavior)
 
-        self.btn_add_files.clicked.connect(self._click_browse_file_button)
-        self.btn_add_folders.clicked.connect(self._click_browse_folder_button)
-        self.btn_view_file_list.clicked.connect(self._click_view_filelist_button)
-        self.btn_clear_list.clicked.connect(self._click_clear_button)
+        self.widget_files.btn_add_files.clicked.connect(self._click_browse_file_button)
+        self.widget_files.btn_add_folders.clicked.connect(self._click_browse_folder_button)
+        self.widget_files.btn_view_file_list.clicked.connect(self._click_view_filelist_button)
+        self.widget_files.btn_clear_list.clicked.connect(self._click_clear_button)
         
-        self.drop_zone.files_dropped.connect(self._add_selected_files)
+        self.widget_files.drop_zone.files_dropped.connect(self._add_selected_files)
 
         self.btn_copy_code.clicked.connect(self._copy_code)
         self.btn_send.clicked.connect(self._click_send_button)
@@ -252,7 +321,7 @@ class SendWidget(QWidget):
             case _:
                 self.btn_send.setText(self.worker.settings.tr("generic:send"))
 
-    def _determine_main_button_behavior(self) -> None:
+    def _main_button_toggle_send_files(self) -> None:
         files_selected: bool = self.are_files_selected()
 
         if self.worker.state.operation == CrocOperation.RECEIVING or not files_selected or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
@@ -266,11 +335,32 @@ class SendWidget(QWidget):
         self._set_button_text_by_operation()
         self.lineedit_code.setDisabled(is_sending)
 
+    def _main_button_toggle_send_text(self) -> None:
+        text_to_send: str = self._get_text_to_send()
+
+        if self.worker.state.operation == CrocOperation.RECEIVING or not text_to_send or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
+            self.btn_send.setEnabled(False)
+            return
+
+        elif text_to_send:
+            self.btn_send.setEnabled(True)
+
+        is_sending: bool = self.worker.state.action not in [CrocAction.NONE, CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]
+        self._set_button_text_by_operation()
+        self.lineedit_code.setDisabled(is_sending)
+
+    def _determine_main_button_behavior(self) -> None:
+        if self._send_type == SendType.FILES:
+            self._main_button_toggle_send_files()
+            return
+
+        self._main_button_toggle_send_text()
+
     def _reset_file_folder_count(self) -> None:
         self.selected_files_folders_count["files"] = 0
         self.selected_files_folders_count["folders"] = 0
 
-        self.drop_zone.label_file_count.setText(self._create_file_folder_count_text())
+        self.widget_files.drop_zone.label_file_count.setText(self._create_file_folder_count_text())
 
     def _calculate_file_folder_count(self) -> None:
         # Init file/folder count
@@ -435,7 +525,7 @@ class SendWidget(QWidget):
 
         self._calculate_file_folder_count()
         count_text: str = self._create_file_folder_count_text()
-        self.drop_zone.label_file_count.setText(count_text)
+        self.widget_files.drop_zone.label_file_count.setText(count_text)
         self._determine_main_button_behavior()
         self._enable_controls()
 
@@ -446,8 +536,8 @@ class SendWidget(QWidget):
         QApplication.clipboard().setText(self.lineedit_code.text())
 
     def _enable_list_buttons(self, enabled: bool) -> None:
-        self.btn_view_file_list.setEnabled(enabled)
-        self.btn_clear_list.setEnabled(enabled)
+        self.widget_files.btn_view_file_list.setEnabled(enabled)
+        self.widget_files.btn_clear_list.setEnabled(enabled)
 
     def _clear_code(self) -> None:
         is_generated_code: bool = app_utils.regex_match(app_utils.CODE_RE, self.lineedit_code.text())
@@ -519,7 +609,13 @@ class SendWidget(QWidget):
             self.worker.change_action(CrocAction.CANCELLED)
             return
 
-        self.worker.start_send(self._flatten_selected_files(), self.lineedit_code.text())
+        items_for_croc: set[Path] | str = None
+        if self._send_type == SendType.FILES:
+            items_for_croc = self._flatten_selected_files()
+        else:
+            items_for_croc = self._get_text_to_send()
+
+        self.worker.start_send(items_for_croc, self.lineedit_code.text())
         self._enable_controls()
 
     def _enable_controls(self) -> None:
@@ -532,8 +628,14 @@ class SendWidget(QWidget):
         if self.worker.state.operation == CrocOperation.SENDING:
             block_all = True
         
-        self.drop_zone.setDisabled(block_all)
-        self.btn_add_files.setDisabled(block_all)
-        self.btn_add_folders.setDisabled(block_all)
-        self.btn_view_file_list.setDisabled(block_all or can_send_no_files)
-        self.btn_clear_list.setDisabled(block_all or can_send_no_files)
+        self.widget_files.drop_zone.setDisabled(block_all)
+        self.widget_files.btn_add_files.setDisabled(block_all)
+        self.widget_files.btn_add_folders.setDisabled(block_all)
+        self.widget_files.btn_view_file_list.setDisabled(block_all or can_send_no_files)
+        self.widget_files.btn_clear_list.setDisabled(block_all or can_send_no_files)
+
+    def _mark_send_type(self, send_type: SendType) -> None:
+        self._send_type = send_type
+
+    def _get_text_to_send(self) -> str:
+        return self.widget_text.textedit_text.toPlainText()

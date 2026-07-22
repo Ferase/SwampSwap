@@ -2,7 +2,8 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QLineEdit,
-    QGroupBox, QFileDialog, QApplication, QMessageBox
+    QGroupBox, QFileDialog, QApplication, QMessageBox,
+    QDialog, QTextEdit, QHBoxLayout, QLabel
 )
 from PyQt6.QtCore import pyqtSignal, QRegularExpression
 
@@ -11,6 +12,56 @@ from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 
 _ACCEPT_RE = QRegularExpression(r"Accept\s+(?:'(?P<filename>[^']+)'|(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?))\s*\((?P<size>[^)]+)\)\?")
+_DISPLAY_TEXT_RE = QRegularExpression(r"Display text message\s+\((?P<size>[^)]+)\)\?")
+_RECEIVING_RE = QRegularExpression(r"Receiving \(<-")
+
+
+
+class ReceiveTextDialog(QDialog):
+    def __init__(self, text: str, worker: CrocWorker, parent=None):
+        super().__init__(parent)
+
+        self.worker = worker
+
+        self.setWindowTitle(self.worker.settings.tr("dialog:displaying_sent_text:title"))
+        self.setFixedSize(600, 300)
+
+        self._text: str = text
+
+        self._build_central()
+        self._connect_signals()
+
+    def _build_central(self) -> None:
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        self.label_display_text = QLabel(self.worker.settings.tr("dialog:displaying_sent_text:body1") + "<br>" + self.worker.settings.tr("dialog:displaying_sent_text:body2"))
+
+        self.textedit_display_text = QTextEdit()
+        self.textedit_display_text.setText(self._text)
+        self.textedit_display_text.setReadOnly(True)
+
+        self.btn_copy_text = QPushButton(self.worker.settings.tr("dialog:displaying_sent_text:copy_text"))
+
+        btn_row = QHBoxLayout()
+
+        self.btn_close = QPushButton(self.worker.settings.tr("generic:close"))
+
+        root.addWidget(self.label_display_text)
+        root.addWidget(self.textedit_display_text)
+        root.addWidget(self.btn_copy_text)
+
+        btn_row.addStretch()
+        btn_row.addWidget(self.btn_close)
+
+        root.addLayout(btn_row)
+
+    def _connect_signals(self) -> None:
+        self.btn_close.clicked.connect(self.accept)
+        self.btn_copy_text.clicked.connect(self._copy_text)
+
+    def _copy_text(self) -> None:
+        QApplication.clipboard().setText(self._text)
 
 
 
@@ -24,6 +75,9 @@ class ReceiveWidget(QWidget):
     def __init__(self, worker: CrocWorker, parent=None) -> None:
         # Run base init
         super().__init__(parent)
+
+        self._is_text_transfer: bool = False
+        self._text_content_lines: list[str] = []
 
         self._output_path: str | None = None
         self._code: str | None = None
@@ -107,7 +161,25 @@ class ReceiveWidget(QWidget):
         box = QMessageBox.question(
             self,
             self.worker.settings.tr("dialog:accept:title"),
-            self.worker.settings.tr("dialog:accept:body").format(f=f"<b>{name}</b>", s=size),
+            self.worker.settings.tr("dialog:accept:body1") + "<br><br>" + self.worker.settings.tr("dialog:accept:body2").format(f=f"<b>{name}</b>", s=size),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            self.worker.send_input("n")
+            self.worker.change_action(CrocAction.CANCELLED)
+            return
+        
+        self.worker.send_input("y")
+
+    def _raise_display_messagebox(self, size: str) -> None:
+        QApplication.alert(self)
+
+        box = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:ask_display_text:title"),
+            self.worker.settings.tr("dialog:ask_display_text:body1") + "<br><br>" + self.worker.settings.tr("dialog:ask_display_text:body2").format(s=size),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No
         )
@@ -180,7 +252,15 @@ class ReceiveWidget(QWidget):
         self.lineedit_code.setText(clipboard_text)
     
     def _read_command_line(self, line: str) -> None:
+        if self._is_text_transfer and self._text_content_lines is not None:
+            self._text_content_lines.append(line)
+            return
+
         self._test_for_accept(line)
+        self._test_for_display(line)
+
+        if _RECEIVING_RE.match(line, 0).hasMatch() and self._is_text_transfer:
+            self._text_content_lines = []
 
     def _test_for_accept(self, line: str) -> None:
         matched_accept_prompt = _ACCEPT_RE.match(line, 0)
@@ -193,6 +273,16 @@ class ReceiveWidget(QWidget):
 
         self._raise_accept_messagebox(name, size)
 
+    def _test_for_display(self, line: str) -> None:
+        matched_display_prompt = _DISPLAY_TEXT_RE.match(line, 0)
+        if not matched_display_prompt.hasMatch():
+            return
+        
+        size = matched_display_prompt.captured("size")
+
+        self._is_text_transfer = True
+        self._raise_display_messagebox(size)
+
     def _state_responses(self) -> None:
         self._determine_main_button_behavior()
 
@@ -203,6 +293,14 @@ class ReceiveWidget(QWidget):
         if operation != CrocOperation.RECEIVING:
             return
 
+        if self._is_text_transfer and self._text_content_lines is not None:
+            text = "\n".join(self._text_content_lines[2:]).strip()
+            if text:
+                self._show_received_text(text)
+
+        self._text_content_lines = []
+        self._is_text_transfer = False
+        
         self.btn_receive.setEnabled(True)
     
 
@@ -275,3 +373,7 @@ class ReceiveWidget(QWidget):
             return
 
         app_utils.reveal_in_file_manager(path)
+
+    def _show_received_text(self, text: str) -> None:
+        dialog = ReceiveTextDialog(text, self.worker, self)
+        dialog.exec()

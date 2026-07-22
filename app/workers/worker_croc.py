@@ -96,6 +96,7 @@ class CrocWorker(QThread):
             (r"Receiving \(<-", CrocAction.RECEIVE_IN_PROGRESS),
 
             (r"Accept", CrocAction.WAIT_FOR_APPROVAL),
+            (r"Display", CrocAction.WAIT_FOR_APPROVAL),
             (r"connecting...", CrocAction.CONNECTING_TO_PEER)
         ]
 
@@ -193,7 +194,7 @@ class CrocWorker(QThread):
             self._proc = None
             self.ended_croc.emit(self.state.operation)
 
-    def start_send(self, paths: set[Path], code: str = None) -> None:
+    def start_send(self, paths_or_text: set[Path] | str, code: str = None) -> None:
         """Construct the command to send files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then settings, and then send
@@ -217,7 +218,11 @@ class CrocWorker(QThread):
             if self._env is not None and "CROC_SECRET" in self._env:
                 self._env.pop("CROC_SECRET")
 
-        args.extend(paths)
+        if isinstance(paths_or_text, str):
+            args.append("--text")
+            args.append(paths_or_text)
+        else:
+            args.extend(paths_or_text)
 
         # print(args)
 

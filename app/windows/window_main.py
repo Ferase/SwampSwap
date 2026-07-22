@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.app_name)
-        self.setFixedSize(375, 620)
+        self.setFixedSize(375, 650)
 
         # Build UI
         self._build_central()
@@ -308,15 +308,15 @@ class MainWindow(QMainWindow):
                 return
 
         self.widget_send._reset_selected_fies_folders()
-        self.widget_send.btn_add_files.click()
+        self.widget_send.widget_files.btn_add_files.click()
 
         if not self.widget_send.are_files_selected():
             return
         
-        self.widget_send.btn_send.click()
+        self.widget_send.widget_files.btn_send.click()
 
         # Wait a moment before copying the code
-        QTimer.singleShot(20, self.widget_send.btn_copy_code.click)
+        QTimer.singleShot(20, self.widget_send.widget_files.btn_copy_code.click)
 
     def _send_folder(self) -> None:
         """Qucik send folders function used for the top menu bar."""
@@ -337,15 +337,15 @@ class MainWindow(QMainWindow):
                 return
 
         self.widget_send._reset_selected_fies_folders()
-        self.widget_send.btn_add_folders.click()
+        self.widget_send.widget_files.btn_add_folders.click()
 
         if not self.widget_send.are_files_selected():
             return
         
-        self.widget_send.btn_send.click()
+        self.widget_send.widget_files.btn_send.click()
 
         # Wait a moment before copying the code
-        QTimer.singleShot(20, self.widget_send.btn_copy_code.click)
+        QTimer.singleShot(20, self.widget_send.widget_files.btn_copy_code.click)
 
     def _receive(self) -> None:
         """Qucik receive files/folders function used for the top menu bar."""
@@ -384,7 +384,7 @@ class MainWindow(QMainWindow):
         # Check if an operation is running and, if so, stop it gracefully
         match self.worker.state.operation:
             case CrocOperation.SENDING:
-                self.widget_send.btn_send.click()
+                self.widget_send.widget_files.btn_send.click()
             case CrocOperation.RECEIVING:
                 self.widget_receive.btn_receive.click()
             case _:

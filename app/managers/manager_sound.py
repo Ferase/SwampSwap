@@ -70,6 +70,10 @@ class SoundManager(QObject):
         
         if self._last_action == state.action:
             return
+
+        if self._last_action in [CrocAction.SEND_IN_PROGRESS, CrocAction.RECEIVE_IN_PROGRESS]:
+            self._stop_sound(CrocWAV.SENDING)
+            self._stop_sound(CrocWAV.RECEIVING)
         
         self._last_action = state.action
 
@@ -86,6 +90,9 @@ class SoundManager(QObject):
             effect.setVolume(volume)
 
         self._enable_sound.setVolume(volume)
+
+    def _stop_sound(self, sound: CrocWAV) -> None:
+        self._sound_effects[sound].stop()
 
     def silence_all(self) -> None:
         self.set_volume(0.0)

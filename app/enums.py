@@ -38,6 +38,10 @@ class CrocWAV(StrEnum):
     RECEIVING = "receiving"
     COMPLETE = "complete"
 
+class SendType(Enum):
+    FILES = 0
+    TEXT = 1
+
 @dataclass
 class CrocState():
     """Dataclass housing the current operation and action states of CrocWorker."""

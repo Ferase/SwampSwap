@@ -36,8 +36,18 @@
     "dialog:croc_not_installed:body1":                  "It looks like croc isn't installed!",
     "dialog:croc_not_installed:body2":                  "Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
 
-    "dialog:accept:title":                              "Accept transfer",
-    "dialog:accept:body":                               "Will you accept {f} (total size: {s})?",
+    "dialog:accept:title":                              "Accept transfer?",
+    "dialog:accept:body1":                              "It looks like you're receiving file(s)!",
+    "dialog:accept:body2":                              "Will you accept {f} (total size: {s})?",
+
+    "dialog:ask_display_text:title":                    "Display text?",
+    "dialog:ask_display_text:body1":                    "It looks like you're receiving text!",
+    "dialog:ask_display_text:body2":                    "Would you like to display the text? (total size: {s})?",
+
+    "dialog:displaying_sent_text:title":                "Received text",
+    "dialog:displaying_sent_text:body1":                "Here's your received text!",
+    "dialog:displaying_sent_text:body2":                "Make sure to copy and save it! Once this window's gone, so is the text.",
+    "dialog:displaying_sent_text:copy_text":            "Copy text",
 
     "dialog:no_receive_path:title":                     "No output path",
     "dialog:no_receive_path:body":                      "The output folder is blank. Please enter a path.",
@@ -110,11 +120,18 @@
     "menubar:window_bad_code:title":                    "Invalid code",
     "menubar:window_bad_code:body":                     "The provided code was blank or invalid.",
 
+    "send:tab:files":                                   "Files",
+    "send:tab:text":                                    "Text",
+
     "send:label:drop_zone":                             "Drop files here...",
     "send:btn:view_file_list":                          "View and manage selected items",
     "send:label:no_files_selected":                     "Nothing selected.",
     "send:label:please_select":                         "Select or drag-drop files or folders.",
     "send:label:multiple_files":                        "Multiple selected (hover to see)",
+
+    "send:label:send_text":                             "Your text:",
+    "send:textedit:send_text":                          "Type the text you want to send here...",
+
     "send:lineedit:placeholder_code":                   "Send code (auto-generated if blank)",
     "send:btn:copy_code":                               "Copy code",
 
