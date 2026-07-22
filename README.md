@@ -10,9 +10,9 @@
     <img src="/assets/gif/connecting_to_peer.gif" width="250px" border="0" alt="croc and bird looking for files to receive">
 </div>
 <div align="center" float="left">
-    <img src="/images/SwampSwap_Window_Screenshot_01.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme on the send tab">
-    <img src="/images/SwampSwap_Window_Screenshot_02.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme on the receive tab">
-    <img src="/images/SwampSwap_Window_Screenshot_03.png" width="250px" border="0" alt="Swamp Swap window preview with dark theme on the settings tab">
+    <img src="/images/SwampSwap_Window_Screenshot_01.png" width="250px" border="0" alt="Swamp Swap window preview with pink theme on the send tab.">
+    <img src="/images/SwampSwap_Window_Screenshot_02.png" width="250px" border="0" alt="Swamp Swap window preview with deep adark theme on the receive tab.">
+    <img src="/images/SwampSwap_Window_Screenshot_03.png" width="250px" border="0" alt="Swamp Swap window preview with dark theme on the settings tab.">
 </div>
 
 ## Overview
