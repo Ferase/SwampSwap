@@ -1,4 +1,3 @@
-# app/update_checker.py
 import urllib.request
 import json
 from PyQt6.QtCore import QThread, pyqtSignal

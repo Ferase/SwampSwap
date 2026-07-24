@@ -12,6 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 # Name and version variables
 _APP_NAME = "Swamp Swap"
 _APP_VERSION = "1.3.0"
+_MINIMUM_CROC_VERSION = "10.5.0"
 
 
 
@@ -41,6 +42,12 @@ def main() -> None:
     # Test if croc is installed. If not, raise an error
     if shutil.which("croc") is None:
         _croc_not_installed(window, worker)
+        return
+
+    # Test if croc is below minimum version
+    elif _is_croc_too_old(worker):
+        _croc_too_old(window, worker)
+        return
 
     # Check for various updates
     else:
@@ -76,6 +83,28 @@ def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
         window,
         worker.settings.tr("dialog:croc_not_installed:title"),
         worker.settings.tr("dialog:croc_not_installed:body1") + "<br><br>" + worker.settings.tr("dialog:croc_not_installed:body2"),
+        QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+        QMessageBox.StandardButton.Open
+    )
+
+    # If the user chooses open, open the install instructions on croc's GitHub page
+    if box == QMessageBox.StandardButton.Open:
+        QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc#install"))
+
+    # Kill the application
+    window.close()
+
+def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
+    """Raises an error if croc is found to be too old."""
+
+    # Set status to error (why the hell not)
+    worker.change_action(CrocAction.ERROR)
+
+    # Raise a message box and tell the user croc isn't installed
+    box = QMessageBox.warning(
+        window,
+        worker.settings.tr("dialog:croc_too_old:title"),
+        worker.settings.tr("dialog:croc_too_old:body1") + "<br><br>" + worker.settings.tr("dialog:croc_too_old:body2").format(v1=f"<b>{worker.get_croc_version_number_only()}</b>", v2=f"<b>{_MINIMUM_CROC_VERSION}</b>") + "<br><br>" + worker.settings.tr("dialog:croc_too_old:body3"),
         QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
         QMessageBox.StandardButton.Open
     )
@@ -123,6 +152,13 @@ def _new_swampswap_version_available(parent, worker: CrocWorker, new_version: st
             QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
         )
 
+def _is_croc_too_old(worker: CrocWorker) -> bool:
+    croc_version: str = worker.get_croc_version_number_only()
+    
+    def _parse(v: str) -> tuple[int]:
+        return tuple(int(x) for x in v.lstrip("v").split("."))
+
+    return bool(_parse(croc_version) < _parse(_MINIMUM_CROC_VERSION))
 
 
 # Start everything

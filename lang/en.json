@@ -37,7 +37,12 @@
 
     "dialog:croc_not_installed:title":                  "croc not installed",
     "dialog:croc_not_installed:body1":                  "It looks like croc isn't installed!",
-    "dialog:croc_not_installed:body2":                  "Please click <b>Open</b> to go to its GitHub page, or choose <b>Close</b> to close the program.",
+    "dialog:croc_not_installed:body2":                  "Please click <b>Open</b> to go to croc's GitHub page so you can get it, or choose <b>Close</b> to close the program.",
+
+    "dialog:croc_too_old:title":                        "croc too old",
+    "dialog:croc_too_old:body1":                        "It looks like your installation of croc is too old!",
+    "dialog:croc_too_old:body2":                        "You're using {v1}, when Swamp Swap's minimum supported croc version is {v2}.",
+    "dialog:croc_too_old:body3":                        "Please click <b>Open</b> to go to croc's GitHub page to download a new version, or choose <b>Close</b> to close the program.",
 
     "dialog:accept:title":                              "Accept transfer?",
     "dialog:accept:body1":                              "It looks like you're receiving file(s)!",
