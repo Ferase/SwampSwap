@@ -24,7 +24,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "zip": False,
 
     # Receive
-    "default_receive_path": "",
+    "default_receive_path": str(app_utils.determine_received_path("received")),
 
     # Relay
     "relay": "178.105.79.46:9009",
@@ -45,6 +45,11 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "internaldns": False,
     "nocompress": False,
     "local": False
+}
+
+# Placeholder settings that are blank in _DEFAULT but have hteir default values applied later
+_PLACEHOLDERS: list[str] = {
+    "default_receive_path"
 }
 
 # Lookup table for croc flags
@@ -240,6 +245,7 @@ class SettingsManager():
 
         # If no changed settings are found, then everything's default.
         changed_settings: list[str] = self.get_changed_settings()
+
         return not bool(changed_settings)
 
 

@@ -171,11 +171,9 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window = QCheckBox(self.worker.settings.tr("options:raise_filter_window:label"))
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
-        self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
 
         self.checkbox_zip = QCheckBox(self.worker.settings.tr("options:zip:label"))
         self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
-        self.checkbox_zip.setChecked(self.worker.settings.zip)
 
         layout.addWidget(self.checkbox_raise_filter_window)
         layout.addWidget(self.checkbox_zip)
