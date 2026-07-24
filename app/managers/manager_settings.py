@@ -19,6 +19,13 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "enable_sound": True,
     "sound_volume": 0.5,
 
+    # Send
+    "raise_filter_window": False,
+    "zip": False,
+
+    # Receive
+    "default_receive_path": "",
+
     # Relay
     "relay": "178.105.79.46:9009",
     "relay6": "[2a01:4f9:c013:7b04::1]:9009",
@@ -41,7 +48,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
 }
 
 # Lookup table for croc flags
-_LOOKUP_TABLE: dict[str, str] = {
+_LOOKUP_TABLE_GENERAL: dict[str, str] = {
     # Relay
     "relay": "--relay",
     "relay6": "--relay6",
@@ -63,6 +70,11 @@ _LOOKUP_TABLE: dict[str, str] = {
     "local": "--local"
 }
 
+# Lookup table for croc's send-only flags
+_LOOKUP_TABLE_SEND: dict[str, str] = {
+    "zip": "--zip"
+}
+
 
 
 class SettingsManager():
@@ -79,12 +91,19 @@ class SettingsManager():
         self.startup_croc_updates_check: bool | None = None
         self.startup_swampswap_updates_check: bool | None = None
 
-        # General
+        # UI
         self.lang: str | None = None
         self.theme: str | None = None
         self.animation_matches_theme: bool | None = None
         self.enable_sound: bool | None = None
         self.sound_volume: float | None = None
+
+        # Send
+        self.raise_filter_window: bool | None = None
+        self.zip: bool | None = None
+
+        # Receive
+        self.default_receive_path: str | None = None
 
         # Relays
         self.relay: str | None = None
@@ -130,6 +149,10 @@ class SettingsManager():
             json_data: dict[str, bool | str | float] = json.load(s)
             self.set_all_from_dict(json_data)
 
+    def _get_defualt_receive_path(self) -> str:
+        defualt_path: str = str(app_utils.determine_received_path("received"))
+        return defualt_path
+
 
 
     def set_all_from_dict(self, dictionary: dict[str, bool | str | float]) -> None:
@@ -148,6 +171,7 @@ class SettingsManager():
         """Passes the _DEFAULTS constant to set_all_from_dict(), resetting all settings to default."""
 
         self.set_all_from_dict(_DEFAULTS)
+        self.default_receive_path = self._get_defualt_receive_path()
 
     def serialize_to_dict(self) -> dict[str, bool | str | float]:
         """Serialize the settings to a dict[str, bool | str | float]."""
@@ -220,13 +244,40 @@ class SettingsManager():
 
 
 
-    def build_flags(self) -> list[str]:
+    def build_general_flags(self) -> list[str]:
         """Build the flags that will be sent to croc when sending or receiving files."""
 
         flags: list[str] = []
 
         # Get the corresponding flag string for each setting
-        for setting_name, flag_name in _LOOKUP_TABLE.items():
+        for setting_name, flag_name in _LOOKUP_TABLE_GENERAL.items():
+            # Get the value of the current setting as well as its default
+            value = getattr(self, setting_name)
+            default = _DEFAULTS[setting_name]
+
+            # Skip settings that are default
+            if value == default:
+                continue
+
+            # If the flag is a boolean expression, just add the flag
+            if isinstance(value, bool):
+                if value:
+                    flags.append(flag_name)
+                    continue
+
+            # If the flag is a value, ensure it's not empty or (somehow) None and then extend the flag list with the flag name and value
+            if value not in (None, ""):
+                flags.extend([flag_name, str(value)])
+
+        return flags
+    
+    def build_send_flags(self) -> list[str]:
+        """Build the flags that will be sent to croc strictly when sending files."""
+
+        flags: list[str] = []
+
+        # Get the corresponding flag string for each setting
+        for setting_name, flag_name in _LOOKUP_TABLE_SEND.items():
             # Get the value of the current setting as well as its default
             value = getattr(self, setting_name)
             default = _DEFAULTS[setting_name]

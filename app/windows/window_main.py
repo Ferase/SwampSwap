@@ -207,6 +207,8 @@ class MainWindow(QMainWindow):
 
         self.tabs.currentChanged.connect(self._check_settings_have_changed_on_tab_switch)
 
+        self.widget_settings.btn_defualt_receive_path.clicked.connect(self._pass_path_from_settings_to_received)
+
         self.btn_console.clicked.connect(self._open_console_window)
         self.btn_about.clicked.connect(self._open_about_window)
 
@@ -408,23 +410,17 @@ class MainWindow(QMainWindow):
 
 
 
-    def _on_progress_update(self, percent: int, filename: str, is_hashing: bool) -> None:
-        """Handle progress bar updating."""
-
-        is_sending: bool = self.worker.state.operation == CrocOperation.SENDING
-
-        # Create prefix; if we're hashing, just say hashing, otherwise display sending or receiving text
-        if is_hashing:
-            prefix = self.worker.settings.tr("state:hashing")
-        else:
-            prefix = self.worker.settings.tr("state:sending") if is_sending else self.worker.settings.tr("state:receiving")
-
-        # Fixes the issue of hashing (which is generally a fast process) stopping at 99 percent even when it's actually done
-        if prefix:
-            percent = 100 if percent == 99 else percent
-
+    def _on_progress_update(self, percent: int, filename: str, prefix_word: str) -> None:
+        self.progress_bar.setVisible(True)
         self.progress_bar.setValue(percent)
-        self.progress_bar.setFormat(f"{prefix} {filename}  {percent}%")
+
+        if prefix_word:
+            key = f"state:{prefix_word.lower()}"
+            prefix = self.worker.settings.tr(key) + " "
+        else:
+            prefix = ""
+
+        self.progress_bar.setFormat(f"{prefix}{filename}  {percent}%")
 
     def _reset_progress_bar(self) -> None:
         """Handle progress bar display when an operation ends."""
@@ -446,6 +442,21 @@ class MainWindow(QMainWindow):
         """Display the latest recolored animation frame."""
 
         self.label_animation.setPixmap(pixmap)
+
+    def _pass_path_from_settings_to_received(self) -> None:
+        text: str = self.widget_settings.lineedit_defualt_receive_path.text()
+        if not text:
+            QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:cant_pass_empty_path:title"),
+                self.worker.settings.tr("dialog:cant_pass_empty_path:body"),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
+        self.tabs.tabBar().setCurrentIndex(1)
+        self.widget_receive.lineedit_path.setText(text)
 
 
 

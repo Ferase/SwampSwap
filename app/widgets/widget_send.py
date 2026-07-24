@@ -16,6 +16,8 @@ import app.utils as app_utils
 from app.enums import CrocOperation, CrocAction, SendType
 from app.workers.worker_croc import CrocWorker
 from app.windows.window_filelist import FileListWindow
+from app.managers.manager_sendfiles import SendFilesManager, SendableFileFolder
+from app.windows.window_filterfiles import FilterFilesDialog
 
 
 
@@ -180,7 +182,6 @@ class SendTextWidget(QWidget):
 
 class SendWidget(QWidget):
 
-    selected_files_changed = pyqtSignal()
     files_added = pyqtSignal(list)
     folders_added = pyqtSignal(list)
 
@@ -197,16 +198,9 @@ class SendWidget(QWidget):
         
         self.worker: CrocWorker = worker
 
-        self.selected_files_folders: dict[str, set[Path]] = {
-            "files": set(),
-            "folders": set()
-        }
-        self.selected_files_folders_count: dict[str, int] = {
-            "files": 0,
-            "folders": 0
-        }
+        self.sendfiles_manager = SendFilesManager(self.worker)
 
-        self.window_filelist = FileListWindow(self.worker, self)
+        self.window_filelist = FileListWindow(self.worker, self.sendfiles_manager, self)
 
         # Build UI
         self._build_central()
@@ -293,7 +287,8 @@ class SendWidget(QWidget):
 
         self.widget_text.textedit_text.textChanged.connect(self._determine_main_button_behavior)
 
-        self.selected_files_changed.connect(self._update_selected_file_ui)
+        self.sendfiles_manager.selected_files_changed.connect(self._update_selected_file_ui)
+        self.sendfiles_manager.file_count_updated.connect(self._on_file_count_updated)
 
         self.files_added.connect(self._add_selected_files)
         self.folders_added.connect(self._add_selected_files)
@@ -313,6 +308,8 @@ class SendWidget(QWidget):
 
         self.window_filelist.files_changed.connect(self._set_selected_files)
         self.window_filelist.files_cleared.connect(self._reset_selected_fies_folders)
+
+
 
     def _set_button_text_by_operation(self) -> None:
         match self.worker.state.operation:
@@ -356,36 +353,19 @@ class SendWidget(QWidget):
 
         self._main_button_toggle_send_text()
 
-    def _reset_file_folder_count(self) -> None:
-        self.selected_files_folders_count["files"] = 0
-        self.selected_files_folders_count["folders"] = 0
-
-        self.widget_files.drop_zone.label_file_count.setText(self._create_file_folder_count_text())
-
-    def _calculate_file_folder_count(self) -> None:
-        # Init file/folder count
-        file_count: int = 0
-        folder_count: int = 0
-
-        for folder in self.selected_files_folders["folders"]:
-            file_count += sum(1 for item in folder.rglob("*") if item.is_file())
-            folder_count += sum(1 for item in folder.rglob("*") if item.is_dir())
-
-        for file in self.selected_files_folders["files"]:
-            file_count += 1
-
-        self.selected_files_folders_count["files"] = file_count
-        self.selected_files_folders_count["folders"] = folder_count
+    def _on_file_count_updated(self, count: dict) -> None:
+        count_text = self._create_file_folder_count_text()
+        self.widget_files.drop_zone.label_file_count.setText(count_text)
 
     def _create_file_folder_count_text(self) -> str:
-        if all(count == 0 for count in self.selected_files_folders_count.values()):
+        if all(count <= 0 for count in self.sendfiles_manager.selected_paths_count.values()):
             return self.worker.settings.tr("send:label:no_files_selected")
 
         file_text: str = ""
         folder_text: str = ""
 
-        files_count: int = self.selected_files_folders_count["files"]
-        folders_count: int = self.selected_files_folders_count["folders"]
+        files_count: int = self.sendfiles_manager.selected_paths_count["files"]
+        folders_count: int = self.sendfiles_manager.selected_paths_count["folders"]
 
         if files_count:
             file_text: str = self._determine_selected_files_text("file", files_count)
@@ -421,7 +401,7 @@ class SendWidget(QWidget):
             self.lineedit_code.setText(match.group(1).strip())
 
     def are_files_selected(self) -> bool:
-        return any([value for value in self.selected_files_folders.values()])
+        return bool(self.sendfiles_manager.selected_paths)
 
     def _state_responses(self) -> None:
         self._enable_controls()
@@ -440,12 +420,11 @@ class SendWidget(QWidget):
         return "\n".join([str(path) + os.sep + "*" if path.is_dir() else str(path) for path in paths])
     
     def _reset_selected_fies_folders(self) -> None:
-        self.selected_files_folders["files"].clear()
-        self.selected_files_folders["folders"].clear()
+        self.sendfiles_manager.clear_selected_file_set()
         self._update_selected_file_ui()
 
     def _flatten_paths_dict(self, paths_dict: dict[str, Path]) -> set[Path]:
-        final_list: set[Path] = paths_dict["files"].copy()
+        final_list: set[Path] = paths_dict.copy()
         final_list.update(paths_dict["folders"])
         return final_list
 
@@ -465,67 +444,64 @@ class SendWidget(QWidget):
         return final_dict
 
     def _flatten_selected_files(self) -> set[Path]:
-        return self._flatten_paths_dict(self.selected_files_folders)
-    
-    def _unflatten_selected_files(self) -> dict[str, set[Path]]:
-        return self._unflatten_paths_set(self.selected_files_folders)
+        return set([sendable.root_path for sendable in self.sendfiles_manager.selected_paths])
+
+    def _flatten_excluded_files(self) -> set[Path]:
+        excluded_files_by_path: set[Path] = set()
+        excluded_files_by_type: set[Path] = set()
+
+        for sendable in self.sendfiles_manager.selected_paths:
+            excluded_files_by_path.update(sendable.excluded_files)
+
+            for filetype_path in sendable.excluded_filetypes.values():
+                excluded_files_by_type.update(filetype_path)
+            
+        return excluded_files_by_path | excluded_files_by_type
 
 
 
-    def _list_str_to_set_path(self, paths: list[str]) -> set[Path]:
-        return set([Path(path) for path in paths])
+    def _list_str_to_sendable_set(self, paths: list[str]) -> set[SendableFileFolder]:
+        return set([SendableFileFolder(path) for path in paths])
 
-    def _check_if_selected_is_dir_and_is_empty(self, path: Path) -> bool:
-        if not path.is_dir():
+    def _check_if_selected_is_dir_and_is_empty(self, path: SendableFileFolder) -> bool:
+        if not path.is_folder:
             return False
         
-        if any(path.iterdir()):
+        if any(path.root_path.iterdir()):
             return False
         
         return True
 
-    def _filter_paths(self, paths: set[Path]) -> set[Path]:
-        final_paths: set[Path] = set()
+    def _filter_paths(self, sendables: set[SendableFileFolder]) -> set[SendableFileFolder]:
+        final_paths: set[SendableFileFolder] = set()
 
-        for path in paths:
-            path = Path(path)
-            if self._check_if_selected_is_dir_and_is_empty(path):
+        for sendable in sendables:
+            if self._check_if_selected_is_dir_and_is_empty(sendable):
                 continue
 
-            final_paths.add(path)
+            final_paths.add(sendable)
 
         return final_paths
     
-    def _set_selected_files(self, paths_dict: dict[str, set[Path]]) -> None:
-        final_paths: set[Path] = self._filter_paths(self._flatten_paths_dict(paths_dict))
-
-        self.selected_files_folders = self._unflatten_paths_set(final_paths)
-        self.selected_files_changed.emit()
+    def _set_selected_files(self, sendables: set[SendableFileFolder]) -> None:
+        final_paths: set[SendableFileFolder] = self._filter_paths(sendables)
+        self.sendfiles_manager.set_paths(final_paths)
     
     def _add_selected_files(self, paths: list[str]) -> None:
-        final_paths: set[Path] = self._filter_paths(self._list_str_to_set_path(paths))
+        final_paths: set[SendableFileFolder] = self._filter_paths(self._list_str_to_sendable_set(paths))
 
-        organized_paths: dict[str, set[Path]] = self._unflatten_paths_set(final_paths)
+        if self.worker.settings.raise_filter_window:
+            for path in final_paths:
+                if path.is_folder:
+                    path = self._open_filter_dialog(path)
 
-        self.selected_files_folders["files"].update(organized_paths["files"])
-        self.selected_files_folders["folders"].update(organized_paths["folders"])
-        self.selected_files_changed.emit()
+        self.sendfiles_manager.add_paths(final_paths)
 
 
 
     def _update_selected_file_ui(self) -> None:
-        self._enable_list_buttons(bool(self.selected_files_folders))
+        self._enable_list_buttons(bool(self.sendfiles_manager.selected_paths))
 
-        if not self.selected_files_folders or self.selected_files_folders is None:
-            self.selected_files_folders = None
-            self._reset_file_folder_count()
-            self._determine_main_button_behavior()
-            self._enable_controls()
-            return
-
-        self._calculate_file_folder_count()
-        count_text: str = self._create_file_folder_count_text()
-        self.widget_files.drop_zone.label_file_count.setText(count_text)
         self._determine_main_button_behavior()
         self._enable_controls()
 
@@ -573,7 +549,7 @@ class SendWidget(QWidget):
         self.folders_added.emit(selected_folders)
 
     def _click_view_filelist_button(self) -> None:
-        result = self.window_filelist.raise_modal(self.selected_files_folders)
+        result = self.window_filelist.raise_modal(self.sendfiles_manager.selected_paths)
 
         if result == QDialog.DialogCode.Rejected:
             return
@@ -593,7 +569,7 @@ class SendWidget(QWidget):
             self._reset_selected_fies_folders()
 
     def _click_send_button(self) -> None:
-        if self.selected_files_folders is None:
+        if not self.sendfiles_manager.selected_paths:
             return
         
         is_active = self.worker.state.action not in (
@@ -610,12 +586,14 @@ class SendWidget(QWidget):
             return
 
         items_for_croc: set[Path] | str = None
+        exclusions_for_croc: set[Path] | None = None
         if self._send_type == SendType.FILES:
             items_for_croc = self._flatten_selected_files()
+            exclusions_for_croc = self._flatten_excluded_files()
         else:
             items_for_croc = self._get_text_to_send()
 
-        self.worker.start_send(items_for_croc, self.lineedit_code.text())
+        self.worker.start_send(items_for_croc, exclusions_for_croc, self.lineedit_code.text())
         self._enable_controls()
 
     def _enable_controls(self) -> None:
@@ -639,3 +617,15 @@ class SendWidget(QWidget):
 
     def _get_text_to_send(self) -> str:
         return self.widget_text.textedit_text.toPlainText()
+
+
+
+    def _open_filter_dialog(self, folder: SendableFileFolder) -> SendableFileFolder:
+        dialog = FilterFilesDialog(folder, self.worker, self)
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            self.sendfiles_manager.calculate_file_folder_count()
+            return dialog.sendable
+
+        return folder

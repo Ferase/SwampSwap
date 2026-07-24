@@ -11,6 +11,8 @@ from PyQt6.QtGui import QIcon
 
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker
+from app.managers.manager_sendfiles import SendFilesManager, SendableFileFolder
+from app.windows.window_filterfiles import FilterFilesDialog
 
 
 
@@ -39,7 +41,7 @@ class FileDropList(QListWidget):
             event.ignore()
 
     def dropEvent(self, event):
-        valid_paths: set[Path] = {}
+        valid_paths: set[Path] = set()
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 if url.isLocalFile():
@@ -55,20 +57,21 @@ class FileDropList(QListWidget):
 class FileListWindow(QDialog):
     """An extended window for managing the files you wish to send."""
 
-    files_changed = pyqtSignal(dict)
+    files_changed = pyqtSignal(set)
     files_cleared = pyqtSignal()
 
-    def __init__(self, worker: CrocWorker, parent=None) -> None:
+    def __init__(self, worker: CrocWorker, sendfiles_manager: SendFilesManager, parent=None) -> None:
         # Run base init
         super().__init__(parent)
 
         self.worker = worker
+        self.manager = sendfiles_manager
 
         self._dirty: bool = False
-        self._paths: dict[str, set[Path]] = {
-            "files": set(),
-            "folders": set(),
-        }
+        self._paths: set[SendableFileFolder] = set()
+
+        self.folder_icon: QIcon = self._get_folder_icon()
+        self.file_icon: QIcon = self._get_file_icon()
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.tr("manage_send_list:window:title"))
@@ -152,9 +155,10 @@ class FileListWindow(QDialog):
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
         self.list_widget.files_dropped.connect(self._add_files)
-        self.list_widget.itemDoubleClicked.connect(
-            lambda item: app_utils.reveal_in_file_manager(item.text())
-        )
+        self.list_widget.itemDoubleClicked.connect(self._open_filter_dialog)
+        # self.list_widget.itemDoubleClicked.connect(
+        #     lambda item: app_utils.reveal_in_file_manager(item.text())
+        # )
 
         self.btn_add_files.clicked.connect(self._click_add_files_button)
         self.btn_add_folder.clicked.connect(self._click_add_folder_button)
@@ -170,21 +174,23 @@ class FileListWindow(QDialog):
         self._clear_list()
 
         # Pass folders first, then files
-        self._create_list_items(self._paths["folders"], "folders")
-        self._create_list_items(self._paths["files"], "files")
+        self._create_list_items()
 
-    def _create_list_items(self, paths: set[Path], item_tyoe: str) -> None:
+    def _add_to_list(self, sendable: SendableFileFolder, icon: QIcon) -> None:
+        list_item = QListWidgetItem(str(sendable.root_path))
+        list_item.setIcon(icon)
+        self.list_widget.addItem(list_item)
+
+    def _create_list_items(self) -> None:
         """Create QListWidgetItem objects that will be used to populate the main list."""
 
-        if item_tyoe == "folders":
-            icon: QIcon = self._get_folder_icon()
-        else:
-            icon: QIcon = self._get_file_icon()
+        for folder in [sendable for sendable in self._paths if sendable.is_folder]:
+            self._add_to_list(folder, self.folder_icon)
+
+        for file in [sendable for sendable in self._paths if not sendable.is_folder]:
+            self._add_to_list(file, self.file_icon)
+
         
-        for path in paths:
-            list_item = QListWidgetItem(str(path))
-            list_item.setIcon(icon)
-            self.list_widget.addItem(list_item)
 
     def _clear_list(self) -> None:
         self.list_widget.clear()
@@ -197,7 +203,7 @@ class FileListWindow(QDialog):
 
 
 
-    def raise_modal(self, paths: dict[str, Path]) -> int:
+    def raise_modal(self, paths: set[SendableFileFolder]) -> int:
         """Raise this window as a modal and handle passing of the current paths more directly."""
 
         # Copy the paths so we don't alter the passed paths list directly
@@ -213,11 +219,26 @@ class FileListWindow(QDialog):
         return result
     
 
+
+    def _sort_selected_paths(self) -> None:
+        if not self._paths:
+            return
+        
+        folder_set: set[SendableFileFolder] = set()
+        file_set: set[SendableFileFolder] = set()
+        for item in self._paths:
+            if item.is_folder:
+                folder_set.add(item)
+            else:
+                file_set.add(item)
+
+        self._paths = folder_set | file_set
+
     def _add_files(self, paths: set[str]):
         """Add files to the list."""
 
         # Filter out paths
-        final_paths: set[Path] = self._filter_paths(paths)
+        final_paths: set[SendableFileFolder] = self._filter_paths(paths)
 
         # Do nothing if no valid files were added
         if not final_paths:
@@ -227,7 +248,8 @@ class FileListWindow(QDialog):
         self._mark_dirty()
 
         # Update and populate
-        self._paths["files"].update(final_paths)
+        self._paths.update(final_paths)
+        self._sort_selected_paths()
         self._populate()
 
     def _add_folders(self, paths: set[str]):
@@ -244,7 +266,8 @@ class FileListWindow(QDialog):
         self._mark_dirty()
 
         # Update and populate
-        self._paths["folders"].update(final_paths)
+        self._paths.update(final_paths)
+        self._sort_selected_paths()
         self._populate()
 
     def _remove_selected(self):
@@ -261,8 +284,7 @@ class FileListWindow(QDialog):
         self._mark_dirty()
 
         # Update the dictionary
-        self._paths["folders"] = set([path for path in self._paths["folders"] if str(path) not in selected_items])
-        self._paths["files"] = set([path for path in self._paths["files"] if str(path) not in selected_items])
+        self._paths = set([path for path in self._paths if str(path.root_path) not in selected_items])
 
         # Repopulate
         self._populate()
@@ -275,37 +297,36 @@ class FileListWindow(QDialog):
         """Clear all of the files from the file list by reverting them to empty sets, then emit a signal alerting other listening scripts that all files were cleared."""
 
         # Replace both values with empty sets
-        self._paths["files"] = set()
-        self._paths["folders"] = set()
+        self._paths = set()
 
         self.files_cleared.emit()
         self.accept()
 
-    def _check_if_selected_is_dir_and_is_empty(self, path: Path) -> bool:
+    def _check_if_selected_is_dir_and_is_empty(self, path: SendableFileFolder) -> bool:
         """Checks if a path is a directory and if it's empty. Empty directories will be filtered out elsewhere becasue croc can't do anything with them."""
 
         # If the path isn't a directory
-        if not path.is_dir():
+        if not path.is_folder:
             return False
         
         # If the path contains nothing
-        if any(path.iterdir()):
+        if any(path.root_path.iterdir()):
             return False
         
         return True
 
-    def _filter_paths(self, paths: set[str]) -> set[Path]:
+    def _filter_paths(self, sendables: set[str]) -> set[SendableFileFolder]:
         """Filter out paths that are invalid and return a clean set."""
 
-        final_paths: set[Path] = set()
+        final_paths: set[SendableFileFolder] = set()
 
         # Check each path for unwanted things before adding it to the final set
-        for path in paths:
-            path = Path(path)
-            if self._check_if_selected_is_dir_and_is_empty(path):
+        for sendable in sendables:
+            sendable = SendableFileFolder(sendable)
+            if self._check_if_selected_is_dir_and_is_empty(sendable):
                 continue
 
-            final_paths.add(path)
+            final_paths.add(sendable)
 
         return final_paths
     
@@ -372,6 +393,20 @@ class FileListWindow(QDialog):
 
         if result == QMessageBox.StandardButton.Yes:
             self.reject()
+
+
+
+    def _open_filter_dialog(self, item: QListWidgetItem) -> None:
+        path = Path(item.text())
+
+        if not path.is_dir():
+            return
+        
+        dialog = FilterFilesDialog(self.manager.get_sendable(path), self.worker, self)
+        result = dialog.exec()
+
+        if result == QDialog.DialogCode.Accepted:
+            self.manager.calculate_file_folder_count()
 
 
 

@@ -11,7 +11,17 @@ import app.utils as app_utils
 from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 
-_ACCEPT_RE = QRegularExpression(r"Accept\s+(?:'(?P<filename>[^']+)'|(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?))\s*\((?P<size>[^)]+)\)\?")
+_ACCEPT_RE = QRegularExpression(
+    r"Accept\s+"
+    r"(?:"
+        r"'(?P<filename>[^']+)'"
+        r"(?:\s+and\s+(?P<extra_folders>\d+\s+folders?))?"
+        r"|"
+        r"(?P<count>\d+\s+files?(?:\s+and\s+\d+\s+folders?)?)"
+    r")"
+    r"\s*\((?P<size>[^)]+)\)\?"
+)
+
 _DISPLAY_TEXT_RE = QRegularExpression(r"Display text message\s+\((?P<size>[^)]+)\)\?")
 _RECEIVING_RE = QRegularExpression(r"Receiving \(<-")
 
@@ -243,9 +253,8 @@ class ReceiveWidget(QWidget):
         self._set_button_text_by_operation()
 
     def _get_default_path(self) -> str:
-        defualt_path: str = str(app_utils.determine_received_path("received"))
-        self._output_path = defualt_path
-        return defualt_path
+        self._output_path = self.worker.settings.default_receive_path
+        return self._output_path
 
     def _paste_code(self) -> None:
         clipboard_text: str = QApplication.clipboard().text().strip()
@@ -267,9 +276,18 @@ class ReceiveWidget(QWidget):
 
         if not matched_accept_prompt.hasMatch():
             return
-        
-        name = matched_accept_prompt.captured("filename") or matched_accept_prompt.captured("count") 
+
+        filename = matched_accept_prompt.captured("filename")
+        extra_folders = matched_accept_prompt.captured("extra_folders")
+        count = matched_accept_prompt.captured("count")
         size = matched_accept_prompt.captured("size")
+
+        if filename and extra_folders:
+            name = f"{filename} and {extra_folders}"
+        elif filename:
+            name = filename
+        else:
+            name = count
 
         self._raise_accept_messagebox(name, size)
 

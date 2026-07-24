@@ -15,8 +15,11 @@
     "generic:clear_list":                               "Clear list",
     "generic:close":                                    "Close",
     "generic:error":                                    "Error",
+    "generic:add":                                      "Add",
     "generic:add_files":                                "Add files",
     "generic:add_folders":                              "Add folders",
+    "generic:check_all":                                "Check all",
+    "generic:uncheck_all":                              "Uncheck all",
 
     "template:num_file_single":                         "{n} file",
     "template:num_files_multiple":                      "{n} files",
@@ -51,6 +54,9 @@
 
     "dialog:no_receive_path:title":                     "No output path",
     "dialog:no_receive_path:body":                      "The output folder is blank. Please enter a path.",
+
+    "dialog:cant_pass_empty_path:title":                "Defualt receive path is empty",
+    "dialog:cant_pass_empty_path:body":                 "You must enter something into the default receive path textbox in order to send it to the receive tab.",
 
     "dialog:invalid_receive_path:title":                "Invalid output folder",
     "dialog:invalid_receive_path:body1":                "The output folder doesn't exist or is invalid.",
@@ -91,6 +97,7 @@
     "file_dialog:choose_folders":                       "Select folders to send",
 
     "state:idle":                                       "Idle",
+    "state:zipping":                                    "Zipping",
     "state:hashing":                                    "Hashing",
     "state:wait_peer":                                  "Waiting for peer",
     "state:sending":                                    "Sending",
@@ -138,6 +145,11 @@
     "manage_send_list:window:title":                    "Manage files and folders to be sent",
     "manage_send_list:btn:remove_selected":             "Remove selected",
 
+    "filetree:window:title":                            "Filter and exclude files",
+    "filetree:group:filetree_heading":                  "Select any files or folders to exclude.",
+    "filetree:group:filetype_heading":                  "Enter any file extensions you wish to exclude.",
+    "filetree:btn:remove_filetype":                     "Remove selected filetype",
+
     "receive:lineedit:placeholder_path":                "Enter a path...",
     "receive:btn:open_output_folder":                   "Open folder",
     "receive:btn:select_folder":                        "Select output folder",
@@ -147,6 +159,8 @@
 
     "options:heading:general":                          "General",
     "options:heading:ui":                               "User Interface",
+    "options:heading:send":                             "Sending",
+    "options:heading:receive":                          "Receiving",
     "options:heading:relays":                           "Relays",
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
@@ -171,6 +185,15 @@
     "options:enable_sound:tooltip":                     "If true, sounds will be enabled in the program.",
     "options:sound_volume:label":                       "Sound volume",
     "options:sound_volume:tooltip":                     "Determines the volume of the program's sound effects.",
+
+    "options:raise_filter_window:label":                "Always ask to filter folders",
+    "options:raise_filter_window:tooltip":              "If enabled, you will always be prompted to add filters and exclusions to the files within a folder you have chosen to send.",
+    "options:zip:label":                                "Compress all files to ZIP",
+    "options:zip:tooltip":                              "If enabled, your files will be compressed into a ZIP file before being sent.",
+
+    "options:default_receive_path:label":               "Default receive path",
+    "options:default_receive_path:tooltip":             "The default location Swamp Swap will use for receiving files when starting up.",
+    "options:default_receive_path:btn":                 "Send default path to receive tab",
 
     "options:yes:label":                                "Auto-agree to all prompts",
     "options:yes:tooltip":                              "If checked, you will automatically accept all files being received and approve all files being sent.",

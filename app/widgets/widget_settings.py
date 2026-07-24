@@ -55,6 +55,8 @@ class SettingsWidget(QWidget):
         # Example content
         group_general_settings = self._build_general_settings_group()
         group_ui_settings = self._build_ui_settings_group()
+        group_send_settings = self._build_send_settings_group()
+        group_receive_settings = self._build_receive_settings_group()
         group_relay_settings = self._build_relay_settings_group()
         group_network_settings = self._build_network_settings_group()
         group_flags_settings = self._build_flags_settings_group()
@@ -62,6 +64,10 @@ class SettingsWidget(QWidget):
         layout.addWidget(group_general_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_ui_settings)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(group_send_settings)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(group_receive_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_relay_settings)
         layout.addSpacing(_PADDING)
@@ -158,7 +164,43 @@ class SettingsWidget(QWidget):
         layout.addLayout(layout_volume_slider)
 
         return self.ui_group
-    
+
+    def _build_send_settings_group(self) -> QGroupBox:
+        self.send_group = QGroupBox(self.worker.settings.tr("options:heading:send"))
+        layout = QVBoxLayout(self.send_group)
+
+        self.checkbox_raise_filter_window = QCheckBox(self.worker.settings.tr("options:raise_filter_window:label"))
+        self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
+        self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
+
+        self.checkbox_zip = QCheckBox(self.worker.settings.tr("options:zip:label"))
+        self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
+        self.checkbox_zip.setChecked(self.worker.settings.zip)
+
+        layout.addWidget(self.checkbox_raise_filter_window)
+        layout.addWidget(self.checkbox_zip)
+
+        return self.send_group
+
+    def _build_receive_settings_group(self) -> QGroupBox:
+        self.receive_group = QGroupBox(self.worker.settings.tr("options:heading:receive"))
+        layout = QVBoxLayout(self.receive_group)
+
+        self.label_defualt_receive_path = QLabel(self.worker.settings.tr("options:default_receive_path:label"))
+        self.label_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
+
+        self.lineedit_defualt_receive_path = QLineEdit()
+        self.lineedit_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
+        self.lineedit_defualt_receive_path.setText(self.worker.settings.default_receive_path)
+
+        self.btn_defualt_receive_path = QPushButton(self.worker.settings.tr("options:default_receive_path:btn"))
+
+        layout.addWidget(self.label_defualt_receive_path)
+        layout.addWidget(self.lineedit_defualt_receive_path)
+        layout.addWidget(self.btn_defualt_receive_path)
+
+        return self.receive_group
+
     def _build_relay_settings_group(self) -> QGroupBox:
         self.relays_group = QGroupBox(self.worker.settings.tr("options:heading:relays"))
         layout = QVBoxLayout(self.relays_group)
@@ -353,6 +395,18 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
         self.spinbox_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
 
+        self.send_group.setTitle(self.worker.settings.tr("options:heading:send"))
+        self.checkbox_raise_filter_window.setText(self.worker.settings.tr("options:raise_filter_window:label"))
+        self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
+        self.checkbox_zip.setText(self.worker.settings.tr("options:zip:label"))
+        self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
+
+        self.receive_group.setTitle(self.worker.settings.tr("options:heading:receive"))
+        self.label_defualt_receive_path.setText(self.worker.settings.tr("options:default_receive_path:label"))
+        self.label_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
+        self.lineedit_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
+        self.btn_defualt_receive_path.setText(self.worker.settings.tr("options:default_receive_path:btn"))
+
         self.relays_group.setTitle(self.worker.settings.tr("options:heading:relays"))
         self.label_relay.setText(self.worker.settings.tr("options:relay:label"))
         self.label_relay.setToolTip(self.worker.settings.tr("options:relay:tooltip"))
@@ -396,9 +450,9 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setText(self.worker.settings.tr("options:local:label"))
         self.checkbox_local.setToolTip(self.worker.settings.tr("options:local:tooltip"))
 
-        self.btn_reset.setText(self.worker.settings.tr("generic:reset_defaults"))
+        self.btn_reset.setText(self.worker.settings.tr("options:btn:reset_defaults"))
         self.btn_revert.setText(self.worker.settings.tr("options:btn:revert_settings"))
-        self.btn_save.setText(self.worker.settings.tr("options:btn:save"))
+        self.btn_save.setText(self.worker.settings.tr("generic:save"))
 
 
 
@@ -431,6 +485,11 @@ class SettingsWidget(QWidget):
         self.checkbox_enable_sound.toggled.connect(self._mark_dirty)
         self.slider_sound_volume.valueChanged.connect(self._mark_dirty)
         self.spinbox_sound_volume.valueChanged.connect(self._mark_dirty)
+
+        self.checkbox_raise_filter_window.toggled.connect(self._mark_dirty)
+        self.checkbox_zip.toggled.connect(self._mark_dirty)
+
+        self.lineedit_defualt_receive_path.textChanged.connect(self._mark_dirty)
 
         self.lineedit_relay.textChanged.connect(self._mark_dirty)
         self.lineedit_relay6.textChanged.connect(self._mark_dirty)
@@ -480,6 +539,11 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.blockSignals(False)
         self.spinbox_sound_volume.blockSignals(False)
 
+        self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
+        self.checkbox_zip.setChecked(self.worker.settings.zip)
+
+        self.lineedit_defualt_receive_path.setText(self.worker.settings.default_receive_path)
+
         self.lineedit_relay.setText(self.worker.settings.relay)
         self.lineedit_relay6.setText(self.worker.settings.relay6)
         self.lineedit_pass.setText(self.worker.settings.password)
@@ -507,6 +571,11 @@ class SettingsWidget(QWidget):
         self.worker.settings.animation_matches_theme = self.checkbox_animation_matches_theme.isChecked()
         self.worker.settings.enable_sound = self.checkbox_enable_sound.isChecked()
         self.worker.settings.sound_volume = self.spinbox_sound_volume.value()
+
+        self.worker.settings.raise_filter_window = self.checkbox_raise_filter_window.isChecked()
+        self.worker.settings.zip = self.checkbox_zip.isChecked()
+
+        self.worker.settings.default_receive_path = self.lineedit_defualt_receive_path.text()
 
         self.worker.settings.relay = self.lineedit_relay.text()
         self.worker.settings.relay6 = self.lineedit_relay6.text()
@@ -538,6 +607,11 @@ class SettingsWidget(QWidget):
             "animation_matches_theme": self.checkbox_animation_matches_theme.isChecked(),
             "enable_sound": self.checkbox_enable_sound.isChecked(),
             "sound_volume": self.spinbox_sound_volume.value(),
+
+            "raise_filter_window": self.checkbox_raise_filter_window.isChecked(),
+            "zip": self.checkbox_zip.isChecked(),
+
+            "defualt_receive_path": self.lineedit_defualt_receive_path.text(),
             
             "relay": self.lineedit_relay.text(),
             "relay6": self.lineedit_relay6.text(),

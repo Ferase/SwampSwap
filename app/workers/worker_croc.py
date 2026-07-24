@@ -12,7 +12,11 @@ from app.managers.manager_settings import SettingsManager
 from app.managers.manager_sound import SoundManager
 
 _PROGRESS_RE = re.compile(
-    r"^(Hashing\s+)?(.+?)\s+(\d+)%\s+\|",
+    r"^((?:Hashing)\s+)?(.+?)\s+(\d+)%\s+\|",
+    re.IGNORECASE
+)
+_ZIPPING_RE = re.compile(
+    r"Zipping",
     re.IGNORECASE
 )
 
@@ -31,8 +35,8 @@ class CrocWorker(QThread):
     finished = pyqtSignal(int, CrocOperation)
     error = pyqtSignal(str)
 
-    # Percentage transferred, filename (truncated), and whetehr it's being hashed
-    progress_update = pyqtSignal(int, str, bool)
+    # Percentage transferred, filename (truncated), and the prefix (hashing/zipping)
+    progress_update = pyqtSignal(int, str, str)
 
     # Initialize
     def __init__(self, app_name: str, app_version: str):
@@ -91,6 +95,8 @@ class CrocWorker(QThread):
 
         # Lookup table for croc behavior and CrocAction correlation
         rules: list[dict[str, CrocAction]] = [
+            (r"Zipping", CrocAction.WAIT_FOR_PEER),
+            (r"Adding", CrocAction.WAIT_FOR_PEER),
             (r"Code is:", CrocAction.WAIT_FOR_PEER),
             (r"Sending \(->", CrocAction.SEND_IN_PROGRESS),
             (r"Receiving \(<-", CrocAction.RECEIVE_IN_PROGRESS),
@@ -107,20 +113,21 @@ class CrocWorker(QThread):
                 return
             
     def _check_for_progress(self, line: str) -> bool:
-        """Parse a progress line and emit progress. Returns True if it there's a match."""
-
-        # Test for a match, and return False if not
+        match_zipping = _ZIPPING_RE.match(line.strip())
         match = _PROGRESS_RE.match(line.strip())
+
+        if match_zipping:
+            self.progress_update.emit(0, "", "zipping")
+            return True
+
         if not match:
             return False
-        
-        # Get the values from the message
-        is_hashing = bool(match.group(1))
+
+        prefix_word = match.group(1).strip() if match.group(1) else ""
         filename = match.group(2).strip()
         percent = int(match.group(3))
 
-        # Return True
-        self.progress_update.emit(percent, filename, is_hashing)
+        self.progress_update.emit(percent, filename, prefix_word)
         return True
     
     def run(self) -> None:
@@ -194,13 +201,14 @@ class CrocWorker(QThread):
             self._proc = None
             self.ended_croc.emit(self.state.operation)
 
-    def start_send(self, paths_or_text: set[Path] | str, code: str = None) -> None:
+    def start_send(self, paths_or_text: set[Path] | str, excluded_paths: set[Path] | None = None, code: str = None) -> None:
         """Construct the command to send files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then settings, and then send
         args = ["croc"]
-        args.extend(self.settings.build_flags())
+        args.extend(self.settings.build_general_flags())
         args.append("send")
+        args.extend(self.settings.build_send_flags())
         
         # If the user has a custom code, add it with the --code flag/CROC_SECRET envrionment variable
         if code:
@@ -222,9 +230,13 @@ class CrocWorker(QThread):
             args.append("--text")
             args.append(paths_or_text)
         else:
+            if excluded_paths:
+                args.append("--exclude-file")
+                args.append(", ".join([str(path) for path in excluded_paths]))
+
             args.extend(paths_or_text)
 
-        # print(args)
+        # print("\n".join([str(arg) for arg in args]))
 
         # Change CrocState to sending while waiting for peer
         self.change_operation(CrocOperation.SENDING)
@@ -243,7 +255,7 @@ class CrocWorker(QThread):
 
         # croc, then build flags
         args = ["croc"]
-        args.extend(self.settings.build_flags())
+        args.extend(self.settings.build_general_flags())
         
         # Pass the output path
         if out_path:
