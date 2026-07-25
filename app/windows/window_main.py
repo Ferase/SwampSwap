@@ -639,4 +639,4 @@ class MainWindow(QMainWindow):
             self.widget_receive.lineedit_path.setText(dialog.get_path())
             self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
             self.worker.settings.save_settings()
-            self.widget_settings._clear_dirty()
+            self.widget_settings.clear_dirty()
