@@ -90,7 +90,7 @@ class SettingsManager():
     def __init__(self, app_name: str, app_version: str):
         self.app_name = app_name
         self.app_version = app_version
-        self._settings_file_path: Path = app_utils.get_settings_path(self.app_name) / "settings.json"
+        self.settings_file_path: Path = app_utils.get_settings_path(self.app_name) / "settings.json"
 
         # Settings integrity
         self.settings_version_baseline: int = _SETTINGS_VERSION
@@ -151,11 +151,11 @@ class SettingsManager():
 
         self.set_defaults()
         
-        if not self._settings_file_path.exists():
+        if not self.settings_file_path.exists():
             return
 
         # Open settings.json and pull out changed settings
-        with open(self._settings_file_path, "r") as s:
+        with open(self.settings_file_path, "r") as s:
             json_data: dict[str, bool | str | float] = json.load(s)
             self.set_all_from_dict(json_data)
 
@@ -211,7 +211,7 @@ class SettingsManager():
         new_dict: dict[str, bool | str | float] = self.serialize_to_dict()
 
         # Open the settings file and write the dictionary to it
-        with open(self._settings_file_path, "w") as s:
+        with open(self.settings_file_path, "w") as s:
             json.dump(new_dict, s, indent=4, ensure_ascii=False)
 
     def save_single_setting(self, key: str, value: bool | str | float) -> None:
@@ -223,7 +223,7 @@ class SettingsManager():
 
         # Try to re-read the JSON file if it exists, otherwise just write it
         try:
-            with open(self._settings_file_path, "r") as s1:
+            with open(self.settings_file_path, "r") as s1:
                 data: dict[str, bool | str | float] = json.load(s1)
                 data.update(setting)
                 setting = data
@@ -231,7 +231,7 @@ class SettingsManager():
             pass
 
         # Open the settings file and write the dictionary to it
-        with open(self._settings_file_path, "w") as s2:
+        with open(self.settings_file_path, "w") as s2:
             json.dump(setting, s2, indent=4, ensure_ascii=False)
 
     def get_changed_settings(self) -> list[str]:

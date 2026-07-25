@@ -132,7 +132,7 @@ def backpedal_paths_to_existing_path(path: Path) -> Path:
 
     return final_path
 
-def get_settings_path(app_name: str) -> Path:
+def get_settings_path(app_name: str, make_dir: bool = True) -> Path:
     """Return the settings directory."""
 
     app_name = app_name.replace(" ", "")
@@ -145,7 +145,10 @@ def get_settings_path(app_name: str) -> Path:
         base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 
     config_dir = base / app_name
-    config_dir.mkdir(parents=True, exist_ok=True)
+
+    if make_dir:
+        config_dir.mkdir(parents=True, exist_ok=True)
+
     return config_dir
     
 

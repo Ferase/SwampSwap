@@ -648,9 +648,9 @@ class SettingsWidget(QWidget):
             self.settings_changed.emit(True)
             return
         
-        self._clear_dirty()
+        self.clear_dirty()
 
-    def _clear_dirty(self):
+    def clear_dirty(self):
         self.dirty = False
         self.btn_revert.setEnabled(False)
         self.btn_reset.setEnabled(not self.worker.settings.are_settings_default())
@@ -684,7 +684,7 @@ class SettingsWidget(QWidget):
     def _click_save_button(self) -> None:
         self._save_to_settings()
         self.worker.settings.save_settings()
-        self._clear_dirty()
+        self.clear_dirty()
 
         box = QMessageBox.information(
             self,
@@ -749,4 +749,4 @@ class SettingsWidget(QWidget):
         
         self.worker.settings.set_all_from_dict(self._previous_settings)
         self._load_from_settings()
-        self._clear_dirty()
+        self.clear_dirty()

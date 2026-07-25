@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from PyQt6.QtWidgets import (
     QMainWindow, QTabWidget, QStatusBar, QMessageBox,
     QMenuBar, QMenu, QLabel, QInputDialog,
     QToolButton, QStyle, QProgressBar, QWidget,
-    QVBoxLayout, QGroupBox
+    QVBoxLayout, QGroupBox, QDialog, QHBoxLayout,
+    QLineEdit, QPushButton, QFileDialog
 )
 from PyQt6.QtGui import QAction, QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
@@ -14,6 +17,107 @@ from app.widgets.widget_receive import ReceiveWidget
 from app.widgets.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
+
+
+
+class FirstRunReceivePathDialog(QDialog):
+    def __init__(self, worker: CrocWorker, parent=None):
+        super().__init__(parent)
+
+        self.worker = worker
+
+        self.setWindowTitle(self.worker.settings.tr("dialog:first_run_receive_path:title"))
+
+        self._build_central()
+        self._connect_signals()
+
+    def _build_central(self) -> None:
+        root = QVBoxLayout(self)
+        root.setSpacing(8)
+
+        main_group = self._build_main()
+        buttons_group = self._build_buttons()
+
+        root.addWidget(main_group)
+        root.addWidget(buttons_group)
+
+    def _build_main(self) -> QGroupBox:
+        group = QGroupBox()
+        layout = QVBoxLayout(group)
+
+        self.label_body = QLabel(self.worker.settings.tr("dialog:first_run_receive_path:body"))
+
+        row = QHBoxLayout()
+        self.lineedit_path = QLineEdit()
+        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("dialog:first_run_receive_path:placeholder"))
+        self.lineedit_path.setText(self.worker.settings.default_receive_path)
+
+        self.btn_browse = QPushButton(self.worker.settings.tr("generic:browse"))
+
+        layout.addWidget(self.label_body)
+
+        layout.addLayout(row)
+        row.addWidget(self.lineedit_path)
+        row.addWidget(self.btn_browse)
+
+        return group
+
+    def _build_buttons(self) -> None:
+        group = QGroupBox()
+        layout = QHBoxLayout(group)
+
+        self.btn_ok = QPushButton(self.worker.settings.tr("generic:ok"))
+
+        layout.addStretch()
+        layout.addWidget(self.btn_ok)
+
+        return group
+
+    def _retranslate(self) -> None:
+        self.setWindowTitle(self.worker.settings.tr("dialog:first_run_receive_path:title"))
+        self.label_body.setText(self.worker.settings.tr("dialog:first_run_receive_path:body"))
+        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("dialog:first_run_receive_path:placeholder"))
+        self.btn_browse.setText(self.worker.settings.tr("generic:browse"))
+        self.btn_ok.setText(self.worker.settings.tr("generic:ok"))
+
+    def _connect_signals(self) -> None:
+        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
+        self.btn_browse.clicked.connect(self._browse)
+        self.lineedit_path.textChanged.connect(self._enable_disable_button)
+
+        self.btn_ok.clicked.connect(self._accept_path)
+
+    def _browse(self) -> None:
+        dialog = QFileDialog(directory=self.lineedit_path.text())
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+
+        if dialog.exec():
+            self.lineedit_path.setText(dialog.selectedFiles()[0])
+
+    def _enable_disable_button(self, text: str) -> None:
+        self.btn_ok.setEnabled(bool(text))
+
+    def _accept_path(self) -> None:
+        if Path(self.get_path()).exists():
+            self.accept()
+            return
+
+        box = QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:first_run_path_create:title"),
+            self.worker.settings.tr("dialog:first_run_path_create:body1") + "<br><br>" + self.worker.settings.tr("dialog:first_run_path_create:body2"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            return
+        
+        self.accept()
+
+    def get_path(self) -> str:
+        return self.lineedit_path.text()
 
 
 
@@ -402,6 +506,7 @@ class MainWindow(QMainWindow):
         self._set_status()
         self._show_console()
         self._check_settings_version()
+        self._first_run()
 
     def _show_console(self) -> None:
         """If the user has enabled the setting to start the console on startup, this function will open the console window."""
@@ -522,3 +627,16 @@ class MainWindow(QMainWindow):
             return
 
         self.worker.settings.set_defaults()
+
+    def _first_run(self) -> None:
+        if self.worker.settings.settings_file_path.exists():
+            return
+
+        dialog = FirstRunReceivePathDialog(self.worker, self)
+
+        if dialog.exec():
+            self.worker.settings.default_receive_path = dialog.get_path()
+            self.widget_receive.lineedit_path.setText(dialog.get_path())
+            self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
+            self.worker.settings.save_settings()
+            self.widget_settings._clear_dirty()

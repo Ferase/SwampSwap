@@ -18,6 +18,7 @@
     "generic:add":                                      "Add",
     "generic:add_files":                                "Add files",
     "generic:add_folders":                              "Add folders",
+    "generic:browse":                                   "Browse",
     "generic:check_all":                                "Check all",
     "generic:uncheck_all":                              "Uncheck all",
 
@@ -62,6 +63,14 @@
 
     "dialog:cant_pass_empty_path:title":                "Defualt receive path is empty",
     "dialog:cant_pass_empty_path:body":                 "You must enter something into the default receive path textbox in order to send it to the receive tab.",
+
+    "dialog:first_run_receive_path:title":              "Set receive path",
+    "dialog:first_run_receive_path:body":               "Choose where to save received files to by default.",
+    "dialog:first_run_receive_path:placehodler":        "Enter path...",
+
+    "dialog:first_run_path_create:title":               "Receive path doesn't exist",
+    "dialog:first_run_path_create:body1":               "The provided receive path doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
+    "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
 
     "dialog:invalid_receive_path:title":                "Invalid output folder",
     "dialog:invalid_receive_path:body1":                "The output folder doesn't exist or is invalid.",
