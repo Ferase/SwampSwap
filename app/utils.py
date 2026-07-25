@@ -1,5 +1,6 @@
-import re
+import os
 import sys
+import re
 import subprocess
 from pathlib import Path
 
@@ -130,6 +131,22 @@ def backpedal_paths_to_existing_path(path: Path) -> Path:
     final_path: Path = path if path.exists() else backpedal_paths_to_existing_path(path.parent)
 
     return final_path
+
+def get_settings_path(app_name: str) -> Path:
+    """Return the settings directory."""
+
+    app_name = app_name.replace(" ", "")
+
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", Path.home()))
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+
+    config_dir = base / app_name
+    config_dir.mkdir(parents=True, exist_ok=True)
+    return config_dir
     
 
 

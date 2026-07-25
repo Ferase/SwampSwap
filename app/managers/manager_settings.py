@@ -5,6 +5,8 @@ from app.managers.manager_locale import LocaleManager
 from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
 
+_SETTINGS_VERSION: int = 1
+
 # Default settings
 _DEFAULTS: dict[str, bool | str | float] = {
     # General
@@ -86,10 +88,13 @@ class SettingsManager():
     """A mananager class that handles loading and applying settings as well as handing off flags to CrocWorker."""
 
     def __init__(self, app_name: str, app_version: str):
-        self._settings_file_path: Path = app_utils.determine_filepath("settings.json", 2)
-
         self.app_name = app_name
         self.app_version = app_version
+        self._settings_file_path: Path = app_utils.get_settings_path(self.app_name) / "settings.json"
+
+        # Settings integrity
+        self.settings_version_baseline: int = _SETTINGS_VERSION
+        self.settings_version: int | None = None
 
         # General
         self.startup_console: bool | None = None
@@ -139,9 +144,9 @@ class SettingsManager():
         self.theme_manager = ThemeManager()
         self.theme_list: list[str] = self.theme_manager.get_theme_list()
 
-        self._load_settings()
+        self.load_settings()
 
-    def _load_settings(self) -> None:
+    def load_settings(self) -> None:
         """Load settings from settings.json file in program root. Load defaults otherwise."""
 
         self.set_defaults()
@@ -181,7 +186,9 @@ class SettingsManager():
     def serialize_to_dict(self) -> dict[str, bool | str | float]:
         """Serialize the settings to a dict[str, bool | str | float]."""
 
-        new_dict: dict[str, bool | str | float] = {}
+        new_dict: dict[str, bool | str | float] = {
+            "settings_version": self.settings_version_baseline
+        }
 
         # Iterate through the keys of the default settings since they contain all possible settings
         for key in _DEFAULTS.keys():

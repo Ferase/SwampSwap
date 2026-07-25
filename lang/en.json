@@ -73,6 +73,10 @@
     "dialog:reset_settings:title":                      "Reset settings",
     "dialog:reset_settings:body":                       "Are you sure you want to reset settings to default? This can't be undone!",
 
+    "dialog:outdated_settings:title":                   "Outdated settings detected",
+    "dialog:outdated_settings:body1":                   "An update to Swamp Swap has changed how the program's settings are fundamentally handled or saved. As a result, your saved settings may not be compatible.",
+    "dialog:outdated_settings:body2":                   "Would you like to reset your settings?",
+
     "dialog:revert_settings:title":                     "Revert settings",
     "dialog:revert_settings:body":                      "You are about to return your settings to how they were before you started editing them. Are you sure you want to proceed?",
 

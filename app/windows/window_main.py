@@ -401,6 +401,7 @@ class MainWindow(QMainWindow):
 
         self._set_status()
         self._show_console()
+        self._check_settings_version()
 
     def _show_console(self) -> None:
         """If the user has enabled the setting to start the console on startup, this function will open the console window."""
@@ -501,3 +502,23 @@ class MainWindow(QMainWindow):
         self.widget_send.window_filelist.close()
         self.worker.stop()
         super().closeEvent(event)
+
+    def _check_settings_version(self) -> None:
+        if self.worker.settings.settings_version is None:
+            return
+
+        if self.worker.settings.settings_version_baseline <= self.worker.settings.settings_version:
+            return
+
+        box = QMessageBox.warning(
+            self,
+            self.worker.settings.tr("dialog:outdated_settings:title"),
+            self.worker.settings.tr("dialog:outdated_settings:body1") + "<br><br>" + self.worker.settings.tr("dialog:outdated_settings:body2"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            return
+
+        self.worker.settings.set_defaults()
