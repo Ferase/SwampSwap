@@ -40,11 +40,24 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller ${{ matrix.spec_file }}
 
+      - name: Archive build (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          tar -czf ${{ matrix.artifact_name }}.tar.gz -C dist .
+
+      - name: Archive build (Windows)
+          if: runner.os == 'Windows'
+          shell: pwsh
+          run: |
+            Compress-Archive -Path dist\* -DestinationPath "${{ matrix.artifact_name }}.zip"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: dist/
+          path: |
+            *.zip
+            *.tar.gz
           retention-days: 30
 
   release:
