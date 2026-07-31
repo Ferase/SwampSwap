@@ -46,10 +46,10 @@ jobs:
           tar -czf ${{ matrix.artifact_name }}.tar.gz -C dist .
 
       - name: Archive build (Windows)
-          if: runner.os == 'Windows'
-          shell: pwsh
-          run: |
-            Compress-Archive -Path dist\* -DestinationPath "${{ matrix.artifact_name }}.zip"
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\* -DestinationPath "${{ matrix.artifact_name }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
