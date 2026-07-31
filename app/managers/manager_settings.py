@@ -24,6 +24,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
     # Send
     "raise_filter_window": False,
     "zip": False,
+    "clear_filelist_after": False,
 
     # Receive
     "default_receive_path": str(app_utils.determine_received_path("received")),
@@ -111,6 +112,7 @@ class SettingsManager():
         # Send
         self.raise_filter_window: bool | None = None
         self.zip: bool | None = None
+        self.clear_filelist_after: bool | None = None
 
         # Receive
         self.default_receive_path: str | None = None

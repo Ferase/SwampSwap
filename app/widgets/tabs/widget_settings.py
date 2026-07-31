@@ -110,7 +110,7 @@ class SettingsWidget(QWidget):
         self.label_lang = QLabel(self.worker.settings.tr("options:language:label"))
         self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
 
-        self.combo_lang = app_utils.NoScrollComboBox()
+        self.combo_lang = app_utils.BoundedComboBox()
         self.combo_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
         self.combo_lang.addItems(self.worker.settings.lang_list)
         self.combo_lang.setCurrentText(self.worker.settings.lang)
@@ -118,9 +118,10 @@ class SettingsWidget(QWidget):
         self.label_theme = QLabel(self.worker.settings.tr("options:theme:label"))
         self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
 
-        self.combo_theme = app_utils.NoScrollComboBox()
+        self.combo_theme = app_utils.BoundedComboBox()
         self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
         self.combo_theme.addItems(self.worker.settings.theme_list)
+        self.combo_theme.addItem("Random")
         self.combo_theme.setCurrentText(self.worker.settings.theme)
 
         self.checkbox_animation_matches_theme = QCheckBox(self.worker.settings.tr("options:animation_matches_theme:label"))
@@ -175,8 +176,12 @@ class SettingsWidget(QWidget):
         self.checkbox_zip = QCheckBox(self.worker.settings.tr("options:zip:label"))
         self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
 
+        self.checkbox_clear_filelist_after = QCheckBox(self.worker.settings.tr("options:clear_filelist_after:label"))
+        self.checkbox_clear_filelist_after.setToolTip(self.worker.settings.tr("options:clear_filelist_after:tooltip"))
+
         layout.addWidget(self.checkbox_raise_filter_window)
         layout.addWidget(self.checkbox_zip)
+        layout.addWidget(self.checkbox_clear_filelist_after)
 
         return self.send_group
 
@@ -398,6 +403,8 @@ class SettingsWidget(QWidget):
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
         self.checkbox_zip.setText(self.worker.settings.tr("options:zip:label"))
         self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
+        self.checkbox_clear_filelist_after.setText(self.worker.settings.tr("options:clear_filelist_after:label"))
+        self.checkbox_clear_filelist_after.setToolTip(self.worker.settings.tr("options:clear_filelist_after:tooltip"))
 
         self.receive_group.setTitle(self.worker.settings.tr("options:heading:receive"))
         self.label_defualt_receive_path.setText(self.worker.settings.tr("options:default_receive_path:label"))
@@ -486,6 +493,7 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window.toggled.connect(self._mark_dirty)
         self.checkbox_zip.toggled.connect(self._mark_dirty)
+        self.checkbox_clear_filelist_after.toggled.connect(self._mark_dirty)
 
         self.lineedit_defualt_receive_path.textChanged.connect(self._mark_dirty)
 
@@ -539,6 +547,7 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
         self.checkbox_zip.setChecked(self.worker.settings.zip)
+        self.checkbox_clear_filelist_after.setChecked(self.worker.settings.clear_filelist_after)
 
         self.lineedit_defualt_receive_path.setText(self.worker.settings.default_receive_path)
 
@@ -572,6 +581,7 @@ class SettingsWidget(QWidget):
 
         self.worker.settings.raise_filter_window = self.checkbox_raise_filter_window.isChecked()
         self.worker.settings.zip = self.checkbox_zip.isChecked()
+        self.worker.settings.clear_filelist_after = self.checkbox_clear_filelist_after.isChecked()
 
         self.worker.settings.default_receive_path = self.lineedit_defualt_receive_path.text()
 
@@ -608,6 +618,7 @@ class SettingsWidget(QWidget):
 
             "raise_filter_window": self.checkbox_raise_filter_window.isChecked(),
             "zip": self.checkbox_zip.isChecked(),
+            "clear_filelist_after": self.checkbox_clear_filelist_after.isChecked(),
 
             "defualt_receive_path": self.lineedit_defualt_receive_path.text(),
             

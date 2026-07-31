@@ -153,7 +153,19 @@ def get_settings_path(app_name: str, make_dir: bool = True) -> Path:
     
 
 
+class BoundedComboBox(QComboBox):
+    def showPopup(self) -> None:
+        super().showPopup()
 
+        max_items = self.maxVisibleItems()
+        if self.count() > max_items:
+            popup = self.view().window()
+            row_height = self.view().sizeHintForRow(0)
+            frame = self.view().frameWidth() * 2
+            popup.setFixedHeight(row_height * max_items + frame)
+
+    def wheelEvent(self, event: QWheelEvent):
+        event.ignore()
 
 class NoScrollComboBox(QComboBox):
     """A variant of QComboBox that does not allow using scroll wheel to change the selected item."""

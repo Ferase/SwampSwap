@@ -208,6 +208,8 @@
     "options:raise_filter_window:tooltip":              "If enabled, you will always be prompted to add filters and exclusions to the files within a folder you have chosen to send.",
     "options:zip:label":                                "Compress all files to ZIP",
     "options:zip:tooltip":                              "If enabled, your files will be compressed into a ZIP file before being sent.",
+    "options:clear_filelist_after:label":               "Clear file list after sending",
+    "options:clear_filelist_after:tooltip":             "If enabled, successfully sending files to a recipient will then clear the send list.",
 
     "options:default_receive_path:label":               "Default receive path",
     "options:default_receive_path:tooltip":             "The default location Swamp Swap will use for receiving files when starting up.",

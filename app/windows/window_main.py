@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from PyQt6.QtWidgets import (
@@ -12,9 +13,9 @@ from PyQt6.QtCore import Qt, QTimer
 
 from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
-from app.widgets.widget_send import SendWidget
-from app.widgets.widget_receive import ReceiveWidget
-from app.widgets.widget_settings import SettingsWidget
+from app.widgets.tabs.widget_send import SendWidget
+from app.widgets.tabs.widget_receive import ReceiveWidget
+from app.widgets.tabs.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
 
@@ -27,6 +28,7 @@ class FirstRunReceivePathDialog(QDialog):
         self.worker = worker
 
         self.setWindowTitle(self.worker.settings.tr("dialog:first_run_receive_path:title"))
+        self.setFixedSize(500, 150)
 
         self._build_central()
         self._connect_signals()
@@ -118,6 +120,13 @@ class FirstRunReceivePathDialog(QDialog):
 
     def get_path(self) -> str:
         return self.lineedit_path.text()
+
+
+
+    def reject(self):
+        sys.exit()
+        super().reject()
+
 
 
 

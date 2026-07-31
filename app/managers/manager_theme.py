@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
@@ -136,6 +137,10 @@ class ThemeManager(QObject):
         """Applies the specified theme to the application's stylesheet."""
 
         # Get the theme
+        if palette_name == "Random":
+            name_list: list[str] = self.palettes.get_list()
+            palette_name = name_list[random.randint(0, len(name_list)-1)]
+
         theme = self.palettes[palette_name]
 
         # Fall back to the Pink theme if we somehow try to load an nonexistent theme

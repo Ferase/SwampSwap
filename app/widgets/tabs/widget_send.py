@@ -413,7 +413,12 @@ class SendWidget(QWidget):
 
         self._clear_code()
         self._enable_controls()
-        if self.are_files_selected():
+
+        if self.worker.settings.clear_filelist_after and self.worker.get_action() == CrocAction.COMPLETED:
+            self.sendfiles_manager.clear_selected_file_set()
+            return
+
+        if self.are_files_selected() and self.tabs.tabBar().currentIndex() == 0:
             self.btn_send.setEnabled(True)
 
     def _paths_set_to_string(self, paths: set[Path]) -> str:

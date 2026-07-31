@@ -95,6 +95,196 @@
         "anim_folder": [44, 52, 41]
     },
     {
+        "name": "Red",
+
+        "bg_front": [50, 0, 0],
+        "bg_back": [36, 0, 0],
+        "text": [255, 233, 233],
+        "highlight": [170, 30, 30],
+        "text_highlight": [255, 255, 255],
+        "disabled": [206, 144, 144],
+        "text_placeholder": [206, 144, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 200, 200],
+        "anim_water": [200, 60, 60],
+        "anim_box": [130, 40, 40],
+        "anim_croc": [250, 110, 110],
+        "anim_bird": [250, 110, 110],
+        "anim_folder": [150, 63, 63]
+    },
+    {
+        "name": "Orange",
+
+        "bg_front": [50, 25, 0],
+        "bg_back": [36, 18, 0],
+        "text": [255, 240, 233],
+        "highlight": [170, 65, 30],
+        "text_highlight": [255, 255, 255],
+        "disabled": [206, 175, 144],
+        "text_placeholder": [206, 175, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 225, 200],
+        "anim_water": [200, 120, 60],
+        "anim_box": [130, 80, 40],
+        "anim_croc": [250, 180, 110],
+        "anim_bird": [250, 180, 110],
+        "anim_folder": [150, 110, 63]
+    },
+    {
+        "name": "Yellow",
+
+        "bg_front": [50, 50, 0],
+        "bg_back": [36, 36, 0],
+        "text": [255, 255, 233],
+        "highlight": [170, 170, 30],
+        "text_highlight": [0, 0, 0],
+        "disabled": [206, 206, 144],
+        "text_placeholder": [206, 206, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 225, 200],
+        "anim_water": [200, 200, 60],
+        "anim_box": [130, 130, 40],
+        "anim_croc": [250, 250, 110],
+        "anim_bird": [250, 250, 110],
+        "anim_folder": [150, 150, 63]
+    },
+    {
+        "name": "Lime",
+
+        "bg_front": [25, 50, 0],
+        "bg_back": [18, 36, 0],
+        "text": [240, 255, 233],
+        "highlight": [65, 170, 30],
+        "text_highlight": [255, 255, 255],
+        "disabled": [175, 206, 144],
+        "text_placeholder": [175, 206, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [225, 255, 200],
+        "anim_water": [120, 200, 60],
+        "anim_box": [80, 130, 40],
+        "anim_croc": [180, 250, 110],
+        "anim_bird": [180, 250, 110],
+        "anim_folder": [110, 150, 63]
+    },
+    {
+        "name": "Green",
+
+        "bg_front": [0, 50, 0],
+        "bg_back": [0, 36, 0],
+        "text": [233, 255, 233],
+        "highlight": [30, 170, 30],
+        "text_highlight": [0, 0, 0],
+        "disabled": [144, 206, 144],
+        "text_placeholder": [144, 206, 144],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [200, 225, 200],
+        "anim_water": [60, 200, 60],
+        "anim_box": [40, 130, 40],
+        "anim_croc": [110, 250, 110],
+        "anim_bird": [110, 250, 110],
+        "anim_folder": [63, 150, 63]
+    },
+    {
+        "name": "Teal",
+
+        "bg_front": [0, 50, 25],
+        "bg_back": [0, 36, 18],
+        "text": [233, 255, 240],
+        "highlight": [30, 170, 65],
+        "text_highlight": [255, 255, 255],
+        "disabled": [144, 206, 175],
+        "text_placeholder": [144, 206, 175],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [200, 255, 225],
+        "anim_water": [60, 200, 120],
+        "anim_box": [40, 130, 80],
+        "anim_croc": [110, 250, 180],
+        "anim_bird": [110, 250, 180],
+        "anim_folder": [63, 150, 110]
+    },
+    {
+        "name": "Cyan",
+
+        "bg_front": [0, 50, 50],
+        "bg_back": [0, 36, 36],
+        "text": [233, 255, 255],
+        "highlight": [30, 170, 170],
+        "text_highlight": [255, 255, 255],
+        "disabled": [144, 206, 206],
+        "text_placeholder": [144, 206, 206],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [200, 255, 255],
+        "anim_water": [60, 200, 200],
+        "anim_box": [40, 130, 130],
+        "anim_croc": [110, 250, 250],
+        "anim_bird": [110, 250, 250],
+        "anim_folder": [63, 150, 150]
+    },
+    {
+        "name": "Blue",
+
+        "bg_front": [0, 25, 50],
+        "bg_back": [0, 18, 36],
+        "text": [233, 240, 255],
+        "highlight": [30, 65, 170],
+        "text_highlight": [255, 255, 255],
+        "disabled": [144, 175, 206],
+        "text_placeholder": [144, 175, 206],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [200, 255, 225],
+        "anim_water": [60, 120, 200],
+        "anim_box": [40, 80, 130],
+        "anim_croc": [110, 180, 250],
+        "anim_bird": [110, 180, 250],
+        "anim_folder": [63, 110, 150]
+    },
+    {
+        "name": "Deep Blue",
+
+        "bg_front": [0, 0, 50],
+        "bg_back": [0, 0, 36],
+        "text": [233, 233, 255],
+        "highlight": [30, 30, 170],
+        "text_highlight": [255, 255, 255],
+        "disabled": [144, 144, 206],
+        "text_placeholder": [144, 144, 206],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [200, 200, 225],
+        "anim_water": [60, 60, 200],
+        "anim_box": [40, 40, 130],
+        "anim_croc": [110, 110, 250],
+        "anim_bird": [110, 110, 250],
+        "anim_folder": [63, 63, 150]
+    },
+    {
+        "name": "Purple",
+
+        "bg_front": [25, 0, 50],
+        "bg_back": [18, 0, 36],
+        "text": [240, 233, 255],
+        "highlight": [65, 30, 170],
+        "text_highlight": [255, 255, 255],
+        "disabled": [175, 144, 206],
+        "text_placeholder": [175, 144, 206],
+
+        "anim_black": [0, 0, 0],
+        "anim_white": [255, 200, 225],
+        "anim_water": [120, 60, 200],
+        "anim_box": [80, 40, 130],
+        "anim_croc": [180, 110, 250],
+        "anim_bird": [180, 110, 250],
+        "anim_folder": [110, 63, 150]
+    },
+    {
         "name": "Pink",
 
         "bg_front": [50, 0, 34],
@@ -112,24 +302,5 @@
         "anim_croc": [250, 110, 208],
         "anim_bird": [250, 110, 208],
         "anim_folder": [150, 63, 124]
-    },
-    {
-        "name": "Red",
-
-        "bg_front": [50, 0, 0],
-        "bg_back": [36, 0, 0],
-        "text": [255, 233, 255],
-        "highlight": [170, 30, 30],
-        "text_highlight": [255, 255, 255],
-        "disabled": [206, 144, 144],
-        "text_placeholder": [206, 144, 144],
-
-        "anim_black": [0, 0, 0],
-        "anim_white": [255, 200, 200],
-        "anim_water": [200, 60, 60],
-        "anim_box": [130, 40, 40],
-        "anim_croc": [250, 110, 110],
-        "anim_bird": [250, 110, 110],
-        "anim_folder": [150, 63, 63]
     }
 ]
