@@ -13,14 +13,17 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: SwampSwap_Linux
+            archive: SwampSwap_Linux.tar.gz
             spec_file: build_onedir.spec
 
           - os: windows-latest
             artifact_name: SwampSwap_Windows
+            archive: SwampSwap_Windows.zip
             spec_file: build_onedir.spec
 
           - os: macos-latest
             artifact_name: SwampSwap_macOS
+            archive: SwampSwap_macOS.tar.gz
             spec_file: build_onedir.spec
 
     runs-on: ${{ matrix.os }}
@@ -55,9 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: |
-            *.zip
-            *.tar.gz
+          path: ${{ matrix.archive }}
           retention-days: 30
 
   release:
