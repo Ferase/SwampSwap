@@ -312,46 +312,56 @@ class SendWidget(QWidget):
 
 
     def _set_button_text_by_operation(self) -> None:
-        match self.worker.state.operation:
-            case CrocOperation.SENDING:
-                self.btn_send.setText(self.worker.settings.tr("generic:cancel"))
-            case _:
-                self.btn_send.setText(self.worker.settings.tr("generic:send"))
+        if self.worker.get_operation() == CrocOperation.SENDING:
+            self.btn_send.setText(self.worker.settings.tr("generic:cancel"))
+            return
+        
+        self.btn_send.setText(self.worker.settings.tr("generic:send"))
 
     def _main_button_toggle_send_files(self) -> None:
         files_selected: bool = self.are_files_selected()
 
-        if self.worker.state.operation == CrocOperation.RECEIVING or not files_selected or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
-            self.btn_send.setEnabled(False)
+        if files_selected:
+            self.btn_send.setEnabled(True)
             return
         
-        elif files_selected:
-            self.btn_send.setEnabled(True)
-
-        is_sending: bool = self.worker.state.action not in [CrocAction.NONE, CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]
-        self._set_button_text_by_operation()
-        self.lineedit_code.setDisabled(is_sending)
+        self.btn_send.setEnabled(False)
 
     def _main_button_toggle_send_text(self) -> None:
         text_to_send: str = self._get_text_to_send()
 
-        if self.worker.state.operation == CrocOperation.RECEIVING or not text_to_send or (self.lineedit_code.text() and len(self.lineedit_code.text()) < 6):
+        if text_to_send:
+            self.btn_send.setEnabled(True)
+            return
+
+        self.btn_send.setEnabled(False)
+
+    def _determine_main_button_behavior(self) -> None:
+        operation: CrocOperation = self.worker.get_operation()
+        is_operating: bool = operation != CrocOperation.IDLE
+        code_entered: bool = bool(self.lineedit_code.text())
+        code_valid_length: bool = len(self.lineedit_code.text()) >= 6
+
+        if operation == CrocOperation.SENDING:
+            self._set_button_text_by_operation()
+            self.lineedit_code.setDisabled(is_operating)
+            self.btn_send.setEnabled(True)
+            return
+        elif operation == CrocOperation.RECEIVING:
             self.btn_send.setEnabled(False)
             return
 
-        elif text_to_send:
-            self.btn_send.setEnabled(True)
+        if code_entered and not code_valid_length:
+            self.btn_send.setEnabled(False)
+            return
 
-        is_sending: bool = self.worker.state.action not in [CrocAction.NONE, CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]
-        self._set_button_text_by_operation()
-        self.lineedit_code.setDisabled(is_sending)
-
-    def _determine_main_button_behavior(self) -> None:
         if self._send_type == SendType.FILES:
             self._main_button_toggle_send_files()
+            self._set_button_text_by_operation()
             return
 
         self._main_button_toggle_send_text()
+        self._set_button_text_by_operation()
 
     def _on_file_count_updated(self, count: dict) -> None:
         count_text = self._create_file_folder_count_text()

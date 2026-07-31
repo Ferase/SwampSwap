@@ -237,19 +237,33 @@ class ReceiveWidget(QWidget):
         self.btn_receive.clicked.connect(self._click_receive_button)
 
     def _set_button_text_by_operation(self) -> None:
-        match self.worker.state.operation:
-            case CrocOperation.RECEIVING:
-                self.btn_receive.setText(self.worker.settings.tr("generic:cancel"))
-            case _:
-                self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
+        if self.worker.get_operation() == CrocOperation.RECEIVING:
+            self.btn_receive.setText(self.worker.settings.tr("generic:cancel"))
+            return
+        
+        self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
 
     def _determine_main_button_behavior(self) -> None:
-        if self.worker.state.operation == CrocOperation.SENDING or len(self.lineedit_code.text()) < 6:
+        operation: CrocOperation = self.worker.get_operation()
+        is_operating: bool = operation != CrocOperation.IDLE
+        code_entered: bool = bool(self.lineedit_code.text())
+        code_valid_length: bool = len(self.lineedit_code.text()) >= 6
+
+        if operation == CrocOperation.RECEIVING:
+            self._set_button_text_by_operation()
+            self.lineedit_code.setDisabled(is_operating)
+            self.btn_receive.setEnabled(True)
+            return
+        elif operation == CrocOperation.SENDING:
             self.btn_receive.setEnabled(False)
             return
-        else:
-            self.btn_receive.setEnabled(True)
 
+        if not code_entered or (code_entered and not code_valid_length):
+            self.btn_receive.setEnabled(False)
+            return
+
+        self.btn_receive.setEnabled(True)
+        self.lineedit_code.setDisabled(is_operating)
         self._set_button_text_by_operation()
 
     def _get_default_path(self) -> str:
