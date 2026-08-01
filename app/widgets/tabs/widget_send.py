@@ -584,15 +584,6 @@ class SendWidget(QWidget):
             self._reset_selected_fies_folders()
 
     def _click_send_button(self) -> None:
-        match self._send_type:
-            case SendType.FILES:
-                if not self.sendfiles_manager.selected_paths:
-                    return
-
-            case _:
-                if not self.widget_text.textedit_text.toPlainText():
-                    return
-        
         is_active = self.worker.state.action not in (
             CrocAction.NONE,
             CrocAction.COMPLETED,
