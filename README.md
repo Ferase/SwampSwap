@@ -25,7 +25,7 @@ This project does not use any code from croc and will not install it if you don'
 
 Simply visit the [Releases page](https://github.com/Ferase/SwampSwap/releases/latest) and download the version for your system.
 
-Swamp Swap currently only supports **Linux** and **Windows**, however it can likely be built for your system if your OS supports Python.
+Swamp Swap currently only supports **Linux**, **macOS**, and **Windows**, however it can be built for any system that supports Python.
 
 ## Building
 
