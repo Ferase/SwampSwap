@@ -172,15 +172,33 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window = QCheckBox(self.worker.settings.tr("options:raise_filter_window:label"))
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
+        self.checkbox_raise_filter_window.setCheckable(self.worker.settings.raise_filter_window)
 
         self.checkbox_zip = QCheckBox(self.worker.settings.tr("options:zip:label"))
         self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
+        self.checkbox_zip.setCheckable(self.worker.settings.zip)
+        
+        self.label_hash = QLabel(self.worker.settings.tr("options:hash:label"))
+        self.label_hash.setToolTip(self.worker.settings.tr("options:hash:tooltip"))
+
+        self.combo_hash = app_utils.NoScrollComboBox()
+        self.combo_hash.setToolTip(self.worker.settings.tr("options:hash:tooltip"))
+        self.combo_hash.addItems(self.worker.settings.hash_list)
+        self.combo_hash.setCurrentText(self.worker.settings.hash)
+
+        self.checkbox_git = QCheckBox(self.worker.settings.tr("options:git:label"))
+        self.checkbox_git.setToolTip(self.worker.settings.tr("options:git:tooltip"))
+        self.checkbox_git.setCheckable(self.worker.settings.git)
 
         self.checkbox_clear_filelist_after = QCheckBox(self.worker.settings.tr("options:clear_filelist_after:label"))
         self.checkbox_clear_filelist_after.setToolTip(self.worker.settings.tr("options:clear_filelist_after:tooltip"))
+        self.checkbox_clear_filelist_after.setCheckable(self.worker.settings.clear_filelist_after)
 
+        layout.addWidget(self.label_hash)
+        layout.addWidget(self.combo_hash)
         layout.addWidget(self.checkbox_raise_filter_window)
         layout.addWidget(self.checkbox_zip)
+        layout.addWidget(self.checkbox_git)
         layout.addWidget(self.checkbox_clear_filelist_after)
 
         return self.send_group
@@ -403,6 +421,11 @@ class SettingsWidget(QWidget):
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
         self.checkbox_zip.setText(self.worker.settings.tr("options:zip:label"))
         self.checkbox_zip.setToolTip(self.worker.settings.tr("options:zip:tooltip"))
+        self.label_hash.setText(self.worker.settings.tr("options:hash:label"))
+        self.label_hash.setToolTip(self.worker.settings.tr("options:hash:tooltip"))
+        self.combo_hash.setToolTip(self.worker.settings.tr("options:hash:tooltip"))
+        self.checkbox_git.setText(self.worker.settings.tr("options:git:label"))
+        self.checkbox_git.setToolTip(self.worker.settings.tr("options:git:tooltip"))
         self.checkbox_clear_filelist_after.setText(self.worker.settings.tr("options:clear_filelist_after:label"))
         self.checkbox_clear_filelist_after.setToolTip(self.worker.settings.tr("options:clear_filelist_after:tooltip"))
 
@@ -493,6 +516,8 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window.toggled.connect(self._mark_dirty)
         self.checkbox_zip.toggled.connect(self._mark_dirty)
+        self.combo_hash.currentTextChanged.connect(self._mark_dirty)
+        self.checkbox_git.toggled.connect(self._mark_dirty)
         self.checkbox_clear_filelist_after.toggled.connect(self._mark_dirty)
 
         self.lineedit_defualt_receive_path.textChanged.connect(self._mark_dirty)
@@ -547,6 +572,8 @@ class SettingsWidget(QWidget):
 
         self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
         self.checkbox_zip.setChecked(self.worker.settings.zip)
+        self.combo_hash.setCurrentText(self.worker.settings.hash)
+        self.checkbox_git.setChecked(self.worker.settings.git)
         self.checkbox_clear_filelist_after.setChecked(self.worker.settings.clear_filelist_after)
 
         self.lineedit_defualt_receive_path.setText(self.worker.settings.default_receive_path)
@@ -581,6 +608,8 @@ class SettingsWidget(QWidget):
 
         self.worker.settings.raise_filter_window = self.checkbox_raise_filter_window.isChecked()
         self.worker.settings.zip = self.checkbox_zip.isChecked()
+        self.worker.settings.hash = self.combo_hash.currentText()
+        self.worker.settings.git = self.checkbox_git.isChecked()
         self.worker.settings.clear_filelist_after = self.checkbox_clear_filelist_after.isChecked()
 
         self.worker.settings.default_receive_path = self.lineedit_defualt_receive_path.text()
@@ -618,6 +647,8 @@ class SettingsWidget(QWidget):
 
             "raise_filter_window": self.checkbox_raise_filter_window.isChecked(),
             "zip": self.checkbox_zip.isChecked(),
+            "hash": self.combo_curve.currentText(),
+            "git": self.checkbox_git.isChecked(),
             "clear_filelist_after": self.checkbox_clear_filelist_after.isChecked(),
 
             "defualt_receive_path": self.lineedit_defualt_receive_path.text(),

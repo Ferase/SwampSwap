@@ -208,6 +208,10 @@
     "options:raise_filter_window:tooltip":              "If enabled, you will always be prompted to add filters and exclusions to the files within a folder you have chosen to send.",
     "options:zip:label":                                "Compress all files to ZIP",
     "options:zip:tooltip":                              "If enabled, your files will be compressed into a ZIP file before being sent.",
+    "options:hash:label":                               "Hashing algorithm",
+    "options:hash:tooltip":                             "The hashing algorithm used when sending files.",
+    "options:git:label":                                "Respect .gitignore",
+    "options:git:tooltip":                              "If a folder or subfolder being sent contains a .gitignore file, the rules defined within it will be used to handle what files will be sent and/or excluded.",
     "options:clear_filelist_after:label":               "Clear file list after sending",
     "options:clear_filelist_after:tooltip":             "If enabled, successfully sending files to a recipient will then clear the send list.",
 

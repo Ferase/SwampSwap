@@ -24,6 +24,8 @@ _DEFAULTS: dict[str, bool | str | float] = {
     # Send
     "raise_filter_window": False,
     "zip": False,
+    "hash": "xxhash",
+    "git": False,
     "clear_filelist_after": False,
 
     # Receive
@@ -48,11 +50,6 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "internaldns": False,
     "nocompress": False,
     "local": False
-}
-
-# Placeholder settings that are blank in _DEFAULT but have hteir default values applied later
-_PLACEHOLDERS: list[str] = {
-    "default_receive_path"
 }
 
 # Lookup table for croc flags
@@ -80,7 +77,9 @@ _LOOKUP_TABLE_GENERAL: dict[str, str] = {
 
 # Lookup table for croc's send-only flags
 _LOOKUP_TABLE_SEND: dict[str, str] = {
-    "zip": "--zip"
+    "zip": "--zip",
+    "hash": "--hash",
+    "git": "--git"
 }
 
 
@@ -112,6 +111,9 @@ class SettingsManager():
         # Send
         self.raise_filter_window: bool | None = None
         self.zip: bool | None = None
+        self.hash: str | None = None
+        self.hash_list: list[str] = ["xxhash", "imohash", "md5", "highway"]
+        self.git: bool | None = None
         self.clear_filelist_after: bool | None = None
 
         # Receive
