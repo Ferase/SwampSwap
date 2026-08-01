@@ -212,6 +212,10 @@
     "options:hash:tooltip":                             "The hashing algorithm used when sending files.",
     "options:git:label":                                "Respect .gitignore",
     "options:git:tooltip":                              "If a folder or subfolder being sent contains a .gitignore file, the rules defined within it will be used to handle what files will be sent and/or excluded.",
+    "options:nolocal:label":                            "Disable local relay",
+    "options:nolocal:tooltip":                          "If checked, the local relay will be disabled when sending files.",
+    "options:nomulti:label":                            "Disable multiplexing",
+    "options:nomulti:tooltip":                          "If checked, this will disable multiplexing (signal merging)",
     "options:clear_filelist_after:label":               "Clear file list after sending",
     "options:clear_filelist_after:tooltip":             "If enabled, successfully sending files to a recipient will then clear the send list.",
 

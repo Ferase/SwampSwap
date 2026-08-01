@@ -26,6 +26,8 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "zip": False,
     "hash": "xxhash",
     "git": False,
+    "nolocal": False,
+    "nomulti": False,
     "clear_filelist_after": False,
 
     # Receive
@@ -79,7 +81,9 @@ _LOOKUP_TABLE_GENERAL: dict[str, str] = {
 _LOOKUP_TABLE_SEND: dict[str, str] = {
     "zip": "--zip",
     "hash": "--hash",
-    "git": "--git"
+    "git": "--git",
+    "nolocal": "--no-local",
+    "nomulti": "--no-multi"
 }
 
 
@@ -114,6 +118,8 @@ class SettingsManager():
         self.hash: str | None = None
         self.hash_list: list[str] = ["xxhash", "imohash", "md5", "highway"]
         self.git: bool | None = None
+        self.nolocal: bool | None = None
+        self.nomulti: bool | None = None
         self.clear_filelist_after: bool | None = None
 
         # Receive
