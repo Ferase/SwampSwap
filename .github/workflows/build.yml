@@ -12,18 +12,28 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: SwampSwap_Linux
-            archive: SwampSwap_Linux.tar.gz
+            artifact_name: SwampSwap_Linux_x86_64
+            archive: SwampSwap_Linux_x86_64.tar.gz
+            spec_file: build_onedir.spec
+
+          - os: ubuntu-24.04-arm
+            artifact_name: SwampSwap_Linux_aarch64
+            archive: SwampSwap_Linux_aarch64.tar.gz
             spec_file: build_onedir.spec
 
           - os: windows-latest
-            artifact_name: SwampSwap_Windows
-            archive: SwampSwap_Windows.zip
+            artifact_name: SwampSwap_Windows_x86_64
+            archive: SwampSwap_Windows_x86_64.zip
+            spec_file: build_onedir.spec
+
+          - os: macos-13
+            artifact_name: SwampSwap_macOS_x86_64
+            archive: SwampSwap_macOS_x86_64.tar.gz
             spec_file: build_onedir.spec
 
           - os: macos-latest
-            artifact_name: SwampSwap_macOS
-            archive: SwampSwap_macOS.tar.gz
+            artifact_name: SwampSwap_macOS_arm64
+            archive: SwampSwap_macOS_arm64.tar.gz
             spec_file: build_onedir.spec
 
     runs-on: ${{ matrix.os }}
