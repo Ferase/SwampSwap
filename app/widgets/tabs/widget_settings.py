@@ -115,6 +115,9 @@ class SettingsWidget(QWidget):
         self.combo_lang.addItems(self.worker.settings.lang_list)
         self.combo_lang.setCurrentText(self.worker.settings.lang)
 
+        # Language will remain disabled until another language is added
+        self.combo_lang.setEnabled(False)
+
         self.label_theme = QLabel(self.worker.settings.tr("options:theme:label"))
         self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
 

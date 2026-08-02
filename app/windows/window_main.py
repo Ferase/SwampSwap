@@ -6,11 +6,13 @@ from PyQt6.QtWidgets import (
     QMenuBar, QMenu, QLabel, QInputDialog,
     QToolButton, QStyle, QProgressBar, QWidget,
     QVBoxLayout, QGroupBox, QDialog, QHBoxLayout,
-    QLineEdit, QPushButton, QFileDialog
+    QLineEdit, QPushButton, QFileDialog, QCheckBox,
+    QGridLayout
 )
 from PyQt6.QtGui import QAction, QIcon, QPixmap
 from PyQt6.QtCore import Qt, QTimer
 
+import app.utils as app_utils
 from app.enums import CrocOperation, CrocAction
 from app.workers.worker_croc import CrocWorker
 from app.widgets.tabs.widget_send import SendWidget
@@ -27,8 +29,8 @@ class FirstRunReceivePathDialog(QDialog):
 
         self.worker = worker
 
-        self.setWindowTitle(self.worker.settings.tr("dialog:first_run_receive_path:title"))
-        self.setFixedSize(500, 150)
+        self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
+        self.setFixedSize(500, 300)
 
         self._build_central()
         self._connect_signals()
@@ -44,25 +46,65 @@ class FirstRunReceivePathDialog(QDialog):
         root.addWidget(buttons_group)
 
     def _build_main(self) -> QGroupBox:
-        group = QGroupBox()
-        layout = QVBoxLayout(group)
+        self.main_group = QGroupBox(self.worker.settings.tr("firstrun:group:set_settings"))
+        layout = QVBoxLayout(self.main_group)
 
-        self.label_body = QLabel(self.worker.settings.tr("dialog:first_run_receive_path:body"))
+        self.label_path = QLabel(self.worker.settings.tr("options:default_receive_path:label"))
+        self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
 
-        row = QHBoxLayout()
+        path_row = QHBoxLayout()
         self.lineedit_path = QLineEdit()
-        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("dialog:first_run_receive_path:placeholder"))
         self.lineedit_path.setText(self.worker.settings.default_receive_path)
+        self.lineedit_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
 
         self.btn_browse = QPushButton(self.worker.settings.tr("generic:browse"))
 
-        layout.addWidget(self.label_body)
+        ui_grid = QGridLayout()
 
-        layout.addLayout(row)
-        row.addWidget(self.lineedit_path)
-        row.addWidget(self.btn_browse)
+        self.label_lang = QLabel(self.worker.settings.tr("options:language:label"))
+        self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
 
-        return group
+        self.combo_lang = app_utils.BoundedComboBox()
+        self.combo_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
+        self.combo_lang.addItems(self.worker.settings.locale_manager.get_lang_list())
+        self.combo_lang.setCurrentText(self.worker.settings.lang)
+
+        # Language will remain disabled until another language is added
+        self.combo_lang.setEnabled(False)
+
+        self.label_theme = QLabel(self.worker.settings.tr("options:theme:label"))
+        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+
+        self.combo_theme = app_utils.BoundedComboBox()
+        self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+        self.combo_theme.addItems(self.worker.settings.theme_manager.get_theme_list() + ["Random"])
+        self.combo_theme.setCurrentText(self.worker.settings.theme)
+
+        self.checkbox_enable_sound = QCheckBox(self.worker.settings.tr("options:enable_sound:label"))
+        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
+        self.checkbox_enable_sound.setChecked(self.worker.settings.enable_sound)
+
+        layout.addLayout(ui_grid)
+        ui_grid.addWidget(self.label_lang, 0, 0)
+        ui_grid.addWidget(self.combo_lang, 1, 0)
+        ui_grid.addWidget(self.label_theme, 0, 1)
+        ui_grid.addWidget(self.combo_theme, 1, 1)
+
+        layout.addStretch()
+
+        layout.addWidget(self.label_path)
+
+        layout.addLayout(path_row)
+        path_row.addWidget(self.lineedit_path)
+        path_row.addWidget(self.btn_browse)
+
+        layout.addStretch()
+
+        layout.addWidget(self.checkbox_enable_sound)
+
+        layout.addStretch()
+
+        return self.main_group
 
     def _build_buttons(self) -> None:
         group = QGroupBox()
@@ -76,10 +118,22 @@ class FirstRunReceivePathDialog(QDialog):
         return group
 
     def _retranslate(self) -> None:
-        self.setWindowTitle(self.worker.settings.tr("dialog:first_run_receive_path:title"))
-        self.label_body.setText(self.worker.settings.tr("dialog:first_run_receive_path:body"))
-        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("dialog:first_run_receive_path:placeholder"))
+        self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
+        self.main_group.setTitle(self.worker.settings.tr("firstrun:group:set_settings"))
+        
+        self.label_path.setText(self.worker.settings.tr("options:default_receive_path:label"))
+        self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
+        self.lineedit_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
         self.btn_browse.setText(self.worker.settings.tr("generic:browse"))
+
+        self.label_lang.setText(self.worker.settings.tr("options:language:label"))
+        self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
+        self.label_theme.setText(self.worker.settings.tr("options:theme:label"))
+        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
+
+        self.checkbox_enable_sound.setText(self.worker.settings.tr("options:enable_sound:label"))
+        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
+
         self.btn_ok.setText(self.worker.settings.tr("generic:ok"))
 
     def _connect_signals(self) -> None:
@@ -88,7 +142,11 @@ class FirstRunReceivePathDialog(QDialog):
         self.btn_browse.clicked.connect(self._browse)
         self.lineedit_path.textChanged.connect(self._enable_disable_button)
 
-        self.btn_ok.clicked.connect(self._accept_path)
+        self.combo_lang.currentTextChanged.connect(self._change_lang)
+        self.combo_theme.currentTextChanged.connect(self._change_theme)
+        self.checkbox_enable_sound.toggled.connect(self._enable_disable_sound)
+
+        self.btn_ok.clicked.connect(self._accept)
 
     def _browse(self) -> None:
         dialog = QFileDialog(directory=self.lineedit_path.text())
@@ -100,7 +158,21 @@ class FirstRunReceivePathDialog(QDialog):
     def _enable_disable_button(self, text: str) -> None:
         self.btn_ok.setEnabled(bool(text))
 
-    def _accept_path(self) -> None:
+    def _change_lang(self, lang: str) -> None:
+        self.worker.settings.lang = lang
+        self.worker.settings.change_language()
+
+    def _change_theme(self, theme: str) -> None:
+        self.worker.settings.theme = theme
+        self.worker.settings.change_theme()
+
+    def _enable_disable_sound(self, enabled: bool) -> None:
+        if enabled:
+            self.worker.sound_manager.play_enable_sound()
+
+        self.worker.settings.enable_sound = enabled
+
+    def _accept(self) -> None:
         if Path(self.get_path()).exists():
             self.accept()
             return
@@ -647,5 +719,10 @@ class MainWindow(QMainWindow):
             self.worker.settings.default_receive_path = dialog.get_path()
             self.widget_receive.lineedit_path.setText(dialog.get_path())
             self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
+
+            self.widget_settings.combo_lang.setCurrentText(dialog.combo_lang.currentText())
+            self.widget_settings.combo_theme.setCurrentText(dialog.combo_theme.currentText())
+            self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
+
             self.worker.settings.save_settings()
             self.widget_settings.clear_dirty()

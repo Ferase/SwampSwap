@@ -64,14 +64,6 @@
     "dialog:cant_pass_empty_path:title":                "Defualt receive path is empty",
     "dialog:cant_pass_empty_path:body":                 "You must enter something into the default receive path textbox in order to send it to the receive tab.",
 
-    "dialog:first_run_receive_path:title":              "Set receive path",
-    "dialog:first_run_receive_path:body":               "Choose where to save received files to by default.",
-    "dialog:first_run_receive_path:placehodler":        "Enter path...",
-
-    "dialog:first_run_path_create:title":               "Receive path doesn't exist",
-    "dialog:first_run_path_create:body1":               "The provided receive path doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
-    "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
-
     "dialog:invalid_receive_path:title":                "Invalid output folder",
     "dialog:invalid_receive_path:body1":                "The output folder doesn't exist or is invalid.",
     "dialog:invalid_receive_path:body2":                "However, Swamp Swap will create this path when receiving any files or folders <b>assuming the path is a possible path and not random text</b>. You just can't open the folder if it doesn't exist. Create it or allow Swamp Swap to do so when you receive files.",
@@ -111,6 +103,10 @@
     "dialog:close_warning_operation:title":             "An operation is running",
     "dialog:close_warning_operation:body":              "An operation is currently running. If you close Swamp Swap, it will be terminated. Are you sure you wish to proceed?",
 
+    "dialog:first_run_path_create:title":               "Receive path doesn't exist",
+    "dialog:first_run_path_create:body1":               "The provided receive path doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
+    "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
+
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
 
@@ -144,6 +140,9 @@
 
     "menubar:window_bad_code:title":                    "Invalid code",
     "menubar:window_bad_code:body":                     "The provided code was blank or invalid.",
+
+    "firstrun:window:title":                            "First run setup",
+    "firstrun:group:set_settings":                      "Set your settings",
 
     "send:tab:files":                                   "Files",
     "send:tab:text":                                    "Text",
