@@ -356,10 +356,12 @@ class SendWidget(QWidget):
             return
 
         if self._send_type == SendType.FILES:
+            self.lineedit_code.setDisabled(is_operating)
             self._main_button_toggle_send_files()
             self._set_button_text_by_operation()
             return
 
+        self.lineedit_code.setDisabled(is_operating)
         self._main_button_toggle_send_text()
         self._set_button_text_by_operation()
 

@@ -13,7 +13,7 @@ from PyQt6.QtGui import QWheelEvent, QFileSystemModel
 from PyQt6.QtCore import Qt, QEvent, QObject
 
 # Regex used to see if a string matches the formatting of croc's auto-generated codes
-CODE_RE = re.compile(r"^([0-9]){4}(-[a-z]+){3}$")
+CODE_RE = re.compile(r"^([a-z]+)(-[a-z]+){3}$")
 
 
 

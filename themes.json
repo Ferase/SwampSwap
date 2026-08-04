@@ -83,7 +83,7 @@
         "text": [222, 223, 214],
         "highlight": [196, 181, 80],
         "text_highlight": [0, 0, 0],
-        "disabled": [41, 44, 33],
+        "disabled": [196, 181, 80],
         "text_placeholder": [216, 222, 211],
 
         "anim_black": [0, 0, 0],
