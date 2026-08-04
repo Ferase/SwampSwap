@@ -334,6 +334,7 @@ class SettingsManager():
         return self.locale_manager.get(text)
     
 
+
     def change_theme(self) -> None:
         """Tell the theme manager to change the current theme."""
 
@@ -343,3 +344,9 @@ class SettingsManager():
         """Tell the theme manager whether animations should be recolored to match the theme."""
 
         self.theme_manager.set_animation_matches_theme(self.animation_matches_theme)
+
+
+
+    def delete_settings_file(self) -> None:
+        if self.settings_file_path.exists():
+            self.settings_file_path.unlink()

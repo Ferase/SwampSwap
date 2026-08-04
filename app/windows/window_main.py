@@ -721,7 +721,12 @@ class MainWindow(QMainWindow):
             self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
 
             self.widget_settings.combo_lang.setCurrentText(dialog.combo_lang.currentText())
+
+            # Block signals so themes like Random don't leapfrog
+            self.widget_settings.combo_theme.blockSignals(True)
             self.widget_settings.combo_theme.setCurrentText(dialog.combo_theme.currentText())
+            self.widget_settings.combo_theme.blockSignals(False)
+
             self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
 
             self.worker.settings.save_settings()

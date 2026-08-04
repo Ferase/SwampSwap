@@ -88,6 +88,15 @@
     "dialog:unsaved_settings:body1":                    "You have unsaved changes. WIthout saving, your settings will not be applied to your croc transfers.",
     "dialog:unsaved_settings:body2":                    "You can either save or discard your settings, abort switching tabs to continue editing them, or ignore to switch tabs without saving or reverting your settings.",
 
+    "dialog:delete_all_settings:title":                 "Delete the settings file?",
+    "dialog:delete_all_settings:body1":                 "Your settings file is located at {f}.",
+    "dialog:delete_all_settings:body2":                 "Deleting it will have the same effect as reverting your settings to default, with the only change being that the first run setup window will open the next time you start Swamp Swap, as if you jsut started using it for the first time.",
+    "dialog:delete_all_settings:body3":                 "Do you wish to proceed?",
+
+    "dialog:settings_deleted:title":                    "Settings file deleted",
+    "dialog:settings_deleted:body1":                    "The settings file has been deleted. Swamp Swap must now either be restarted or closed.",
+    "dialog:settings_deleted:body2":                    "Click \"OK\" to restart, or choose \"Close\" to close the program.",
+
     "dialog:clear_list_confirm:title":                  "Confirm clearing",
     "dialog:clear_list_confirm:body":                   "Are you sure you want to clear the list of files you want to send?",
 
@@ -253,6 +262,9 @@
     "options:classic:tooltip":                          "Uses croc's classic mode. This is less secure due to potential local attack vectors, so only use this if you know what you're doing.",
     "options:local:label":                              "Local connections only",
     "options:local:tooltip":                            "Only allows connections and file transfers over LAN.",
+
+    "options:delete_all:btn":                           "Delete settings file",
+    "options:delete_all:tooltip":                       "Unlike reverting settings to default, deleting the settings file will force Swamp Swap to raise its first run setup window again the next time it starts.",
 
     "console:window:title":                             "Console",
     "console:input_placeholder":                        "Enter commands while croc runs...",

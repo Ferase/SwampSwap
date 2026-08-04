@@ -1,9 +1,11 @@
+import sys
+
 from PyQt6.QtWidgets import (
     QMessageBox, QPushButton, QGroupBox, QVBoxLayout,
     QScrollArea, QLabel, QWidget, QLineEdit,
-    QCheckBox, QSlider, QDoubleSpinBox, QHBoxLayout
+    QCheckBox, QSlider, QApplication, QHBoxLayout
 )
-from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import pyqtSignal, Qt, QProcess
 
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker
@@ -60,6 +62,7 @@ class SettingsWidget(QWidget):
         group_relay_settings = self._build_relay_settings_group()
         group_network_settings = self._build_network_settings_group()
         group_flags_settings = self._build_flags_settings_group()
+        delete_settings_group = self._build_delete_settings_group()
 
         layout.addWidget(group_general_settings)
         layout.addSpacing(_PADDING)
@@ -74,6 +77,8 @@ class SettingsWidget(QWidget):
         layout.addWidget(group_network_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_flags_settings)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(delete_settings_group)
 
         layout.addStretch()
 
@@ -372,6 +377,17 @@ class SettingsWidget(QWidget):
         layout.addWidget(self.checkbox_local)
 
         return self.flags_group
+
+    def _build_delete_settings_group(self) -> QGroupBox:
+        group = QGroupBox()
+        layout = QVBoxLayout(group)
+
+        self.btn_delete_settings = QPushButton(self.worker.settings.tr("options:delete_all:btn"))
+        self.btn_delete_settings.setToolTip(self.worker.settings.tr("options:delete_all:tooltip"))
+
+        layout.addWidget(self.btn_delete_settings)
+
+        return group
     
     def _build_buttons(self) -> QWidget:
         widget = QWidget()
@@ -495,6 +511,9 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setText(self.worker.settings.tr("options:local:label"))
         self.checkbox_local.setToolTip(self.worker.settings.tr("options:local:tooltip"))
 
+        self.btn_delete_settings.setText(self.worker.settings.tr("options:delete_all:btn"))
+        self.btn_delete_settings.setToolTip(self.worker.settings.tr("options:delete_all:tooltip"))
+
         self.btn_reset.setText(self.worker.settings.tr("options:btn:reset_defaults"))
         self.btn_revert.setText(self.worker.settings.tr("options:btn:revert_settings"))
         self.btn_save.setText(self.worker.settings.tr("generic:save"))
@@ -514,6 +533,8 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.valueChanged.connect(self._on_slider_volume_changed)
         self.slider_sound_volume.sliderReleased.connect(self._play_enable_sound)
         self.spinbox_sound_volume.valueChanged.connect(self._on_spinbox_volume_changed)
+
+        self.btn_delete_settings.clicked.connect(self._click_delete_settings_button)
 
         self.btn_reset.clicked.connect(self._click_reset_button)
         self.btn_revert.clicked.connect(self._click_revert_button)
@@ -725,6 +746,39 @@ class SettingsWidget(QWidget):
         self.settings_changed.emit(False)
 
 
+
+    def _click_delete_settings_button(self) -> None:
+        box = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:delete_all_settings:title"),
+            "<br><br>".join([
+                self.worker.settings.tr("dialog:delete_all_settings:body1").format(f=f"<b>{str(self.worker.settings.settings_file_path)}</b>") ,
+                self.worker.settings.tr("dialog:delete_all_settings:body2"),
+                self.worker.settings.tr("dialog:delete_all_settings:body3")
+            ]),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            return
+
+        self.worker.settings.delete_settings_file()
+
+        box2 = QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:settings_deleted:title"),
+            self.worker.settings.tr("dialog:settings_deleted:body1") + "<br><br>" + self.worker.settings.tr("dialog:settings_deleted:body2"),
+            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Close,
+            QMessageBox.StandardButton.Close
+        )
+
+        if box2 == QMessageBox.StandardButton.Ok:
+            QProcess.startDetached(sys.executable, sys.argv)
+
+        QApplication.instance().exit()
+        QApplication.instance().quit()
+        sys.exit()
 
     def _click_reset_button(self) -> None:
         if self.worker.settings.are_settings_default():
