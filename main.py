@@ -12,7 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 # Name and version variables
 _APP_NAME = "Swamp Swap"
 _APP_VERSION = "1.3.8"
-_MINIMUM_CROC_VERSION = "10.5.0"
+_MINIMUM_CROC_VERSION = "11.0.0"
 
 
 
