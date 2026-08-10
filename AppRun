@@ -18,7 +18,9 @@ if [[ "$1" == "--install" ]]; then
     # Write desktop entry pointing at the installed AppImage
     cat > "$DESKTOP_DIR/SwampSwap.desktop" <<EOF
 [Desktop Entry]
-Name=SwampSwap
+Name=Swamp Swap
+GenericName=croc
+Comment=A GUI wrapper for the croc CLI file transfer program
 Exec=${INSTALL_DIR}/SwampSwap.AppImage
 Icon=SwampSwap
 Type=Application
@@ -26,7 +28,7 @@ Categories=Network;FileTransfer;
 EOF
 
     update-desktop-database "$DESKTOP_DIR" 2>/dev/null
-    echo "SwampSwap installed. It should now appear in your application launcher."
+    echo "Swamp Swap has been installed. It should now appear in your application launcher."
     exit 0
 fi
 
