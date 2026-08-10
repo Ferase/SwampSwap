@@ -1,3 +1,33 @@
 #!/bin/bash
 HERE="$(dirname "$(readlink -f "${0}")")"
+
+if [[ "$1" == "--install" ]]; then
+    INSTALL_DIR="${HOME}/.local/bin"
+    DESKTOP_DIR="${HOME}/.local/share/applications"
+    ICON_DIR="${HOME}/.local/share/icons/hicolor/256x256/apps"
+
+    mkdir -p "$INSTALL_DIR" "$DESKTOP_DIR" "$ICON_DIR"
+
+    # Copy AppImage to ~/.local/bin
+    cp "$APPIMAGE" "$INSTALL_DIR/SwampSwap.AppImage"
+    chmod +x "$INSTALL_DIR/SwampSwap.AppImage"
+
+    # Install icon
+    cp "${HERE}/SwampSwap.png" "$ICON_DIR/SwampSwap.png"
+
+    # Write desktop entry pointing at the installed AppImage
+    cat > "$DESKTOP_DIR/SwampSwap.desktop" <<EOF
+[Desktop Entry]
+Name=SwampSwap
+Exec=${INSTALL_DIR}/SwampSwap.AppImage
+Icon=SwampSwap
+Type=Application
+Categories=Network;FileTransfer;
+EOF
+
+    update-desktop-database "$DESKTOP_DIR" 2>/dev/null
+    echo "SwampSwap installed. It should now appear in your application launcher."
+    exit 0
+fi
+
 exec "${HERE}/usr/bin/SwampSwap/SwampSwap" "$@"
