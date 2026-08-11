@@ -1,5 +1,7 @@
+import os
 import sys
 import shutil
+import certifi
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtGui import QIcon, QDesktopServices
 from PyQt6.QtCore import QUrl
@@ -10,14 +12,25 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.0"
+_APP_VERSION = "1.4.02"
 _MINIMUM_CROC_VERSION = "11.0.0"
 
 
 
+def _configure_ssl() -> None:
+    """Point Python's SSL to bundled certificates when running as an executable."""
+
+    try:
+        os.environ["SSL_CERT_FILE"] = certifi.where()
+        os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+    except ImportError:
+        pass
+
 # Main runner
 def main() -> None:
     """Main function that creates the persistent worker and the main window. Also handles critical warnings and updater calling"""
+
+    _configure_ssl()
 
     # Create and setup application
     app = QApplication(sys.argv)
