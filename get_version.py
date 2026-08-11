@@ -14,26 +14,21 @@ class UpdateChecker():
         self._url = f"https://api.github.com/repos/{user}/{repo}/releases/latest"
 
     def check(self) -> tuple[bool, str]:
-        # Try to reach out to GitHub and get the tag name for version comparison
-        try:
-            # Reach out to GitHub's API
-            result = urllib.request.Request(
-                self._url,
-                headers={"Accept": "application/vnd.github+json"}
-            )
+        # Reach out to GitHub's API
+        result = urllib.request.Request(
+            self._url,
+            headers={"Accept": "application/vnd.github+json"}
+        )
 
-            # Get the resulting data as JSON
-            with urllib.request.urlopen(result, timeout=5) as resp:
-                data = json.loads(resp.read())
+        # Get the resulting data as JSON
+        with urllib.request.urlopen(result, timeout=5) as resp:
+            data = json.loads(resp.read())
 
-            # Get the tag name
-            tag = data.get("tag_name", "")
+        # Get the tag name
+        tag = data.get("tag_name", "")
 
-            # Emit the update_available signal if the remote version tests newer
-            return tag and _is_new_version_available(tag, self._current), tag
-
-        except Exception:
-            pass
+        # Emit the update_available signal if the remote version tests newer
+        return tag and _is_new_version_available(tag, self._current), tag
 
 
 
