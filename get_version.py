@@ -3,19 +3,17 @@ import json
 from PyQt6.QtCore import QThread, pyqtSignal
 
 
-class UpdateChecker(QThread):
+class UpdateChecker():
     """Basic update checker that uses GitHub's REST API to check for updates to a specific repo by their release tag."""
 
-    update_available = pyqtSignal(str)
-
-    def __init__(self, current_version: str, user: str, repo: str):
+    def __init__(self, current_version: str, user: str, repo: str) -> None:
         """Construct URL and get current version."""
 
         super().__init__()
         self._current = current_version
         self._url = f"https://api.github.com/repos/{user}/{repo}/releases/latest"
 
-    def run(self):
+    def check(self) -> tuple[bool, str]:
         # Try to reach out to GitHub and get the tag name for version comparison
         try:
             # Reach out to GitHub's API
@@ -32,8 +30,7 @@ class UpdateChecker(QThread):
             tag = data.get("tag_name", "")
 
             # Emit the update_available signal if the remote version tests newer
-            if tag and _is_new_version_available(tag, self._current):
-                self.update_available.emit(tag)
+            return tag and _is_new_version_available(tag, self._current), tag
 
         except Exception:
             pass

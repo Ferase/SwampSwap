@@ -4,14 +4,13 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtGui import QIcon, QDesktopServices
 from PyQt6.QtCore import QUrl
 
-from get_version import UpdateChecker
 import app.utils as app_utils
 from app.windows.window_main import MainWindow
 from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.3.92"
+_APP_VERSION = "1.4.0"
 _MINIMUM_CROC_VERSION = "11.0.0"
 
 
@@ -48,24 +47,6 @@ def main() -> None:
     elif _is_croc_too_old(worker):
         _croc_too_old(window, worker)
         return
-
-    # Check for various updates
-    else:
-        # If the user hasn't disabled checking for croc updates, check schollz/croc for a new release
-        if worker.settings.startup_croc_updates_check:
-            croc_checker = UpdateChecker(worker.get_croc_version_number_only(), "schollz", "croc")
-            croc_checker.update_available.connect(
-                lambda v: _new_croc_version_available(window, worker, v)
-            )
-            croc_checker.start()
-
-        # If the user hasn't disabled checking for Swamp Swamp GUI updates, check Ferase/SwampSwap for a new release
-        if worker.settings.startup_swampswap_updates_check:
-            swampswap_checker = UpdateChecker(_APP_VERSION, "Ferase", "SwampSwap")
-            swampswap_checker.update_available.connect(
-                lambda v: _new_swampswap_version_available(window, worker, v)
-            )
-            swampswap_checker.start()
 
     # General exit logic
     sys.exit(app.exec())
@@ -116,42 +97,6 @@ def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
     # Kill the application
     window.close()
 
-def _new_croc_version_available(parent, worker: CrocWorker, new_version: str) -> None:
-    """Raise an alert if a new croc version is detected on the schollz/croc repo on GitHub"""
-
-    # Ask the user if they want to update
-    result = QMessageBox.information(
-        parent,
-        worker.settings.tr("dialog:croc_update_available:title"),
-        worker.settings.tr("dialog:croc_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:croc_update_available:body2") + "<br><br>" + f"<b>{worker.settings.tr('dialog:croc_update_available:body3')}</b>",
-        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        QMessageBox.StandardButton.Yes
-    )
-
-    # If they do, open the GitHub
-    if result == QMessageBox.StandardButton.Yes:
-        QDesktopServices.openUrl(
-            QUrl("https://github.com/schollz/croc/releases/latest")
-        )
-
-def _new_swampswap_version_available(parent, worker: CrocWorker, new_version: str) -> None:
-    """Raise an alert if a new Swamp Swap version is detected on the Ferase/SwampSwap repo on GitHub"""
-
-    # Ask the user if they want to update
-    result = QMessageBox.information(
-        parent,
-        worker.settings.tr("dialog:swampswap_update_available:title"),
-        worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:swampswap_update_available:body2"),
-        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        QMessageBox.StandardButton.Yes
-    )
-
-    # If they do, open the GitHub
-    if result == QMessageBox.StandardButton.Yes:
-        QDesktopServices.openUrl(
-            QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
-        )
-
 def _is_croc_too_old(worker: CrocWorker) -> bool:
     croc_version: str = worker.get_croc_version_number_only()
     
@@ -159,6 +104,7 @@ def _is_croc_too_old(worker: CrocWorker) -> bool:
         return tuple(int(x) for x in v.lstrip("v").split("."))
 
     return bool(_parse(croc_version) < _parse(_MINIMUM_CROC_VERSION))
+
 
 
 # Start everything

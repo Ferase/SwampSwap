@@ -5,8 +5,10 @@ from PyQt6.QtWidgets import (
     QScrollArea, QLabel, QWidget, QLineEdit,
     QCheckBox, QSlider, QApplication, QHBoxLayout
 )
-from PyQt6.QtCore import pyqtSignal, Qt, QProcess
+from PyQt6.QtCore import pyqtSignal, Qt, QProcess, QUrl, QTimer
+from PyQt6.QtGui import QDesktopServices
 
+from get_version import UpdateChecker
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker
 
@@ -30,12 +32,16 @@ class SettingsWidget(QWidget):
         self.worker: CrocWorker = worker
         self.dirty = False
 
+        self._update_checker_croc = None
+        self._update_checker_swampswap = None
+
         # Build UI
         self._build_central()
         self._load_from_settings()
         self._connect_signals()
         self._enable_disable_settings()
         self._set_previous_settings()
+        self._startup_updates_check()
 
     # Construct main UI
     def _build_central(self) -> None:
@@ -90,6 +96,10 @@ class SettingsWidget(QWidget):
         self.general_group = QGroupBox(self.worker.settings.tr("options:heading:general"))
         layout = QVBoxLayout(self.general_group)
 
+        self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
+        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+
         self.checkbox_startup_croc_updates_check = QCheckBox(self.worker.settings.tr("options:startup_croc_updates_check:label"))
         self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
         self.checkbox_startup_croc_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
@@ -98,13 +108,14 @@ class SettingsWidget(QWidget):
         self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
         self.checkbox_startup_swampswap_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
 
-        self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
-        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
-        self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
+        self.btn_check_update_croc = QPushButton(self.worker.settings.tr("options:btn:check_update_croc"))
+        self.btn_check_update_swampswap = QPushButton(self.worker.settings.tr("options:btn:check_update_swampswap"))
 
         layout.addWidget(self.checkbox_startup_console)
         layout.addWidget(self.checkbox_startup_croc_updates_check)
         layout.addWidget(self.checkbox_startup_swampswap_updates_check)
+        layout.addWidget(self.btn_check_update_croc)
+        layout.addWidget(self.btn_check_update_swampswap)
 
         return self.general_group
     
@@ -422,12 +433,14 @@ class SettingsWidget(QWidget):
         self.setWindowTitle(self.worker.settings.tr("options:window:title"))
 
         self.general_group.setTitle(self.worker.settings.tr("options:heading:general"))
+        self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
+        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
         self.checkbox_startup_croc_updates_check.setText(self.worker.settings.tr("options:startup_croc_updates_check:label"))
         self.checkbox_startup_croc_updates_check.setToolTip(self.worker.settings.tr("options:startup_croc_updates_check:tooltip"))
         self.checkbox_startup_swampswap_updates_check.setText(self.worker.settings.tr("options:startup_swampswap_updates_check:label"))
         self.checkbox_startup_swampswap_updates_check.setToolTip(self.worker.settings.tr("options:startup_swampswap_updates_check:tooltip"))
-        self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
-        self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
+        self.btn_check_update_croc.setText(self.worker.settings.tr("options:btn:check_update_croc"))
+        self.btn_check_update_swampswap.setText(self.worker.settings.tr("options:btn:check_update_swampswap"))
 
         self.ui_group.setTitle(self.worker.settings.tr("options:heading:ui"))
         self.label_lang.setText(self.worker.settings.tr("options:language:label"))
@@ -524,6 +537,9 @@ class SettingsWidget(QWidget):
         """Connect all necessary Qt signals."""
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+
+        self.btn_check_update_croc.clicked.connect(self._check_for_croc_update)
+        self.btn_check_update_swampswap.clicked.connect(self._check_for_swampswap_update)
 
         self.combo_lang.currentTextChanged.connect(self._change_language)
         self.combo_theme.currentTextChanged.connect(self._change_theme)
@@ -871,3 +887,99 @@ class SettingsWidget(QWidget):
         self.worker.settings.set_all_from_dict(self._previous_settings)
         self._load_from_settings()
         self.clear_dirty()
+
+
+
+    def _new_croc_version_available(self, parent, worker: CrocWorker, new_version: str) -> None:
+        """Raise an alert if a new croc version is detected on the schollz/croc repo on GitHub"""
+
+        # Ask the user if they want to update
+        result = QMessageBox.information(
+            parent,
+            worker.settings.tr("dialog:croc_update_available:title"),
+            worker.settings.tr("dialog:croc_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:croc_update_available:body2") + "<br><br>" + f"<b>{worker.settings.tr('dialog:croc_update_available:body3')}</b>",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
+
+        # If they do, open the GitHub
+        if result == QMessageBox.StandardButton.Yes:
+            QDesktopServices.openUrl(
+                QUrl("https://github.com/schollz/croc/releases/latest")
+            )
+
+    def _new_swampswap_version_available(self, parent, worker: CrocWorker, new_version: str) -> None:
+        """Raise an alert if a new Swamp Swap version is detected on the Ferase/SwampSwap repo on GitHub"""
+
+        # Ask the user if they want to update
+        result = QMessageBox.information(
+            parent,
+            worker.settings.tr("dialog:swampswap_update_available:title"),
+            worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:swampswap_update_available:body2"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
+
+        # If they do, open the GitHub
+        if result == QMessageBox.StandardButton.Yes:
+            QDesktopServices.openUrl(
+                QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
+            )
+
+    def _croc_up_to_date(self, parent, worker: CrocWorker, new_version: str) -> None:
+        """Let the user know they are on the latest version of croc."""
+
+        QMessageBox.information(
+            parent,
+            worker.settings.tr("dialog:croc_up_to_date:title"),
+            worker.settings.tr("dialog:croc_up_to_date:body").format(v1=f"<b>{self.worker.get_croc_version_number_only()}</b>", v2=f"<b>{new_version}</b>"),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
+
+    def _swampswap_up_to_date(self, parent, worker: CrocWorker, new_version: str) -> None:
+        """Let the user know they are on the latest version of croc."""
+
+        QMessageBox.information(
+            parent,
+            worker.settings.tr("dialog:swampswap_up_to_date:title"),
+            worker.settings.tr("dialog:swampswap_up_to_date:body").format(v1=f"<b>v{self.worker.get_app_version()}</b>", v2=f"<b>{new_version}</b>"),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
+
+    def _check_for_croc_update(self, skip_up_to_date: bool = False) -> None:
+        update_available, version = self._update_checker_croc.check()
+
+        if not update_available:
+            if skip_up_to_date:
+                return
+            
+            self._croc_up_to_date(self.parent(), self.worker, version)
+            return
+        
+        self._new_croc_version_available(self.parent(), self.worker, version)
+
+    def _check_for_swampswap_update(self, skip_up_to_date: bool = False) -> None:
+        update_available, version = self._update_checker_swampswap.check()
+
+        if not update_available:
+            if skip_up_to_date:
+                return
+            
+            self._swampswap_up_to_date(self.parent(), self.worker, version)
+            return
+        
+        self._new_swampswap_version_available(self.parent(), self.worker, version)
+
+    def _startup_updates_check(self) -> None:
+        self._update_checker_croc = UpdateChecker(self.worker.get_croc_version_number_only(), "schollz", "croc")
+        self._update_checker_swampswap = UpdateChecker(self.worker.get_app_version(), "Ferase", "SwampSwap")
+
+        # If the user hasn't disabled checking for croc updates, check schollz/croc for a new release
+        if self.worker.settings.startup_croc_updates_check:
+            self._check_for_croc_update(True)
+
+        # If the user hasn't disabled checking for Swamp Swamp GUI updates, check Ferase/SwampSwap for a new release
+        if self.worker.settings.startup_swampswap_updates_check:
+            self._check_for_swampswap_update(True)

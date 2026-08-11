@@ -32,9 +32,15 @@
     "dialog:croc_update_available:body2":               "Would you like to go to the GitHub releases page to download it?",
     "dialog:croc_update_available:body3":               "Note: If you installed croc via your operating system's package manager, you should update it from there instead.",
 
+    "dialog:croc_up_to_date:title":                     "croc is up to date!",
+    "dialog:croc_up_to_date:body":                      "Your version of croc ({v1}) is up to date with the remote version on GitHub ({v2}).",
+
     "dialog:swampswap_update_available:title":          "Swamp Swap update available!",
     "dialog:swampswap_update_available:body1":          "Version {v} of Swamp Swap is now available!",
     "dialog:swampswap_update_available:body2":          "Would you like to go to the GitHub releases page to download it?",
+
+    "dialog:swampswap_up_to_date:title":                "Swamp Swap is up to date!",
+    "dialog:swampswap_up_to_date:body":                 "Your version of Swamp Swap ({v1}) is up to date with the remote version on GitHub ({v2}).",
 
     "dialog:croc_not_installed:title":                  "croc not installed",
     "dialog:croc_not_installed:body1":                  "It looks like croc isn't installed!",
@@ -200,6 +206,8 @@
     "options:startup_croc_updates_check:tooltip":       "If checked, Swamp Swap will notify you if an update is available for croc.",
     "options:startup_swampswap_updates_check:label":    "Check for GUI updates on startup",
     "options:startup_swampswap_updates_check:tooltip":  "If checked, Swamp Swap will notify you if an update is available for the GUI application.",
+    "options:btn:check_update_croc":                    "Check for croc update",
+    "options:btn:check_update_swampswap":               "Check for Swamp Swap update",
 
     "options:language:label":                           "Language",
     "options:language:tooltip":                         "Set the application's display language.",

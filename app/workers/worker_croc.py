@@ -45,6 +45,9 @@ class CrocWorker(QThread):
         self._args: list[str] = []
         self._env: dict | None = None
 
+        self.app_name = app_name
+        self.app_version = app_version
+
         # Get croc version
         self.croc_version: str | None = None
         try:
@@ -375,3 +378,8 @@ class CrocWorker(QThread):
         """Get just the version number from croc --version for comparison purposes."""
 
         return self.get_croc_version().split("croc version ")[1]
+
+    def get_app_version(self) -> str:
+        """Get the version of Swamp Swap as a string."""
+        
+        return self.app_version
