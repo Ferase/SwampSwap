@@ -1,3 +1,9 @@
+# WARNING: CURRENTLY BROKEN
+
+croc version 11 came out just recently and broke how Swamp Swap reads back what croc is doing, so please wait until version 1.4.1 of Swamp Swap releases for this to be fixed.
+
+Sorry for the inconvenience!
+
 <div align="center">
     <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="Swamp Swap icon">
     <br>
