@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 
+from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QMovie, QImage, QPixmap, QColor
 from PyQt6.QtCore import QTimer, QObject, pyqtSignal, QSize, Qt
 

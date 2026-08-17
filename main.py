@@ -54,12 +54,10 @@ def main() -> None:
     # Test if croc is installed. If not, raise an error
     if shutil.which(worker.settings.croc_path) is None:
         _croc_not_installed(window, worker)
-        return
 
     # Test if croc is below minimum version
     elif _is_croc_too_old(worker):
         _croc_too_old(window, worker)
-        return
 
     # General exit logic
     sys.exit(app.exec())
@@ -91,7 +89,7 @@ def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
     elif box == QMessageBox.StandardButton.Ignore:
         return
 
-    window.close()
+    sys.exit()
 
 def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
     """Raises an error if croc is found to be too old."""
@@ -119,7 +117,7 @@ def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
     elif box == QMessageBox.StandardButton.Ignore:
         return
 
-    window.close()
+    sys.exit()
 
 def _is_croc_too_old(worker: CrocWorker) -> bool:
     croc_version: str = worker.get_croc_version_number_only()
