@@ -22,6 +22,7 @@ _ZIPPING_RE = re.compile(
 
 
 
+
 class CrocWorker(QThread):
     """Worker object responsible for running croc and taking commands from the GUI."""
 
@@ -47,6 +48,11 @@ class CrocWorker(QThread):
 
         self.app_name = app_name
         self.app_version = app_version
+        
+        self.state: CrocState = CrocState()
+
+        self.settings = SettingsManager(app_name, app_version)
+        self.sound_manager = SoundManager(self.settings)
 
         # Get croc version
         self.croc_version: str | None = None
@@ -54,11 +60,6 @@ class CrocWorker(QThread):
             self.croc_version = self.get_croc_version()
         except Exception:
             self.croc_version = "Couldn't get croc version!"
-        
-        self.state: CrocState = CrocState()
-
-        self.settings = SettingsManager(app_name, app_version)
-        self.sound_manager = SoundManager(self.settings)
 
         self.state_changed.connect(self.sound_manager.on_state_change)
 
@@ -144,7 +145,7 @@ class CrocWorker(QThread):
             self._proc = self._create_croc_process(self.state.operation, self._args)
 
             # Buffer for line processing
-            buffer = ""
+            buffer: str = ""
 
             while True:
                 # Read one character of the output at a time
@@ -169,7 +170,7 @@ class CrocWorker(QThread):
                     continue
 
                 # Process yes-no prompts
-                if re.search(r"\(Y/n\)", buffer):
+                if re.search(r"\(y/n\)", buffer.lower()):
                     self.line_received.emit(buffer)
                     buffer = ""
 
@@ -208,7 +209,7 @@ class CrocWorker(QThread):
         """Construct the command to send files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then settings, and then send
-        args = ["croc"]
+        args = [self.settings.croc_path]
         args.extend(self.settings.build_general_flags())
         args.append("send")
         args.extend(self.settings.build_send_flags())
@@ -257,7 +258,7 @@ class CrocWorker(QThread):
         """Construct the command to receive files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then build flags
-        args = ["croc"]
+        args = [self.settings.croc_path]
         args.extend(self.settings.build_general_flags())
         
         # Pass the output path
@@ -366,11 +367,11 @@ class CrocWorker(QThread):
     
 
     
-    def get_croc_version(self) -> str:
+    def get_croc_version(self, recheck: bool = False) -> str:
         """Get the output from croc --version as a string."""
 
-        if self.croc_version is None:
-            return subprocess.run(["croc", "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        if self.croc_version is None or recheck:
+            return subprocess.run([self.settings.croc_path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
         
         return self.croc_version
     

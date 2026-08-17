@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import certifi
-from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMessageBox, QDialog, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGroupBox
 from PyQt6.QtGui import QIcon, QDesktopServices
 from PyQt6.QtCore import QUrl
 
@@ -12,7 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.02"
+_APP_VERSION = "1.4.03"
 _MINIMUM_CROC_VERSION = "11.0.0"
 
 
@@ -52,7 +52,7 @@ def main() -> None:
     window.show()
 
     # Test if croc is installed. If not, raise an error
-    if shutil.which("croc") is None:
+    if shutil.which(worker.settings.croc_path) is None:
         _croc_not_installed(window, worker)
         return
 
@@ -75,17 +75,22 @@ def _croc_not_installed(window: MainWindow, worker: CrocWorker) -> None:
     # Raise a message box and tell the user croc isn't installed
     box = QMessageBox.warning(
         window,
-        worker.settings.tr("dialog:croc_not_installed:title"),
-        worker.settings.tr("dialog:croc_not_installed:body1") + "<br><br>" + worker.settings.tr("dialog:croc_not_installed:body2"),
-        QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+        worker.settings.tr("dialog:croc_not_found:title"),
+        "<br><br>".join([
+            worker.settings.tr("dialog:croc_not_found:body1"),
+            worker.settings.tr("dialog:croc_not_found:body2"),
+            worker.settings.tr("dialog:croc_not_found:body3")
+        ]),
+        QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Ignore | QMessageBox.StandardButton.Close,
         QMessageBox.StandardButton.Open
     )
 
     # If the user chooses open, open the install instructions on croc's GitHub page
     if box == QMessageBox.StandardButton.Open:
         QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc#install"))
+    elif box == QMessageBox.StandardButton.Ignore:
+        return
 
-    # Kill the application
     window.close()
 
 def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
@@ -98,16 +103,22 @@ def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
     box = QMessageBox.warning(
         window,
         worker.settings.tr("dialog:croc_too_old:title"),
-        worker.settings.tr("dialog:croc_too_old:body1") + "<br><br>" + worker.settings.tr("dialog:croc_too_old:body2").format(v1=f"<b>{worker.get_croc_version_number_only()}</b>", v2=f"<b>{_MINIMUM_CROC_VERSION}</b>") + "<br><br>" + worker.settings.tr("dialog:croc_too_old:body3"),
-        QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+        "<br><br>".join([
+            worker.settings.tr("dialog:croc_too_old:body1"),
+            worker.settings.tr("dialog:croc_too_old:body2"),
+            worker.settings.tr("dialog:croc_too_old:body3"),
+            worker.settings.tr("dialog:croc_too_old:body4")
+        ]),
+        QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Ignore | QMessageBox.StandardButton.Close,
         QMessageBox.StandardButton.Open
     )
 
     # If the user chooses open, open the install instructions on croc's GitHub page
     if box == QMessageBox.StandardButton.Open:
         QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc#install"))
+    elif box == QMessageBox.StandardButton.Ignore:
+        return
 
-    # Kill the application
     window.close()
 
 def _is_croc_too_old(worker: CrocWorker) -> bool:

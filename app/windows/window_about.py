@@ -79,7 +79,7 @@ class AboutWindow(QDialog):
         self.label_name.setFont(hero_font)
         self.label_name.setWordWrap(True)
 
-        self.label_version = QLabel(f"GUI version {self.worker.settings.app_version}")
+        self.label_version = QLabel(self.worker.settings.tr("about:version:swampswap").format(v=self.worker.settings.app_version))
         self.label_version.setWordWrap(True)
 
         self.label_croc_version = QLabel(self.worker.get_croc_version())
@@ -179,6 +179,8 @@ class AboutWindow(QDialog):
     def _retranslate(self) -> None:
         """Retranslate everything on language change."""
 
+        self.label_version.setText(self.worker.settings.tr("about:version:swampswap").format(v=self.worker.settings.app_version))
+
         self.btn_close.setText(self.worker.settings.tr("generic:close"))
 
         self.disclaimer_label.setText(self.worker.settings.tr("about:disclaimer"))
@@ -192,6 +194,7 @@ class AboutWindow(QDialog):
         """Connect all necessary Qt signals."""
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
+        self.worker.settings.settings_saved.connect(self._update_croc_version)
 
         self.btn_github_croc.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc"))
@@ -212,3 +215,6 @@ class AboutWindow(QDialog):
             lang_credits.append(f"{lang.author} ({lang.language})")
 
         return lang_credits
+
+    def _update_croc_version(self) -> None:
+        self.label_croc_version.setText(self.worker.get_croc_version(True))

@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QDialog,
     QPushButton, QLineEdit, QLabel, QMessageBox,
     QGroupBox, QFileDialog, QApplication, QFrame,
-    QStyle, QTabWidget, QTextEdit
+    QStyle, QTabWidget, QTextEdit, QCheckBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal, QSize
 from PyQt6.QtGui import QFont
@@ -249,11 +249,15 @@ class SendWidget(QWidget):
         self.lineedit_code = QLineEdit()
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
 
+        self.checkbox_regenerate_code = QCheckBox(self.worker.settings.tr("send:checkbox:regenerate_code"))
+        self.checkbox_regenerate_code.setChecked(True)
+
         self.btn_copy_code = QPushButton(self.worker.settings.tr("send:btn:copy_code"))
         self.btn_copy_code.setEnabled(False)
 
         layout.addWidget(self.btn_send)
         layout.addWidget(self.lineedit_code)
+        layout.addWidget(self.checkbox_regenerate_code)
         layout.addWidget(self.btn_copy_code)
 
         return group
@@ -264,6 +268,7 @@ class SendWidget(QWidget):
         """Retranslate everything on language change."""
 
         self.lineedit_code.setPlaceholderText(self.worker.settings.tr("send:lineedit:placeholder_code"))
+        self.btn_copy_code.setText(self.worker.settings.tr("send:btn:copy_code"))
         self.btn_copy_code.setText(self.worker.settings.tr("send:btn:copy_code"))
 
         self._set_button_text_by_operation()
@@ -533,8 +538,7 @@ class SendWidget(QWidget):
         self.widget_files.btn_clear_list.setEnabled(enabled)
 
     def _clear_code(self) -> None:
-        is_generated_code: bool = app_utils.regex_match(app_utils.CODE_RE, self.lineedit_code.text())
-        if not is_generated_code:
+        if self.checkbox_regenerate_code.isChecked():
             self.lineedit_code.clear()
 
 
@@ -625,6 +629,7 @@ class SendWidget(QWidget):
         self.widget_files.btn_add_folders.setDisabled(block_all)
         self.widget_files.btn_view_file_list.setDisabled(block_all or can_send_no_files)
         self.widget_files.btn_clear_list.setDisabled(block_all or can_send_no_files)
+        self.checkbox_regenerate_code.setDisabled(block_all)
 
     def _mark_send_type(self, send_type: SendType) -> None:
         self._send_type = send_type

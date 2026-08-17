@@ -68,6 +68,7 @@ class SettingsWidget(QWidget):
         group_relay_settings = self._build_relay_settings_group()
         group_network_settings = self._build_network_settings_group()
         group_flags_settings = self._build_flags_settings_group()
+        group_advanced_settings = self._build_advanced_settings_group()
         delete_settings_group = self._build_delete_settings_group()
 
         layout.addWidget(group_general_settings)
@@ -83,6 +84,8 @@ class SettingsWidget(QWidget):
         layout.addWidget(group_network_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_flags_settings)
+        layout.addSpacing(_PADDING)
+        layout.addWidget(group_advanced_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(delete_settings_group)
 
@@ -245,9 +248,13 @@ class SettingsWidget(QWidget):
 
         self.btn_defualt_receive_path = QPushButton(self.worker.settings.tr("options:default_receive_path:btn"))
 
+        self.checkbox_overwrite = QCheckBox(self.worker.settings.tr("options:overwrite:label"))
+        self.checkbox_overwrite.setToolTip(self.worker.settings.tr("options:overwrite:tooltip"))
+
         layout.addWidget(self.label_defualt_receive_path)
         layout.addWidget(self.lineedit_defualt_receive_path)
         layout.addWidget(self.btn_defualt_receive_path)
+        layout.addWidget(self.checkbox_overwrite)
 
         return self.receive_group
 
@@ -389,6 +396,21 @@ class SettingsWidget(QWidget):
 
         return self.flags_group
 
+    def _build_advanced_settings_group(self) -> QGroupBox:
+        self.advanced_group = QGroupBox(self.worker.settings.tr("options:heading:advanced"))
+        layout = QVBoxLayout(self.advanced_group)
+
+        self.label_croc_path = QLabel(self.worker.settings.tr("options:croc_path:label"))
+        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+        self.lineedit_croc_path = QLineEdit(self.worker.settings.croc_path)
+        self.lineedit_croc_path.setPlaceholderText(self.worker.settings.tr("options:croc_path:placeholder"))
+        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+
+        layout.addWidget(self.label_croc_path)
+        layout.addWidget(self.lineedit_croc_path)
+
+        return self.advanced_group
+
     def _build_delete_settings_group(self) -> QGroupBox:
         group = QGroupBox()
         layout = QVBoxLayout(group)
@@ -480,6 +502,8 @@ class SettingsWidget(QWidget):
         self.label_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
         self.lineedit_defualt_receive_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
         self.btn_defualt_receive_path.setText(self.worker.settings.tr("options:default_receive_path:btn"))
+        self.checkbox_overwrite.setText(self.worker.settings.tr("options:overwrite:label"))
+        self.checkbox_overwrite.setToolTip(self.worker.settings.tr("options:overwrite:tooltip"))
 
         self.relays_group.setTitle(self.worker.settings.tr("options:heading:relays"))
         self.label_relay.setText(self.worker.settings.tr("options:relay:label"))
@@ -523,6 +547,11 @@ class SettingsWidget(QWidget):
         self.checkbox_nocompress.setToolTip(self.worker.settings.tr("options:nocompress:tooltip"))
         self.checkbox_local.setText(self.worker.settings.tr("options:local:label"))
         self.checkbox_local.setToolTip(self.worker.settings.tr("options:local:tooltip"))
+
+        self.label_croc_path.setText(self.worker.settings.tr("options:croc_path:label"))
+        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+        self.lineedit_croc_path.setPlaceholderText(self.worker.settings.tr("options:croc_path:placeholder"))
+        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
 
         self.btn_delete_settings.setText(self.worker.settings.tr("options:delete_all:btn"))
         self.btn_delete_settings.setToolTip(self.worker.settings.tr("options:delete_all:tooltip"))
@@ -577,6 +606,7 @@ class SettingsWidget(QWidget):
         self.checkbox_clear_filelist_after.toggled.connect(self._mark_dirty)
 
         self.lineedit_defualt_receive_path.textChanged.connect(self._mark_dirty)
+        self.checkbox_overwrite.toggled.connect(self._mark_dirty)
 
         self.lineedit_relay.textChanged.connect(self._mark_dirty)
         self.lineedit_relay6.textChanged.connect(self._mark_dirty)
@@ -595,6 +625,8 @@ class SettingsWidget(QWidget):
         self.checkbox_internaldns.toggled.connect(self._mark_dirty)
         self.checkbox_nocompress.toggled.connect(self._mark_dirty)
         self.checkbox_local.toggled.connect(self._mark_dirty)
+
+        self.lineedit_croc_path.textChanged.connect(self._mark_dirty)
 
     def _change_language(self, text: str) -> None:
         self.worker.settings.lang = text
@@ -635,6 +667,7 @@ class SettingsWidget(QWidget):
         self.checkbox_clear_filelist_after.setChecked(self.worker.settings.clear_filelist_after)
 
         self.lineedit_defualt_receive_path.setText(self.worker.settings.default_receive_path)
+        self.checkbox_overwrite.setChecked(self.worker.settings.overwrite)
 
         self.lineedit_relay.setText(self.worker.settings.relay)
         self.lineedit_relay6.setText(self.worker.settings.relay6)
@@ -652,6 +685,8 @@ class SettingsWidget(QWidget):
         self.checkbox_internaldns.setChecked(self.worker.settings.internaldns)
         self.checkbox_nocompress.setChecked(self.worker.settings.nocompress)
         self.checkbox_local.setChecked(self.worker.settings.local)
+
+        self.lineedit_croc_path.setText(self.worker.settings.croc_path)
 
     def _save_to_settings(self) -> None:
         self.worker.settings.startup_croc_updates_check = self.checkbox_startup_croc_updates_check.isChecked()
@@ -673,6 +708,7 @@ class SettingsWidget(QWidget):
         self.worker.settings.clear_filelist_after = self.checkbox_clear_filelist_after.isChecked()
 
         self.worker.settings.default_receive_path = self.lineedit_defualt_receive_path.text()
+        self.worker.settings.overwrite = self.checkbox_overwrite.isChecked()
 
         self.worker.settings.relay = self.lineedit_relay.text()
         self.worker.settings.relay6 = self.lineedit_relay6.text()
@@ -690,6 +726,8 @@ class SettingsWidget(QWidget):
         self.worker.settings.internaldns = self.checkbox_internaldns.isChecked()
         self.worker.settings.nocompress = self.checkbox_nocompress.isChecked()
         self.worker.settings.local = self.checkbox_local.isChecked()
+
+        self.worker.settings.croc_path = self.lineedit_croc_path.text()
 
         self._set_previous_settings()
 
@@ -714,6 +752,7 @@ class SettingsWidget(QWidget):
             "clear_filelist_after": self.checkbox_clear_filelist_after.isChecked(),
 
             "defualt_receive_path": self.lineedit_defualt_receive_path.text(),
+            "overwrite": self.checkbox_overwrite.isChecked(),
             
             "relay": self.lineedit_relay.text(),
             "relay6": self.lineedit_relay6.text(),
@@ -730,7 +769,9 @@ class SettingsWidget(QWidget):
             "classic": self.checkbox_classic.isChecked(),
             "internaldns": self.checkbox_internaldns.isChecked(),
             "nocompress": self.checkbox_nocompress.isChecked(),
-            "local": self.checkbox_local.isChecked()
+            "local": self.checkbox_local.isChecked(),
+
+            "croc_path": self.lineedit_croc_path.text()
         }
     
     def _set_defaults(self) -> None:

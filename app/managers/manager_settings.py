@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from PyQt6.QtCore import QObject, pyqtSignal
+
 from app.managers.manager_locale import LocaleManager
 from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
@@ -32,6 +34,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
 
     # Receive
     "default_receive_path": str(app_utils.determine_received_path("received")),
+    "overwrite": False,
 
     # Relay
     "relay": "178.105.79.46:9009",
@@ -51,11 +54,17 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "classic": False,
     "internaldns": False,
     "nocompress": False,
-    "local": False
+    "local": False,
+
+    # Advabced
+    "croc_path": "croc"
 }
 
 # Lookup table for croc flags
 _LOOKUP_TABLE_GENERAL: dict[str, str] = {
+    # Receive
+    "overwrite": "--overwrite",
+
     # Relay
     "relay": "--relay",
     "relay6": "--relay6",
@@ -88,10 +97,14 @@ _LOOKUP_TABLE_SEND: dict[str, str] = {
 
 
 
-class SettingsManager():
+class SettingsManager(QObject):
     """A mananager class that handles loading and applying settings as well as handing off flags to CrocWorker."""
 
-    def __init__(self, app_name: str, app_version: str):
+    settings_saved = pyqtSignal()
+
+    def __init__(self, app_name: str, app_version: str, parent=None):
+        super().__init__(parent)
+
         self.app_name = app_name
         self.app_version = app_version
         self.settings_file_path: Path = app_utils.get_settings_path(self.app_name) / "settings.json"
@@ -124,6 +137,7 @@ class SettingsManager():
 
         # Receive
         self.default_receive_path: str | None = None
+        self.overwrite: bool | None = None
 
         # Relays
         self.relay: str | None = None
@@ -145,6 +159,9 @@ class SettingsManager():
         self.internaldns: bool | None = None
         self.nocompress: bool | None = None
         self.local: bool | None = None
+
+        # Advanced
+        self.croc_path: str | None = None
 
         # Locale manager and language list
         self.locale_manager = LocaleManager()
@@ -224,6 +241,8 @@ class SettingsManager():
         with open(self.settings_file_path, "w") as s:
             json.dump(new_dict, s, indent=4, ensure_ascii=False)
 
+        self.settings_saved.emit()
+
     def save_single_setting(self, key: str, value: bool | str | float) -> None:
         """Save a single setting into settings.json"""
 
@@ -243,6 +262,8 @@ class SettingsManager():
         # Open the settings file and write the dictionary to it
         with open(self.settings_file_path, "w") as s2:
             json.dump(setting, s2, indent=4, ensure_ascii=False)
+
+        self.settings_saved.emit()
 
     def get_changed_settings(self) -> list[str]:
         """Gets a list of the names of settings that are no longer default."""

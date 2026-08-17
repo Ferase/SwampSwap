@@ -21,7 +21,7 @@ _ACCEPT_RE = QRegularExpression(
     r")"
     r"\s*\((?P<size>[^)]+)\)\?"
 )
-
+_OVERWRITE_RE = QRegularExpression(r"Overwrite\s+'(?P<name>[^']+)'\?")
 _DISPLAY_TEXT_RE = QRegularExpression(r"Display text message\s+\((?P<size>[^)]+)\)\?")
 _RECEIVING_RE = QRegularExpression(r"Receiving \(<-")
 
@@ -173,12 +173,29 @@ class ReceiveWidget(QWidget):
             self.worker.settings.tr("dialog:accept:title"),
             self.worker.settings.tr("dialog:accept:body1") + "<br><br>" + self.worker.settings.tr("dialog:accept:body2").format(f=f"<b>{name}</b>", s=size),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
+            QMessageBox.StandardButton.Yes
         )
 
         if box == QMessageBox.StandardButton.No:
             self.worker.send_input("n")
             self.worker.change_action(CrocAction.CANCELLED)
+            return
+        
+        self.worker.send_input("y")
+
+    def _raise_overwrite_messagebox(self, name: str) -> None:
+        QApplication.alert(self)
+
+        box = QMessageBox.question(
+            self,
+            self.worker.settings.tr("dialog:overwrite:title"),
+            self.worker.settings.tr("dialog:overwrite:body1") + "<br><br>" + self.worker.settings.tr("dialog:overwrite:body2").format(f=f"<b>{name}</b>"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+
+        if box == QMessageBox.StandardButton.No:
+            self.worker.send_input("n")
             return
         
         self.worker.send_input("y")
@@ -281,6 +298,7 @@ class ReceiveWidget(QWidget):
 
         self._test_for_accept(line)
         self._test_for_display(line)
+        self._test_for_overwrite(line)
 
         if _RECEIVING_RE.match(line, 0).hasMatch() and self._is_text_transfer:
             self._text_content_lines = []
@@ -304,6 +322,16 @@ class ReceiveWidget(QWidget):
             name = count
 
         self._raise_accept_messagebox(name, size)
+
+    def _test_for_overwrite(self, line: str) -> None:
+        matched_overwrite_prompt = _OVERWRITE_RE.match(line, 0)
+
+        if not matched_overwrite_prompt.hasMatch():
+            return
+
+        name = matched_overwrite_prompt.captured("name")
+
+        self._raise_overwrite_messagebox(name)
 
     def _test_for_display(self, line: str) -> None:
         matched_display_prompt = _DISPLAY_TEXT_RE.match(line, 0)

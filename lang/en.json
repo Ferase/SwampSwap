@@ -42,18 +42,24 @@
     "dialog:swampswap_up_to_date:title":                "Swamp Swap is up to date!",
     "dialog:swampswap_up_to_date:body":                 "Your version of Swamp Swap ({v1}) is up to date with the remote version on GitHub ({v2}).",
 
-    "dialog:croc_not_installed:title":                  "croc not installed",
-    "dialog:croc_not_installed:body1":                  "It looks like croc isn't installed!",
-    "dialog:croc_not_installed:body2":                  "Please click <b>Open</b> to go to croc's GitHub page so you can get it, or choose <b>Close</b> to close the program.",
+    "dialog:croc_not_found:title":                      "croc not found!",
+    "dialog:croc_not_found:body1":                      "It looks like Swamp Swap couldn't find croc!",
+    "dialog:croc_not_found:body2":                      "Please click <b>Open</b> to go to croc's GitHub page so you can get it, or choose <b>Close</b> to close the program.",
+    "dialog:croc_not_found:body3":                      "Alternatively, if you do have croc installed but don't have it on your PATH, choose <b>Ignore</b> and set its path at <b>Settings > Advanced > croc executable path</b>.",
 
     "dialog:croc_too_old:title":                        "croc too old",
     "dialog:croc_too_old:body1":                        "It looks like your installation of croc is too old!",
     "dialog:croc_too_old:body2":                        "You're using {v1}, when Swamp Swap's minimum supported croc version is {v2}.",
     "dialog:croc_too_old:body3":                        "Please click <b>Open</b> to go to croc's GitHub page to download a new version, or choose <b>Close</b> to close the program.",
+    "dialog:croc_too_old:body4":                        "Alternatively, if you have an newer version of croc on your system that is not in your PATH, choose <b>Ignore</b> and set its path at <b>Settings > Advanced > croc executable path</b>.",
 
     "dialog:accept:title":                              "Accept transfer?",
     "dialog:accept:body1":                              "It looks like you're receiving file(s)!",
     "dialog:accept:body2":                              "Will you accept {f} (total size: {s})?",
+
+    "dialog:overwrite:title":                           "Overwrite file?",
+    "dialog:overwrite:body1":                           "It looks like you already have one of the files you're receiving in your received foler!",
+    "dialog:overwrite:body2":                           "Do you want to overwrite {f}?",
 
     "dialog:ask_display_text:title":                    "Display text?",
     "dialog:ask_display_text:body1":                    "It looks like you're receiving text!",
@@ -172,6 +178,7 @@
     "send:textedit:send_text":                          "Type the text you want to send here...",
 
     "send:lineedit:placeholder_code":                   "Send code (auto-generated if blank)",
+    "send:checkbox:regenerate_code":                    "Regenerate code every time",
     "send:btn:copy_code":                               "Copy code",
 
     "manage_send_list:window:title":                    "Manage files and folders to be sent",
@@ -196,6 +203,7 @@
     "options:heading:relays":                           "Relays",
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
+    "options:heading:advanced":                         "Advanced",
 
     "options:btn:reset_defaults":                       "Reset to defaults",
     "options:btn:revert_settings":                      "Revert changes",
@@ -238,6 +246,8 @@
     "options:default_receive_path:label":               "Default receive path",
     "options:default_receive_path:tooltip":             "The default location Swamp Swap will use for receiving files when starting up.",
     "options:default_receive_path:btn":                 "Send default path to receive tab",
+    "options:overwrite:label":                          "Always overwrite duplicate files",
+    "options:overwrite:tooltip":                        "If checked, any files that already exist in your received folder will automatically be overwritten without manual approval.",
 
     "options:yes:label":                                "Auto-agree to all prompts",
     "options:yes:tooltip":                              "If checked, you will automatically accept all files being received and approve all files being sent.",
@@ -271,6 +281,10 @@
     "options:local:label":                              "Local connections only",
     "options:local:tooltip":                            "Only allows connections and file transfers over LAN.",
 
+    "options:croc_path:label":                          "croc executable path",
+    "options:croc_path:placeholder":                    "e.g. croc",
+    "options:croc_path:tooltip":                        "The path to the croc executable, or the just name of the executable if it's on your PATH.",
+
     "options:delete_all:btn":                           "Delete settings file",
     "options:delete_all:tooltip":                       "Unlike reverting settings to default, deleting the settings file will force Swamp Swap to raise its first run setup window again the next time it starts.",
 
@@ -278,6 +292,7 @@
     "console:input_placeholder":                        "Enter commands while croc runs...",
 
     "about:window:title":                               "About",
+    "about:version:swampswap":                          "GUI version {v}",
     "about:credits:croc":                               "croc by",
     "about:credits:ui_developers":                      "User interface by",
     "about:credits:testers":                            "Tested by",
