@@ -12,7 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.1"
+_APP_VERSION = "1.4.11"
 _MINIMUM_CROC_VERSION = "11.1.1"
 
 
@@ -105,7 +105,7 @@ def _croc_too_old(window: MainWindow, worker: CrocWorker) -> None:
         worker.settings.tr("dialog:croc_too_old:title"),
         "<br><br>".join([
             worker.settings.tr("dialog:croc_too_old:body1"),
-            worker.settings.tr("dialog:croc_too_old:body2"),
+            worker.settings.tr("dialog:croc_too_old:body2").format(v1=worker.get_croc_version_number_only(), v2=f"v{_MINIMUM_CROC_VERSION}"),
             worker.settings.tr("dialog:croc_too_old:body3"),
             worker.settings.tr("dialog:croc_too_old:body4")
         ]),
