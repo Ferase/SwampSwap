@@ -83,7 +83,7 @@ Please refer to the [official install guide](https://github.com/schollz/croc#ins
 
 ### Notes
 
-I should also mention that sometimes new croc releases don't come out at the same time they come out on GitHub. Thus, Swamp Swap may tell you **croc has a new version available**, but if that version doesn't get installed when you update your croc package on your OS, you can eitehr install from GitHub (advanced) or wait until the new version comes out. If you want to disable the update check, you can do so in the **Settings** tab.
+I should also mention that sometimes new croc releases don't come out on all package managers at the same time they come out on GitHub. Thus, Swamp Swap may tell you **croc has a new version available**, but if that version doesn't get installed when you update your croc package on your OS, you can either install from GitHub directly (advanced) or wait until the new version comes out on your package manager. You can alternatively disable the update check in the **Settings** tab if you want to suppress the alert.
 
 ## Building
 
