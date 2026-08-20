@@ -67,7 +67,7 @@ Please refer to the [official install guide](https://github.com/schollz/croc#ins
     1. Extract the **.tar.gz** file anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
     2. Enter the extracted folder, and open the file **SwampSwap**
 3. If you downloaded an **AppImage**:
-    1. Save the AppImage into your downloads folder (or anywher eyou can easily get to it)
+    1. Save the AppImage into your downloads folder (or anywhere you can easily get to it)
     2. Open a terminal wherever you saved the AppImage to, and make it executable
         ```
         chmod +x ./SwampSwap_Linux_YourArchHere.AppImage
