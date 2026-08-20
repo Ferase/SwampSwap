@@ -34,7 +34,7 @@ Note that you can also obtain releases from [croc's releases page](https://githu
     winget install schollz.croc
     ```
     - If you are running `winget` for the first time, it will ask you to agree to their policies. Press `y` for everything to proceed
-    - If you already have croc installed via `winget`, you can upgrade it by doing:
+    - If you already have croc installed via `winget`, you can update it/check for updates by doing:
         ```
         winget upgrade schollz.croc
         ```
