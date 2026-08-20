@@ -29,7 +29,7 @@ Note that you can also obtain releases from [croc's releases page](https://githu
 
 ### On Windows
 
-1. Simply use `winget`, the pre-installed Windows package manager, to install croc from the official Windows repository:
+1. Open your command prompt and use `winget`, the pre-installed Windows package manager, to install croc from the official Windows repository:
     ```
     winget install schollz.croc
     ```
