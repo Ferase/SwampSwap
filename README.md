@@ -25,7 +25,7 @@ This project does not use any code from croc and will not install it if you don'
 
 Before installing Swamp Swap, you must install croc for your system. Brief instructions will be given below for Windows due to the convineicne of `winget`, but you should refer to the [official install guide](https://github.com/schollz/croc#install) for all other systems since there are several distributions and package managers on which croc is available for macOS, Linux, Conda, Docker, and more.
 
-Note that you can also obtain releases from [croc's releases page](https://github.com/schollz/croc/releases/latest) and use those instead of anything from any of the package managers.
+Note that you can also obtain releases from [croc's releases page](https://github.com/schollz/croc/releases/latest) and use those instead of anything from any of the package managers, though it's not as convenient as getting ti from a package manager and could requrie advanced setup for your system in certain cases.
 
 ### On Windows
 
