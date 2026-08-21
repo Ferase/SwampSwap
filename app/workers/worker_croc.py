@@ -101,7 +101,7 @@ class CrocWorker(QThread):
         rules: list[dict[str, CrocAction]] = [
             (r"Zipping", CrocAction.WAIT_FOR_PEER),
             (r"Adding", CrocAction.WAIT_FOR_PEER),
-            (r"Code is:", CrocAction.WAIT_FOR_PEER),
+            (r"On the other computer, run:", CrocAction.WAIT_FOR_PEER),
             (r"Sending \(->", CrocAction.SEND_IN_PROGRESS),
             (r"Receiving \(<-", CrocAction.RECEIVE_IN_PROGRESS),
 
