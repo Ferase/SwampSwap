@@ -1,17 +1,3 @@
-# CURRENTLY BROKEN
-
-## UPDATE
-
-[Version 1.4.13 of Swamp Swap](https://github.com/Ferase/SwampSwap/releases/tag/v1.4.13) possibly fixes the compatibility issues with croc 11.2.4. Hopefully nothing breaks during testing, though the disclaimer below will remain until it has been tested thoroughly.
-
-<hr>
-
-croc version 11.2.4 introduced some changes to its messages in the terminal, resulting in Swamp Swap not being able to figure out what its doing. The next version of Swamp Swap will address these changes to croc. Stay tuned!
-
-**Note:** If you're running ay version of croc between 11.1.1 and 11.2.3, you can still use Swamp Swap as the latest version is compatible with any croc version in that range. You can also downgrade your croc version to continue using Swamp Swap in the meantime if you have already updated.
-
-<hr>
-
 <div align="center">
     <img src="/images/SwampSwap_Icon.png" width="250px" border="0" alt="Swamp Swap icon">
     <br>
