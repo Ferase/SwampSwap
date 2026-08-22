@@ -161,6 +161,7 @@ pyinstaller build_onedir.spec
 
 **Testing**
 - OctoToon
+- inktrinket
 
 **Translations**
 - Ferase (English)

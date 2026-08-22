@@ -12,7 +12,7 @@ from app.managers.manager_locale import SwampSwapLanguageList
 
 _CROC_DEVELOPERS = ["Zack Schollz"]
 _UI_DEVELOPERS = ["Ferase"]
-_TESTERS = ["OctoToon"]
+_TESTERS = ["OctoToon", "inktrinket"]
 
 
 
