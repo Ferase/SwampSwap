@@ -641,7 +641,7 @@ class SendWidget(QWidget):
 
         if self.worker.settings.auto_copy_code:
             QTimer.singleShot(
-                50,
+                100,
                 lambda: self._copy_code()
             )
 
