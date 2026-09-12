@@ -24,6 +24,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "sound_volume": 0.5,
 
     # Send
+    "auto_copy_code": False,
     "raise_filter_window": False,
     "zip": False,
     "hash": "xxhash",
@@ -126,6 +127,7 @@ class SettingsManager(QObject):
         self.sound_volume: float | None = None
 
         # Send
+        self.auto_copy_code: bool | None = None
         self.raise_filter_window: bool | None = None
         self.zip: bool | None = None
         self.hash: str | None = None

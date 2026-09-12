@@ -7,9 +7,10 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QDialog,
     QPushButton, QLineEdit, QLabel, QMessageBox,
     QGroupBox, QFileDialog, QApplication, QFrame,
-    QStyle, QTabWidget, QTextEdit, QCheckBox
+    QStyle, QTabWidget, QTextEdit, QCheckBox,
+    QSystemTrayIcon
 )
-from PyQt6.QtCore import Qt, pyqtSignal, QSize
+from PyQt6.QtCore import Qt, pyqtSignal, QSize, QTimer
 from PyQt6.QtGui import QFont
 
 import app.utils as app_utils
@@ -534,6 +535,26 @@ class SendWidget(QWidget):
 
     def _copy_code(self) -> None:
         QApplication.clipboard().setText(self.lineedit_code.text())
+        self._show_copied_notification()
+
+    def _show_copied_notification(self) -> None:
+        # Get application instance
+        app: QApplication = QApplication.instance()
+
+        # Get application icon
+        icon = app.windowIcon()
+
+        # Create tray icon
+        tray_icon = QSystemTrayIcon(icon, app)
+        tray_icon.show()
+
+        # Display a system notification message
+        tray_icon.showMessage(
+            self.worker.settings.tr("notification:copied_clipboard:title"),
+            self.worker.settings.tr("notification:copied_clipboard:body"),
+            icon,
+            5000
+        )
 
     def _enable_list_buttons(self, enabled: bool) -> None:
         self.widget_files.btn_view_file_list.setEnabled(enabled)
@@ -612,6 +633,12 @@ class SendWidget(QWidget):
             exclusions_for_croc = self._flatten_excluded_files()
         else:
             items_for_croc = self._get_text_to_send()
+
+        if self.worker.settings.auto_copy_code:
+            QTimer.singleShot(
+                50,
+                lambda: self._copy_code()
+            )
 
         self.worker.start_send(items_for_croc, exclusions_for_croc, self.lineedit_code.text())
         self._enable_controls()

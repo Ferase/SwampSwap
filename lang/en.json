@@ -131,6 +131,9 @@
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
 
+    "notification:copied_clipboard:title":              "Code copied",
+    "notification:copied_clipboard:body":               "Your send code was copied to your clipboard.",
+
     "state:idle":                                       "Idle",
     "state:zipping":                                    "Zipping",
     "state:hashing":                                    "Hashing",
@@ -228,6 +231,8 @@
     "options:sound_volume:label":                       "Sound volume",
     "options:sound_volume:tooltip":                     "Determines the volume of the program's sound effects.",
 
+    "options:auto_copy_code:label":                     "Auto copy code to clipboard",
+    "options:auto_copy_code:tooltip":                   "If enabled, the send code will automatically copy to your clipboard when you start sending files.",
     "options:raise_filter_window:label":                "Always ask to filter folders",
     "options:raise_filter_window:tooltip":              "If enabled, you will always be prompted to add filters and exclusions to the files within a folder you have chosen to send.",
     "options:zip:label":                                "Compress all files to ZIP",

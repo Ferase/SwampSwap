@@ -192,6 +192,10 @@ class SettingsWidget(QWidget):
         self.send_group = QGroupBox(self.worker.settings.tr("options:heading:send"))
         layout = QVBoxLayout(self.send_group)
 
+        self.checkbox_auto_copy_code = QCheckBox(self.worker.settings.tr("options:auto_copy_code:label"))
+        self.checkbox_auto_copy_code.setToolTip(self.worker.settings.tr("options:auto_copy_code:tooltip"))
+        self.checkbox_auto_copy_code.setChecked(self.worker.settings.auto_copy_code)
+
         self.checkbox_raise_filter_window = QCheckBox(self.worker.settings.tr("options:raise_filter_window:label"))
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
         self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
@@ -226,6 +230,7 @@ class SettingsWidget(QWidget):
 
         layout.addWidget(self.label_hash)
         layout.addWidget(self.combo_hash)
+        layout.addWidget(self.checkbox_auto_copy_code)
         layout.addWidget(self.checkbox_raise_filter_window)
         layout.addWidget(self.checkbox_zip)
         layout.addWidget(self.checkbox_git)
@@ -481,6 +486,8 @@ class SettingsWidget(QWidget):
         self.spinbox_sound_volume.setToolTip(self.worker.settings.tr("options:sound_volume:tooltip"))
 
         self.send_group.setTitle(self.worker.settings.tr("options:heading:send"))
+        self.checkbox_auto_copy_code.setText(self.worker.settings.tr("options:auto_copy_code:label"))
+        self.checkbox_auto_copy_code.setToolTip(self.worker.settings.tr("options:auto_copy_code:tooltip"))
         self.checkbox_raise_filter_window.setText(self.worker.settings.tr("options:raise_filter_window:label"))
         self.checkbox_raise_filter_window.setToolTip(self.worker.settings.tr("options:raise_filter_window:tooltip"))
         self.checkbox_zip.setText(self.worker.settings.tr("options:zip:label"))
@@ -597,6 +604,7 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.valueChanged.connect(self._mark_dirty)
         self.spinbox_sound_volume.valueChanged.connect(self._mark_dirty)
 
+        self.checkbox_auto_copy_code.toggled.connect(self._mark_dirty)
         self.checkbox_raise_filter_window.toggled.connect(self._mark_dirty)
         self.checkbox_zip.toggled.connect(self._mark_dirty)
         self.combo_hash.currentTextChanged.connect(self._mark_dirty)
@@ -658,6 +666,7 @@ class SettingsWidget(QWidget):
         self.slider_sound_volume.blockSignals(False)
         self.spinbox_sound_volume.blockSignals(False)
 
+        self.checkbox_auto_copy_code.setChecked(self.worker.settings.auto_copy_code)
         self.checkbox_raise_filter_window.setChecked(self.worker.settings.raise_filter_window)
         self.checkbox_zip.setChecked(self.worker.settings.zip)
         self.combo_hash.setCurrentText(self.worker.settings.hash)
@@ -699,6 +708,7 @@ class SettingsWidget(QWidget):
         self.worker.settings.enable_sound = self.checkbox_enable_sound.isChecked()
         self.worker.settings.sound_volume = self.spinbox_sound_volume.value()
 
+        self.worker.settings.auto_copy_code = self.checkbox_auto_copy_code.isChecked()
         self.worker.settings.raise_filter_window = self.checkbox_raise_filter_window.isChecked()
         self.worker.settings.zip = self.checkbox_zip.isChecked()
         self.worker.settings.hash = self.combo_hash.currentText()
@@ -743,6 +753,7 @@ class SettingsWidget(QWidget):
             "enable_sound": self.checkbox_enable_sound.isChecked(),
             "sound_volume": self.spinbox_sound_volume.value(),
 
+            "auto_copy_code": self.checkbox_auto_copy_code.isChecked(),
             "raise_filter_window": self.checkbox_raise_filter_window.isChecked(),
             "zip": self.checkbox_zip.isChecked(),
             "hash": self.combo_hash.currentText(),

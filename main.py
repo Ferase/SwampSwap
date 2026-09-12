@@ -2,7 +2,7 @@ import os
 import sys
 import shutil
 import certifi
-from PyQt6.QtWidgets import QApplication, QMessageBox, QDialog, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QGroupBox
+from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtGui import QIcon, QDesktopServices
 from PyQt6.QtCore import QUrl
 
