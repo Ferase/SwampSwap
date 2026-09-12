@@ -418,7 +418,12 @@ class SendWidget(QWidget):
 
         match = re.search(r"^croc\s*(.+)", line, re.IGNORECASE)
         if match:
-            self.lineedit_code.setText(match.group(1).strip())
+            text: str = match.group(1).strip()
+
+            if sys.platform == "win32":
+                text = text.replace("(code copied to clipboard)", "").strip()
+
+            self.lineedit_code.setText()
 
     def are_files_selected(self) -> bool:
         return bool(self.sendfiles_manager.selected_paths)

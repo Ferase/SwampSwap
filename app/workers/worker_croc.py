@@ -210,6 +210,7 @@ class CrocWorker(QThread):
 
         # croc, then settings, and then send
         args = [self.settings.croc_path]
+        args.append("--disable-clipboard")
         args.extend(self.settings.build_general_flags())
         args.append("send")
         args.extend(self.settings.build_send_flags())
