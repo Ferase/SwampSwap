@@ -23,9 +23,9 @@ This project does not use any code from croc and will not install it if you don'
 
 ## Installing
 
-Before installing Swamp Swap, you must install croc for your system. Brief instructions will be given below for Windows due to the convineicne of `winget`, but you should refer to the [official install guide](https://github.com/schollz/croc#install) for all other systems since there are several distributions and package managers on which croc is available for macOS, Linux, Conda, Docker, and more.
+Before installing Swamp Swap, you must install croc for your system. Brief instructions will be given below for Windows due to the convenience of `winget`, but you should refer to the [official install guide](https://github.com/schollz/croc#install) for all other systems since there are several distributions and package managers on which croc is available for macOS, Linux, Conda, Docker, and more.
 
-Note that you can also obtain releases from [croc's releases page](https://github.com/schollz/croc/releases/latest) and use those instead of anything from any of the package managers, though it's not as convenient as getting ti from a package manager and could requrie advanced setup for your system in certain cases.
+Note that you can also obtain releases from [croc's releases page](https://github.com/schollz/croc/releases/latest) and use those instead of anything from any of the package managers, though it's not as convenient as getting it from a package manager and could requrie advanced setup for your system in certain cases.
 
 ### On Windows
 
@@ -38,7 +38,7 @@ Note that you can also obtain releases from [croc's releases page](https://githu
         ```
         winget upgrade schollz.croc
         ```
-2. Once croc is installed, go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and downlaod **SwampSwap_Windows_x86_64.zip**
+2. Once croc is installed, go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download **SwampSwap_Windows_x86_64.zip**
 3. Extract **SwampSwap_Windows_x86_64.zip** anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
 4. Enter the extracted folder, and open **SwampSwap.exe**
 5. You will be prompted to set up the program

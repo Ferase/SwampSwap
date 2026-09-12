@@ -385,3 +385,6 @@ class CrocWorker(QThread):
         """Get the version of Swamp Swap as a string."""
         
         return self.app_version
+
+    def _get_croc_path(self) -> Path:
+        pass
