@@ -423,7 +423,7 @@ class SendWidget(QWidget):
             if sys.platform == "win32":
                 text = text.replace("(code copied to clipboard)", "").strip()
 
-            self.lineedit_code.setText()
+            self.lineedit_code.setText(text)
 
     def are_files_selected(self) -> bool:
         return bool(self.sendfiles_manager.selected_paths)
