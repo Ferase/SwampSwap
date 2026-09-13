@@ -391,7 +391,11 @@ class CrocWorker(QThread):
     def get_croc_version_number_only(self) -> str:
         """Get just the version number from croc --version for comparison purposes."""
 
-        return self.get_croc_version().split("croc version ")[1]
+        version: str | None = self.get_croc_version()
+        if version is None:
+            return "Not found"
+
+        return version.split("croc version ")[1]
 
     def get_app_version(self) -> str:
         """Get the version of Swamp Swap as a string."""
