@@ -137,7 +137,7 @@ class SettingsWidget(QWidget):
         row2.addWidget(self.checkbox_use_evar)
         row2.addWidget(self.btn_use_evar_info, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        layout.addSpacing(8)
+        layout.addSpacing(16)
 
         layout.addWidget(self.checkbox_startup_console)
         layout.addWidget(self.checkbox_startup_croc_updates_check)

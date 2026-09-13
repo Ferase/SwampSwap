@@ -29,6 +29,8 @@ class FirstRunReceivePathDialog(QDialog):
 
         self.worker = worker
 
+        self._confirmed_croc_path: bool = False
+
         self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
         self.setFixedSize(500, 400)
 
@@ -291,6 +293,7 @@ class FirstRunReceivePathDialog(QDialog):
             QMessageBox.StandardButton.Ok
         )
 
+        self._confirmed_croc_path = True
         return True
 
     def _update_croc_path(self, checked: bool) -> None:
@@ -366,8 +369,9 @@ class FirstRunReceivePathDialog(QDialog):
 
 
     def _accept(self) -> None:
-        if not self._test_croc_path():
-            return
+        if not self._confirmed_croc_path:
+            if not self._test_croc_path():
+                return
 
         if Path(self.get_path()).exists():
             self.accept()
