@@ -385,7 +385,7 @@ class CrocWorker(QThread):
         
             return self.croc_version
         
-        except FileNotFoundError, PermissionError:
+        except (FileNotFoundError, PermissionError):
             return None
     
     def get_croc_version_number_only(self) -> str:
