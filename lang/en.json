@@ -148,7 +148,7 @@
 
     "dialog:about_croc_path:title":                     "About croc on the PATH",
     "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment veriables.",
-    "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH.",
+    "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH. Whatever path is written in the text box above is ignored when this is checked.",
     "dialog:about_croc_path:body3":                     "However, if you've just donwloaded the executable from GitHub and placed it somewhere, or you'd like to use a different supported version of croc instead of one installed on your PATH, you will want to unckeck this box and browse to your desired croc executable.",
     "dialog:about_croc_path:body4":                     "Swamp Swap will automatically verify if the option you've selected is valid. You must resolve a proper croc installation or executable before using Swamp Swap.",
 
