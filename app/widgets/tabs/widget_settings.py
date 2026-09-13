@@ -1094,6 +1094,24 @@ class SettingsWidget(QWidget):
             self.lineedit_croc_path.setText(self.worker.settings.croc_path)
             return
 
+        version_string: str = self.worker.get_croc_version_number_only(path=path, recheck=True)
+        is_newer: bool = tuple(int(x) for x in version_string.lstrip("v").split(".")) >= tuple(int(x) for x in self.worker.minimum_croc_version.lstrip("v").split("."))
+
+        if not is_newer:
+            QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:change_croc_path_is_outdated:title"),
+                "<br><br>".join([
+                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body1").format(v1=f"<b>v{self.worker.minimum_croc_version}</b>", v2=f"<b>v{version_string}</b>"),
+                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body2")
+                ]),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+
+            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
+            return
+
         QMessageBox.information(
             self,
             self.worker.settings.tr("dialog:change_croc_path_was_found:title"),
@@ -1102,6 +1120,7 @@ class SettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok
         )
 
+        self.save_to_settings()
         self.worker.settings.save_single_setting("croc_path", self.lineedit_croc_path.text())
         self.worker.settings.save_single_setting("use_evar", self.checkbox_use_evar.isChecked())
 

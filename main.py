@@ -12,7 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.5"
+_APP_VERSION = "1.4.52"
 _MINIMUM_CROC_VERSION = "11.2.4"
 
 
@@ -45,7 +45,7 @@ def main() -> None:
         app.setStyle("Fusion")
 
     # Create worker
-    worker = CrocWorker(_APP_NAME, _APP_VERSION)
+    worker = CrocWorker(_APP_NAME, _APP_VERSION, _MINIMUM_CROC_VERSION)
 
     # Create and show main window
     window = MainWindow(worker)

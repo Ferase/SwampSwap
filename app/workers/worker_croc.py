@@ -40,7 +40,7 @@ class CrocWorker(QThread):
     progress_update = pyqtSignal(int, str, str)
 
     # Initialize
-    def __init__(self, app_name: str, app_version: str):
+    def __init__(self, app_name: str, app_version: str, minimum_croc_version: str):
         super().__init__()
         self._proc: subprocess.Popen | None = None
         self._args: list[str] = []
@@ -48,6 +48,7 @@ class CrocWorker(QThread):
 
         self.app_name = app_name
         self.app_version = app_version
+        self.minimum_croc_version = minimum_croc_version
         
         self.state: CrocState = CrocState()
 
@@ -388,12 +389,12 @@ class CrocWorker(QThread):
         except (FileNotFoundError, PermissionError):
             return None
     
-    def get_croc_version_number_only(self) -> str:
+    def get_croc_version_number_only(self, path: str | None = None, recheck: bool = False) -> str | None:
         """Get just the version number from croc --version for comparison purposes."""
 
-        version: str | None = self.get_croc_version()
+        version: str | None = self.get_croc_version(path, recheck)
         if version is None:
-            return "Not found"
+            return None
 
         return version.split("croc version ")[1]
 
