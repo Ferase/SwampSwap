@@ -7,10 +7,10 @@ from pathlib import Path
 from PyQt6.QtWidgets import (
     QDoubleSpinBox, QComboBox, QFileDialog, QListView,
     QTreeView, QAbstractItemView, QStyleOptionSlider, QStyle,
-    QSlider
+    QSlider, QLineEdit
 )
 from PyQt6.QtGui import QWheelEvent, QFileSystemModel
-from PyQt6.QtCore import Qt, QEvent, QObject
+from PyQt6.QtCore import Qt, pyqtSignal
 
 # Regex used to see if a string matches the formatting of croc's auto-generated codes
 # CODE_RE = re.compile(r"^([a-z]+)(-[a-z]+){2}$")
@@ -227,3 +227,10 @@ class ClickableSlider(QSlider):
 class NoScrollDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, event: QWheelEvent):
         event.ignore()
+
+class FocusLineEdit(QLineEdit):
+    focus_lost = pyqtSignal()
+
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        self.focus_lost.emit()

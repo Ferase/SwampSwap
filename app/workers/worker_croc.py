@@ -209,7 +209,7 @@ class CrocWorker(QThread):
         """Construct the command to send files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then settings, and then send
-        args = [self.settings.croc_path]
+        args = [self.get_croc_path()]
         args.append("--disable-clipboard")
         args.extend(self.settings.build_general_flags())
         args.append("send")
@@ -259,7 +259,7 @@ class CrocWorker(QThread):
         """Construct the command to receive files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then build flags
-        args = [self.settings.croc_path]
+        args = [self.get_croc_path()]
         args.extend(self.settings.build_general_flags())
         
         # Pass the output path
@@ -368,13 +368,25 @@ class CrocWorker(QThread):
     
 
     
-    def get_croc_version(self, recheck: bool = False) -> str:
+    def get_croc_version(self, path: str | None = None, recheck: bool = False) -> str | None:
         """Get the output from croc --version as a string."""
 
-        if self.croc_version is None or recheck:
-            return subprocess.run([self.settings.croc_path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        croc_path: str = self.get_croc_path()
+        if path:
+            croc_path = path
+
+        try:
+            if self.croc_version is None or recheck:
+                output: str = subprocess.run([croc_path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+                if not output.startswith("croc version"):
+                    return None
+
+                return output
         
-        return self.croc_version
+            return self.croc_version
+        
+        except FileNotFoundError, PermissionError:
+            return None
     
     def get_croc_version_number_only(self) -> str:
         """Get just the version number from croc --version for comparison purposes."""
@@ -386,5 +398,8 @@ class CrocWorker(QThread):
         
         return self.app_version
 
-    def _get_croc_path(self) -> Path:
-        pass
+    def get_croc_path(self) -> str:
+        if self.settings.use_evar:
+            return "croc"
+
+        return self.settings.croc_path

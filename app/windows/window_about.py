@@ -217,4 +217,4 @@ class AboutWindow(QDialog):
         return lang_credits
 
     def _update_croc_version(self) -> None:
-        self.label_croc_version.setText(self.worker.get_croc_version(True))
+        self.label_croc_version.setText(self.worker.get_croc_version(recheck=True))

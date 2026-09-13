@@ -414,8 +414,6 @@ class SendWidget(QWidget):
         if self.lineedit_code.text():
             return
 
-        print(line)
-
         match = re.search(r"^croc\s*(.+)", line, re.IGNORECASE)
         if match:
             text: str = match.group(1).strip()

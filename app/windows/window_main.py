@@ -30,7 +30,7 @@ class FirstRunReceivePathDialog(QDialog):
         self.worker = worker
 
         self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
-        self.setFixedSize(500, 300)
+        self.setFixedSize(500, 400)
 
         self._build_central()
         self._connect_signals()
@@ -48,6 +48,23 @@ class FirstRunReceivePathDialog(QDialog):
     def _build_main(self) -> QGroupBox:
         self.main_group = QGroupBox(self.worker.settings.tr("firstrun:group:set_settings"))
         layout = QVBoxLayout(self.main_group)
+
+        self.label_croc_path = QLabel(self.worker.settings.tr("options:croc_path:label"))
+        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+
+        croc_path_row = QHBoxLayout()
+        self.lineedit_croc_path = app_utils.FocusLineEdit()
+        self.lineedit_croc_path.setText(self.worker.settings.croc_path)
+        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+
+        self.btn_browse_for_croc = QPushButton(self.worker.settings.tr("generic:browse"))
+
+        checkbox_row = QHBoxLayout()
+        self.checkbox_use_evar = QCheckBox(self.worker.settings.tr("options:use_evar:label"))
+        self.checkbox_use_evar.setToolTip(self.worker.settings.tr("options:use_evar:tooltip"))
+        self.checkbox_use_evar.setChecked(self.worker.settings.use_evar)
+        self.btn_use_evar_info = QPushButton("?")
+        self.btn_use_evar_info.setFixedSize(20, 20)
 
         self.label_path = QLabel(self.worker.settings.tr("options:default_receive_path:label"))
         self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
@@ -83,6 +100,18 @@ class FirstRunReceivePathDialog(QDialog):
         self.checkbox_enable_sound = QCheckBox(self.worker.settings.tr("options:enable_sound:label"))
         self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
         self.checkbox_enable_sound.setChecked(self.worker.settings.enable_sound)
+
+        layout.addWidget(self.label_croc_path)
+
+        layout.addLayout(croc_path_row)
+        croc_path_row.addWidget(self.lineedit_croc_path)
+        croc_path_row.addWidget(self.btn_browse_for_croc)
+
+        layout.addLayout(checkbox_row)
+        checkbox_row.addWidget(self.checkbox_use_evar)
+        checkbox_row.addWidget(self.btn_use_evar_info, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        layout.addSpacing(16)
 
         layout.addLayout(ui_grid)
         ui_grid.addWidget(self.label_lang, 0, 0)
@@ -121,6 +150,11 @@ class FirstRunReceivePathDialog(QDialog):
         self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
         self.main_group.setTitle(self.worker.settings.tr("firstrun:group:set_settings"))
         
+        self.label_croc_path.setText(self.worker.settings.tr("options:croc_path:label"))
+        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
+        self.btn_croc_browse.setText(self.worker.settings.tr("generic:browse"))
+        
         self.label_path.setText(self.worker.settings.tr("options:default_receive_path:label"))
         self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
         self.lineedit_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
@@ -139,6 +173,12 @@ class FirstRunReceivePathDialog(QDialog):
     def _connect_signals(self) -> None:
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
+        self.lineedit_croc_path.focus_lost.connect(self._warn_croc_path_change)
+        self.lineedit_croc_path.textChanged.connect(self._enable_disable_button)
+        self.btn_browse_for_croc.clicked.connect(self._browse_for_croc)
+        self.checkbox_use_evar.toggled.connect(self._update_croc_path)
+        self.btn_use_evar_info.clicked.connect(self._open_use_evar_info)
+
         self.btn_browse.clicked.connect(self._browse)
         self.lineedit_path.textChanged.connect(self._enable_disable_button)
 
@@ -155,8 +195,18 @@ class FirstRunReceivePathDialog(QDialog):
         if dialog.exec():
             self.lineedit_path.setText(dialog.selectedFiles()[0])
 
-    def _enable_disable_button(self, text: str) -> None:
-        self.btn_ok.setEnabled(bool(text))
+    def _enable_disable_button(self) -> None:
+        croc_path_bool: bool = self.checkbox_use_evar.isChecked()
+        croc_path_xor: bool = croc_path_bool or bool(self.lineedit_croc_path.text())
+
+        all_text: bool = all([
+            croc_path_xor,
+            self.lineedit_path.text()
+        ])
+
+        print(all_text)
+
+        self.btn_ok.setEnabled(all_text)
 
     def _change_lang(self, lang: str) -> None:
         self.worker.settings.lang = lang
@@ -172,7 +222,135 @@ class FirstRunReceivePathDialog(QDialog):
 
         self.worker.settings.enable_sound = enabled
 
+
+
+    def _browse_for_croc(self) -> None:
+        dialog = QFileDialog(self)
+        dialog.setWindowTitle(self.worker.settings.tr(""))
+        
+        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+        
+        if sys.platform == "win32":
+            dialog.setNameFilter("Executables (*.exe)")
+        else:
+            dialog.setNameFilter("All Files (*)")
+            
+        if dialog.exec():
+            files = dialog.selectedFiles()
+
+            if not files:
+                return
+
+            self._warn_croc_path_change()
+            self.lineedit_croc_path.setText(files[0])
+
+    def _test_croc_path(self, is_checked: bool | None = None) -> bool:
+        path: str = self.lineedit_croc_path.text()
+        result: str | None = self.worker.get_croc_version(path=path, recheck=True)
+
+        if result is None:
+            QMessageBox.warning(
+                self,
+                self.worker.settings.tr("dialog:change_croc_path_not_found:title"),
+                self.worker.settings.tr("dialog:change_croc_path_not_found:body"),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+
+            if is_checked is not None:
+                self.checkbox_use_evar.blockSignals(True)
+                self.checkbox_use_evar.setChecked(not is_checked)
+                self.checkbox_use_evar.blockSignals(False)
+
+            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
+            return False
+
+        QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:change_croc_path_was_found:title"),
+            self.worker.settings.tr("dialog:change_croc_path_was_found:body"),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
+
+        return True
+
+    def _update_croc_path(self, checked: bool) -> None:
+        if not checked and self.lineedit_croc_path.text() == "croc":
+            box = QMessageBox.information(
+                self,
+                self.worker.settings.tr("dialog:change_croc_path_is_default:title"),
+                "<br><br>".join([
+                    self.worker.settings.tr("dialog:change_croc_path_is_default:body1"),
+                    self.worker.settings.tr("dialog:change_croc_path_is_default:body2")
+                ]),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+
+            self.checkbox_use_evar.blockSignals(True)
+            self.checkbox_use_evar.setChecked(True)
+            self.checkbox_use_evar.blockSignals(False)
+            return
+
+        body: list[str] = [
+            self.worker.settings.tr("dialog:change_croc_path_unchecked:body1"),
+            f"<b>{self.lineedit_croc_path.text()}</b>",
+            self.worker.settings.tr("dialog:change_croc_path_unchecked:body2"),
+            self.worker.settings.tr("dialog:change_croc_path:body3")
+        ]
+        if checked:
+            body = [
+                self.worker.settings.tr("dialog:change_croc_path_checked:body1"),
+                self.worker.settings.tr("dialog:change_croc_path_checked:body2"),
+                self.worker.settings.tr("dialog:change_croc_path:body3")
+            ]
+
+        final_body: str = "<br><br>".join(body)
+
+        box = QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:change_croc_path:title"),
+            final_body,
+            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+            QMessageBox.StandardButton.Cancel
+        )
+
+        if box == QMessageBox.StandardButton.Cancel:
+            self.checkbox_use_evar.blockSignals(True)
+            self.checkbox_use_evar.setChecked(not checked)
+            self.checkbox_use_evar.blockSignals(False)
+            return
+
+        self._test_croc_path(checked)
+
+    def _warn_croc_path_change(self) -> None:
+        if self.worker.settings.use_evar:
+            return
+
+        if self.worker.settings.croc_path == self.lineedit_croc_path.text():
+            return
+        
+        box = QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:change_croc_path:title"),
+            self.worker.settings.tr("dialog:change_croc_path_unfocused:body"),
+            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+            QMessageBox.StandardButton.Cancel
+        )
+
+        if box == QMessageBox.StandardButton.Cancel:
+            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
+            return
+        
+        self._test_croc_path()
+
+
+
     def _accept(self) -> None:
+        if not self._test_croc_path():
+            return
+
         if Path(self.get_path()).exists():
             self.accept()
             return
@@ -192,6 +370,23 @@ class FirstRunReceivePathDialog(QDialog):
 
     def get_path(self) -> str:
         return self.lineedit_path.text()
+
+    def get_croc_path(self) -> str:
+        return self.lineedit_croc_path.text()
+
+    def _open_use_evar_info(self) -> None:
+        QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:about_croc_path:title"),
+            "<br><br>".join([
+                self.worker.settings.tr("dialog:about_croc_path:body1"),
+                self.worker.settings.tr("dialog:about_croc_path:body2"),
+                self.worker.settings.tr("dialog:about_croc_path:body3"),
+                self.worker.settings.tr("dialog:about_croc_path:body4")
+            ]),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
 
 
 
@@ -447,7 +642,9 @@ class MainWindow(QMainWindow):
         # Click the save button for the user
         match box:
             case QMessageBox.StandardButton.Save:
-                self.widget_settings.btn_save.click()
+                self.widget_settings._save_to_settings()
+                self.worker.settings.save_settings()
+                self.widget_settings.clear_dirty()
             case QMessageBox.StandardButton.Discard:
                 self.widget_settings.restore_previous_settings()
             case QMessageBox.StandardButton.Abort:
@@ -664,6 +861,7 @@ class MainWindow(QMainWindow):
                 return
             
             elif box == QMessageBox.StandardButton.Yes:
+                self.widget_settings.save_to_settings()
                 self.worker.settings.save_settings()
 
         if self._is_operation_running():
@@ -720,6 +918,13 @@ class MainWindow(QMainWindow):
             self.widget_receive.lineedit_path.setText(dialog.get_path())
             self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
 
+            if not dialog.checkbox_use_evar.isChecked():
+                self.widget_settings.lineedit_croc_path.setText(dialog.get_croc_path())
+
+            self.widget_settings.checkbox_use_evar.blockSignals(True)
+            self.widget_settings.checkbox_use_evar.setChecked(dialog.checkbox_use_evar.isChecked())
+            self.widget_settings.checkbox_use_evar.blockSignals(False)
+
             self.widget_settings.combo_lang.setCurrentText(dialog.combo_lang.currentText())
 
             # Block signals so themes like Random don't leapfrog
@@ -729,5 +934,6 @@ class MainWindow(QMainWindow):
 
             self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
 
+            self.widget_settings.save_to_settings()
             self.worker.settings.save_settings()
             self.widget_settings.clear_dirty()

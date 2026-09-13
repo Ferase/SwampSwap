@@ -128,6 +128,30 @@
     "dialog:first_run_path_create:body1":               "The provided receive path doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
     "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
 
+    "dialog:change_croc_path:title":                    "Changing croc path",
+    "dialog:change_croc_path_checked:body1":            "By checking <b>Use croc on your PATH</b>, Swamp Swap will attempt to find and use croc via your system PATH.",
+    "dialog:change_croc_path_checked:body2":            "If you know croc isn't on your PATH or you are unsure of what this means, press <b>Cancel</b>.",
+    "dialog:change_croc_path_unchecked:body1":          "By unchecking <b>Use croc on your PATH</b>, Swamp Swap will attempt to find and use croc via the path specified:",
+    "dialog:change_croc_path_unchecked:body2":          "If you have installed croc via a package manager, have added it to your PATH yourself, or you are unsure of what this means, press <b>Cancel</b>.",
+    "dialog:change_croc_path_unfocused:body":           "By changing the croc path, Swamp Swap must make sure the path points to a valid croc executable.",
+    "dialog:change_croc_path:body3":                    "Swamp Swap will now attempt to handshake with croc. Do you wish to proceed?",
+
+    "dialog:change_croc_path_not_found:title":          "croc was not found",
+    "dialog:change_croc_path_not_found:body":           "croc could not be found at the specified location. If you're certain this is a croc executable, ensure you have permission to access it. Reverting to old settings.",
+
+    "dialog:change_croc_path_was_found:title":          "croc was found!",
+    "dialog:change_croc_path_was_found:body":           "Swamp Swap found croc at the desired path.",
+
+    "dialog:change_croc_path_is_default:title":         "Entered croc path is the same as PATH version",
+    "dialog:change_croc_path_is_default:body1":         "It looks like the croc path line entry currently reads \"croc\", which is the same as using croc via your PATH.",
+    "dialog:change_croc_path_is_default:body2":         "Please browse for the croc executable you want to use, then try unchecking again.",
+
+    "dialog:about_croc_path:title":                     "About croc on the PATH",
+    "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment veriables.",
+    "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH.",
+    "dialog:about_croc_path:body3":                     "However, if you've just donwloaded the executable from GitHub and placed it somewhere, or you'd like to use a different supported version of croc instead of one installed on your PATH, you will want to unckeck this box and browse to your desired croc executable.",
+    "dialog:about_croc_path:body4":                     "Swamp Swap will automatically verify if the option you've selected is valid. You must resolve a proper croc installation or executable before using Swamp Swap.",
+
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
 
@@ -206,11 +230,15 @@
     "options:heading:relays":                           "Relays",
     "options:heading:network":                          "Network",
     "options:heading:flags":                            "Flags",
-    "options:heading:advanced":                         "Advanced",
 
     "options:btn:reset_defaults":                       "Reset to defaults",
     "options:btn:revert_settings":                      "Revert changes",
 
+    "options:croc_path:label":                          "croc executable path",
+    "options:croc_path:placeholder":                    "path/to/croc",
+    "options:croc_path:tooltip":                        "The path to the croc executable. This is disregarded if you're using the croc installed on your PATH.",
+    "options:use_evar:label":                           "Use croc on your PATH",
+    "options:use_evar:tooltip":                         "Use this if you have installed croc via a package manager (winget, apt, pacman, etc.) or know that croc is on your PATH.",
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",
     "options:startup_croc_updates_check:label":         "Check for croc updates on startup",
@@ -285,10 +313,6 @@
     "options:classic:tooltip":                          "Uses croc's classic mode. This is less secure due to potential local attack vectors, so only use this if you know what you're doing.",
     "options:local:label":                              "Local connections only",
     "options:local:tooltip":                            "Only allows connections and file transfers over LAN.",
-
-    "options:croc_path:label":                          "croc executable path",
-    "options:croc_path:placeholder":                    "e.g. croc",
-    "options:croc_path:tooltip":                        "The path to the croc executable, or the just name of the executable if it's on your PATH.",
 
     "options:delete_all:btn":                           "Delete settings file",
     "options:delete_all:tooltip":                       "Unlike reverting settings to default, deleting the settings file will force Swamp Swap to raise its first run setup window again the next time it starts.",

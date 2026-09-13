@@ -12,7 +12,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.3"
+_APP_VERSION = "1.4.4"
 _MINIMUM_CROC_VERSION = "11.2.4"
 
 
@@ -52,7 +52,7 @@ def main() -> None:
     window.show()
 
     # Test if croc is installed. If not, raise an error
-    if shutil.which(worker.settings.croc_path) is None:
+    if shutil.which(worker.get_croc_path()) is None:
         _croc_not_installed(window, worker)
 
     # Test if croc is below minimum version

@@ -12,6 +12,8 @@ _SETTINGS_VERSION: int = 1
 # Default settings
 _DEFAULTS: dict[str, bool | str | float] = {
     # General
+    "croc_path": "",
+    "use_evar": True,
     "startup_console": False,
     "startup_croc_updates_check": True,
     "startup_swampswap_updates_check": True,
@@ -55,10 +57,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "classic": False,
     "internaldns": False,
     "nocompress": False,
-    "local": False,
-
-    # Advabced
-    "croc_path": "croc"
+    "local": False
 }
 
 # Lookup table for croc flags
@@ -115,6 +114,8 @@ class SettingsManager(QObject):
         self.settings_version: int | None = None
 
         # General
+        self.croc_path: str | None = None
+        self.use_evar: bool | None = None
         self.startup_console: bool | None = None
         self.startup_croc_updates_check: bool | None = None
         self.startup_swampswap_updates_check: bool | None = None
@@ -161,9 +162,6 @@ class SettingsManager(QObject):
         self.internaldns: bool | None = None
         self.nocompress: bool | None = None
         self.local: bool | None = None
-
-        # Advanced
-        self.croc_path: str | None = None
 
         # Locale manager and language list
         self.locale_manager = LocaleManager()
