@@ -45,7 +45,7 @@
     "dialog:croc_not_found:title":                      "croc not found!",
     "dialog:croc_not_found:body1":                      "It looks like Swamp Swap couldn't find croc!",
     "dialog:croc_not_found:body2":                      "Please click <b>Open</b> to go to croc's GitHub page so you can get it, or choose <b>Close</b> to close the program.",
-    "dialog:croc_not_found:body3":                      "Alternatively, if you do have croc installed but don't have it on your PATH, choose <b>Ignore</b> and set its path at <b>Settings > Advanced > croc executable path</b>.",
+    "dialog:croc_not_found:body3":                      "Alternatively, if you do have croc installed but don't have it on your PATH, choose <b>Ignore</b> and set its path at <b>Settings > General > croc executable path</b>.",
 
     "dialog:croc_too_old:title":                        "croc too old",
     "dialog:croc_too_old:body1":                        "It looks like your installation of croc is too old!",
@@ -151,9 +151,9 @@
     "dialog:change_croc_path_is_outdated:body2":        "Please provide a version of croc at or above the minimum version required by Swamp Swap.",
 
     "dialog:about_croc_path:title":                     "About croc on the PATH",
-    "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment veriables.",
+    "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment variables.",
     "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH. Whatever path is written in the text box above is ignored when this is checked.",
-    "dialog:about_croc_path:body3":                     "However, if you've just donwloaded the executable from GitHub and placed it somewhere, or you'd like to use a different supported version of croc instead of one installed on your PATH, you will want to unckeck this box and browse to your desired croc executable.",
+    "dialog:about_croc_path:body3":                     "However, if you've just downloaded the executable from GitHub and placed it somewhere, or you'd like to use a different supported version of croc instead of one installed on your PATH, you will want to unckeck this box and browse to your desired croc executable.",
     "dialog:about_croc_path:body4":                     "Swamp Swap will automatically verify if the option you've selected is valid. You must resolve a proper croc installation or executable before using Swamp Swap.",
 
     "file_dialog:choose_files":                         "Select files to send",

@@ -29,7 +29,7 @@ class FirstRunReceivePathDialog(QDialog):
 
         self.worker = worker
 
-        self._confirmed_croc_path: bool = False
+        self.confirmed_croc_path: bool = False
 
         self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
         self.setFixedSize(500, 400)
@@ -293,7 +293,7 @@ class FirstRunReceivePathDialog(QDialog):
             QMessageBox.StandardButton.Ok
         )
 
-        self._confirmed_croc_path = True
+        self.confirmed_croc_path = True
         return True
 
     def _update_croc_path(self, checked: bool) -> None:
@@ -333,11 +333,11 @@ class FirstRunReceivePathDialog(QDialog):
             self,
             self.worker.settings.tr("dialog:change_croc_path:title"),
             final_body,
-            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-            QMessageBox.StandardButton.Cancel
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
 
-        if box == QMessageBox.StandardButton.Cancel:
+        if box == QMessageBox.StandardButton.No:
             self.checkbox_use_evar.blockSignals(True)
             self.checkbox_use_evar.setChecked(not checked)
             self.checkbox_use_evar.blockSignals(False)
@@ -356,11 +356,11 @@ class FirstRunReceivePathDialog(QDialog):
             self,
             self.worker.settings.tr("dialog:change_croc_path:title"),
             self.worker.settings.tr("dialog:change_croc_path_unfocused:body"),
-            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-            QMessageBox.StandardButton.Cancel
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
 
-        if box == QMessageBox.StandardButton.Cancel:
+        if box == QMessageBox.StandardButton.No:
             self.lineedit_croc_path.setText(self.worker.settings.croc_path)
             return
         
@@ -369,7 +369,7 @@ class FirstRunReceivePathDialog(QDialog):
 
 
     def _accept(self) -> None:
-        if not self._confirmed_croc_path:
+        if not self.confirmed_croc_path:
             if not self._test_croc_path():
                 return
 
@@ -955,6 +955,10 @@ class MainWindow(QMainWindow):
             self.widget_settings.combo_theme.blockSignals(False)
 
             self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
+
+            if dialog.confirmed_croc_path:
+                self.worker.change_operation(CrocOperation.IDLE)
+                self.worker.change_action(CrocAction.NONE)
 
             self.widget_settings.save_to_settings()
             self.worker.settings.save_settings()

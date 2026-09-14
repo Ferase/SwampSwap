@@ -11,7 +11,7 @@ from PyQt6.QtGui import QDesktopServices
 
 from get_version import UpdateChecker
 import app.utils as app_utils
-from app.workers.worker_croc import CrocWorker
+from app.workers.worker_croc import CrocWorker, CrocOperation, CrocAction
 
 _PADDING: int = 10
 
@@ -1120,6 +1120,9 @@ class SettingsWidget(QWidget):
             QMessageBox.StandardButton.Ok
         )
 
+        self.worker.change_operation(CrocOperation.IDLE)
+        self.worker.change_action(CrocAction.NONE)
+
         self.save_to_settings()
         self.worker.settings.save_single_setting("croc_path", self.lineedit_croc_path.text())
         self.worker.settings.save_single_setting("use_evar", self.checkbox_use_evar.isChecked())
@@ -1161,8 +1164,8 @@ class SettingsWidget(QWidget):
             self,
             self.worker.settings.tr("dialog:change_croc_path:title"),
             final_body,
-            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-            QMessageBox.StandardButton.Cancel
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
 
         if box == QMessageBox.StandardButton.Cancel:
@@ -1184,8 +1187,8 @@ class SettingsWidget(QWidget):
             self,
             self.worker.settings.tr("dialog:change_croc_path:title"),
             self.worker.settings.tr("dialog:change_croc_path_unfocused:body"),
-            QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-            QMessageBox.StandardButton.Cancel
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
 
         if box == QMessageBox.StandardButton.Cancel:
