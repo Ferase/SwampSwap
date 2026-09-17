@@ -33,7 +33,7 @@ class AboutWindow(QDialog):
 
         # Define window title and size
         self.setWindowTitle(self.worker.settings.tr("about:window:title"))
-        self.setFixedSize(480, 350)
+        self.setFixedSize(480, 400)
 
         # Build UI
         self._build_central()
@@ -82,11 +82,14 @@ class AboutWindow(QDialog):
         self.label_name.setFont(hero_font)
         self.label_name.setWordWrap(True)
 
-        self.label_version = QLabel(self.worker.settings.tr("about:version:swampswap").format(v=self.worker.settings.app_version))
+        self.label_version = QLabel(self.worker.settings.tr("about:version:swampswap").format(v=f"<b>{self.worker.settings.app_version}</b>"))
         self.label_version.setWordWrap(True)
 
         self.label_croc_version = QLabel()
         self.label_croc_version.setWordWrap(True)
+
+        self.label_croc_source = QLabel()
+        self.label_croc_source.setWordWrap(True)
 
         self.disclaimer_label = QLabel(self.worker.settings.tr("about:disclaimer"))
         self.disclaimer_label.setWordWrap(True)
@@ -95,6 +98,7 @@ class AboutWindow(QDialog):
         layout.addWidget(self.label_name)
         layout.addWidget(self.label_version)
         layout.addWidget(self.label_croc_version)
+        layout.addWidget(self.label_croc_source)
         layout.addStretch()
         layout.addWidget(self.disclaimer_label)
 
@@ -190,6 +194,8 @@ class AboutWindow(QDialog):
 
         for key, label in self._credit_labels.items():
             label.setText(key)
+
+        self._update_croc_version()
     
 
 
@@ -220,4 +226,17 @@ class AboutWindow(QDialog):
         return lang_credits
 
     def _update_croc_version(self) -> None:
-        self.label_croc_version.setText(self.worker.get_croc_version_from_path(self.worker.settings.croc_path))
+        version: str | None = self.worker.get_croc_version_from_path_number_only(self.worker.settings.croc_path)
+        version_string: str = self.worker.settings.tr("detect_croc:label:croc_not_found") if version is None else self.worker.settings.tr("about:version:croc").format(v=f"<b>{version}</b>")
+        self.label_croc_version.setText(version_string)
+
+        croc_source: str = self.worker.settings.tr("detect_croc:combo:standalone")
+        if version is None:
+            croc_source = self.worker.settings.tr("detect_croc:label:croc_not_found")
+        else:
+            if self.worker.settings.croc_path == "croc":
+                croc_source = f"<b>{self.worker.settings.tr('detect_croc:combo:system')}</b>"
+
+        source_text: str = self.worker.settings.tr("about:croc:source").format(s=f"<br><b>{croc_source}</b>")
+
+        self.label_croc_source.setText(source_text)

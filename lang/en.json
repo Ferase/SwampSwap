@@ -209,6 +209,7 @@
     "detect_croc:label:croc_exists":                    "croc status:",
     "detect_croc:label:croc_exists_yes":                "Success! croc detected in {p}",
     "detect_croc:label:croc_exists_no":                 "Not detected",
+    "detect_croc:label:croc_not_found":                 "Not found",
     "detect_croc:combo:system":                         "System",
     "detect_croc:combo:standalone":                     "Standalone executable",
     "detect_croc:combo:tooltip":                        "Select the method Swamp Swap will use to detect a usable croc application on your comptuer.",
@@ -344,11 +345,13 @@
     "console:input_placeholder":                        "Enter commands while croc runs...",
 
     "about:window:title":                               "About",
-    "about:version:swampswap":                          "GUI version {v}",
-    "about:credits:croc":                               "croc by",
-    "about:credits:ui_developers":                      "User interface by",
-    "about:credits:testers":                            "Tested by",
-    "about:credits:languages":                          "Translations by",
+    "about:version:croc":                               "croc version: {v}",
+    "about:version:swampswap":                          "GUI version: {v}",
+    "about:croc:source":                                "croc source: {s}",
+    "about:credits:croc":                               "croc by:",
+    "about:credits:ui_developers":                      "User interface by:",
+    "about:credits:testers":                            "Tested by:",
+    "about:credits:languages":                          "Translations by:",
     
     "about:disclaimer":                                 "Swamp Swap is not affiliated with Zack Schollz or croc."
 }

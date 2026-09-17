@@ -218,7 +218,7 @@ class ConfigureCrocDialog(QDialog):
         # croc was found on the system PATH
         return True
 
-    def _verify(self, silent_success: bool = False) -> None:
+    def _verify(self) -> None:
         """Using the selected detection method and the user's system PATH/specified croc EXE path, the croc application will be checekd to be sure it exists and up to date."""
 
         # Check that croc exists on the system PATH/at the location specified by the user
@@ -243,14 +243,13 @@ class ConfigureCrocDialog(QDialog):
                 return
 
             # A valid croc EXE was found at the specified path
-            if not silent_success:
-                QMessageBox.information(
-                    self,
-                    self.worker.settings.tr("dialog:detect_croc_path_found_standalone:title").format(p=f"<b>{self.get_croc_path()}</b>"),
-                    self.worker.settings.tr("dialog:detect_croc_path_found_standalone:body"),
-                    QMessageBox.StandardButton.Ok,
-                    QMessageBox.StandardButton.Ok
-                )
+            QMessageBox.information(
+                self,
+                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:title"),
+                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:body").format(p=f"<b>{self.get_croc_path()}</b>"),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
 
             # croc has been verified
             self.verified_changed.emit(True)
@@ -271,14 +270,13 @@ class ConfigureCrocDialog(QDialog):
             return
 
         # croc was found on the system PATH
-        if not silent_success:
-            QMessageBox.information(
-                self,
-                self.worker.settings.tr("dialog:detect_croc_path_found_on_path:title"),
-                self.worker.settings.tr("dialog:detect_croc_path_found_on_path:body"),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
+        QMessageBox.information(
+            self,
+            self.worker.settings.tr("dialog:detect_croc_path_found_on_path:title"),
+            self.worker.settings.tr("dialog:detect_croc_path_found_on_path:body"),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
 
         # croc has been verified
         self.verified_changed.emit(True)

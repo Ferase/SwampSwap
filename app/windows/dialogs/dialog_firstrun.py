@@ -367,8 +367,8 @@ class FirstRunReceivePathDialog(QDialog):
             # A valid croc EXE was found at the specified path
             QMessageBox.information(
                 self,
-                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:title").format(p=f"<b>{self.get_croc_path()}</b>"),
-                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:body"),
+                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:title"),
+                self.worker.settings.tr("dialog:detect_croc_path_found_standalone:body").format(p=f"<b>{self.get_croc_path()}</b>"),
                 QMessageBox.StandardButton.Ok,
                 QMessageBox.StandardButton.Ok
             )
