@@ -12,6 +12,7 @@ from PyQt6.QtGui import QDesktopServices
 from get_version import UpdateChecker
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker, CrocOperation, CrocAction
+from app.windows.dialogs.dialog_crocconfig import ConfigureCrocDialog
 
 _PADDING: int = 10
 
@@ -38,11 +39,7 @@ class SettingsWidget(QWidget):
 
         # Build UI
         self._build_central()
-        self._load_from_settings()
         self._connect_signals()
-        self._enable_disable_settings()
-        self._set_previous_settings()
-        self._startup_updates_check()
 
     # Construct main UI
     def _build_central(self) -> None:
@@ -62,6 +59,7 @@ class SettingsWidget(QWidget):
         layout = QVBoxLayout(widget)
 
         # Example content
+        group_croc_setup = self._build_croc_setup_group()
         group_general_settings = self._build_general_settings_group()
         group_ui_settings = self._build_ui_settings_group()
         group_send_settings = self._build_send_settings_group()
@@ -71,6 +69,8 @@ class SettingsWidget(QWidget):
         group_flags_settings = self._build_flags_settings_group()
         delete_settings_group = self._build_delete_settings_group()
 
+        layout.addWidget(group_croc_setup)
+        layout.addSpacing(_PADDING)
         layout.addWidget(group_general_settings)
         layout.addSpacing(_PADDING)
         layout.addWidget(group_ui_settings)
@@ -93,24 +93,20 @@ class SettingsWidget(QWidget):
 
         return scroll
     
+    def _build_croc_setup_group(self) -> QGroupBox:
+        self.croc_group = QGroupBox(self.worker.settings.tr("options:heading:croc_setup"))
+        layout = QVBoxLayout(self.croc_group)
+
+        self.btn_detect_croc = QPushButton(self.worker.settings.tr("options:detect_croc:btn"))
+        self.btn_detect_croc.setToolTip(self.worker.settings.tr("options:detect_croc:tooltip"))
+
+        layout.addWidget(self.btn_detect_croc)
+
+        return self.croc_group
+    
     def _build_general_settings_group(self) -> QGroupBox:
         self.general_group = QGroupBox(self.worker.settings.tr("options:heading:general"))
         layout = QVBoxLayout(self.general_group)
-
-        row1 = QHBoxLayout()
-        self.label_croc_path = QLabel(self.worker.settings.tr("options:croc_path:label"))
-        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.lineedit_croc_path = app_utils.FocusLineEdit(self.worker.settings.croc_path)
-        self.lineedit_croc_path.setPlaceholderText(self.worker.settings.tr("options:croc_path:placeholder"))
-        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.btn_browse_for_croc = QPushButton(self.worker.settings.tr("generic:browse"))
-
-        row2 = QHBoxLayout()
-        self.checkbox_use_evar = QCheckBox(self.worker.settings.tr("options:use_evar:label"))
-        self.checkbox_use_evar.setToolTip(self.worker.settings.tr("options:use_evar:tooltip"))
-        self.checkbox_use_evar.setChecked(self.worker.settings.use_evar)
-        self.btn_use_evar_info = QPushButton("?")
-        self.btn_use_evar_info.setFixedSize(20, 20)
 
         self.checkbox_startup_console = QCheckBox(self.worker.settings.tr("options:startup_console:label"))
         self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
@@ -126,18 +122,6 @@ class SettingsWidget(QWidget):
 
         self.btn_check_update_croc = QPushButton(self.worker.settings.tr("options:btn:check_update_croc"))
         self.btn_check_update_swampswap = QPushButton(self.worker.settings.tr("options:btn:check_update_swampswap"))
-
-        layout.addWidget(self.label_croc_path)
-        
-        layout.addLayout(row1)
-        row1.addWidget(self.lineedit_croc_path)
-        row1.addWidget(self.btn_browse_for_croc)
-
-        layout.addLayout(row2)
-        row2.addWidget(self.checkbox_use_evar)
-        row2.addWidget(self.btn_use_evar_info, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        layout.addSpacing(16)
 
         layout.addWidget(self.checkbox_startup_console)
         layout.addWidget(self.checkbox_startup_croc_updates_check)
@@ -469,6 +453,10 @@ class SettingsWidget(QWidget):
 
         self.setWindowTitle(self.worker.settings.tr("options:window:title"))
 
+        self.croc_group.setTitle(self.worker.settings.tr("options:heading:croc_setup"))
+        self.btn_detect_croc.setText(self.worker.settings.tr("options:detect_croc:btn"))
+        self.btn_detect_croc.setToolTip(self.worker.settings.tr("options:detect_croc:tooltip"))
+
         self.general_group.setTitle(self.worker.settings.tr("options:heading:general"))
         self.checkbox_use_evar.setText(self.worker.settings.tr("options:use_evar:label"))
         self.checkbox_use_evar.setToolTip(self.worker.settings.tr("options:use_evar:tooltip"))
@@ -586,10 +574,7 @@ class SettingsWidget(QWidget):
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
-        self.lineedit_croc_path.focus_lost.connect(self._warn_croc_path_change)
-        self.btn_browse_for_croc.clicked.connect(self._browse_for_croc)
-        self.checkbox_use_evar.toggled.connect(self._update_croc_path)
-        self.btn_use_evar_info.clicked.connect(self._open_use_evar_info)
+        self.btn_detect_croc.clicked.connect(self._handle_configure_croc)
 
         self.btn_check_update_croc.clicked.connect(self._check_for_croc_update)
         self.btn_check_update_swampswap.clicked.connect(self._check_for_swampswap_update)
@@ -610,8 +595,6 @@ class SettingsWidget(QWidget):
         self.btn_save.clicked.connect(self._click_save_button)
 
         # Mark changed settings as dirty
-        self.lineedit_croc_path.textChanged.connect(self._mark_dirty)
-        self.checkbox_use_evar.toggled.connect(self._mark_dirty)
         self.checkbox_startup_croc_updates_check.toggled.connect(self._mark_dirty)
         self.checkbox_startup_swampswap_updates_check.toggled.connect(self._mark_dirty)
         self.checkbox_startup_console.toggled.connect(self._mark_dirty)
@@ -667,8 +650,6 @@ class SettingsWidget(QWidget):
         self.worker.settings.change_animation_matches_theme()
 
     def _load_from_settings(self) -> None:
-        self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-        self.checkbox_use_evar.setChecked(self.worker.settings.use_evar)
         self.checkbox_startup_croc_updates_check.setChecked(self.worker.settings.startup_croc_updates_check)
         self.checkbox_startup_swampswap_updates_check.setChecked(self.worker.settings.startup_swampswap_updates_check)
         self.checkbox_startup_console.setChecked(self.worker.settings.startup_console)
@@ -715,8 +696,6 @@ class SettingsWidget(QWidget):
         self.checkbox_local.setChecked(self.worker.settings.local)
 
     def save_to_settings(self) -> None:
-        self.worker.settings.croc_path = self.lineedit_croc_path.text()
-        self.worker.settings.use_evar = self.checkbox_use_evar.isChecked()
         self.worker.settings.startup_croc_updates_check = self.checkbox_startup_croc_updates_check.isChecked()
         self.worker.settings.startup_swampswap_updates_check = self.checkbox_startup_swampswap_updates_check.isChecked()
         self.worker.settings.startup_console = self.checkbox_startup_console.isChecked()
@@ -760,8 +739,7 @@ class SettingsWidget(QWidget):
 
     def _ui_settings_to_dict(self) -> dict[str, bool | str]:
         return {
-            "croc_path": self.lineedit_croc_path.text(),
-            "use_evar": self.checkbox_use_evar.isChecked(),
+            "croc_path": self.worker.settings.croc_path,
             "startup_croc_updates_check": self.checkbox_startup_croc_updates_check.isChecked(),
             "startup_swampswap_updates_check": self.checkbox_startup_swampswap_updates_check.isChecked(),
             "startup_console": self.checkbox_startup_console.isChecked(),
@@ -1001,7 +979,7 @@ class SettingsWidget(QWidget):
         QMessageBox.information(
             parent,
             worker.settings.tr("dialog:croc_up_to_date:title"),
-            worker.settings.tr("dialog:croc_up_to_date:body").format(v1=f"<b>{self.worker.get_croc_version_number_only()}</b>", v2=f"<b>{new_version}</b>"),
+            worker.settings.tr("dialog:croc_up_to_date:body").format(v1=f"<b>{self.worker.get_croc_version_from_path_number_only(self.worker.settings.croc_path)}</b>", v2=f"<b>{new_version}</b>"),
             QMessageBox.StandardButton.Ok,
             QMessageBox.StandardButton.Ok
         )
@@ -1042,7 +1020,7 @@ class SettingsWidget(QWidget):
         self._new_swampswap_version_available(self.parent(), self.worker, version)
 
     def _startup_updates_check(self) -> None:
-        self._update_checker_croc = UpdateChecker(self.worker.get_croc_version_number_only(), "schollz", "croc")
+        self._update_checker_croc = UpdateChecker(self.worker.get_croc_version_from_path_number_only(self.worker.settings.croc_path), "schollz", "croc")
         self._update_checker_swampswap = UpdateChecker(self.worker.get_app_version(), "Ferase", "SwampSwap")
 
         # If the user hasn't disabled checking for croc updates, check schollz/croc for a new release
@@ -1053,160 +1031,16 @@ class SettingsWidget(QWidget):
         if self.worker.settings.startup_swampswap_updates_check:
             self._check_for_swampswap_update(True)
 
-    def _browse_for_croc(self) -> None:
-        dialog = QFileDialog(self)
-        dialog.setWindowTitle(self.worker.settings.tr(""))
-        
-        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
-        
-        if sys.platform == "win32":
-            dialog.setNameFilter("Executables (*.exe)")
-        else:
-            dialog.setNameFilter("All Files (*)")
-            
-        if dialog.exec():
-            files = dialog.selectedFiles()
+    def _handle_configure_croc(self) -> None:
+        dialog = ConfigureCrocDialog(self.worker, self)
 
-            if not files:
-                return
-
-            self._warn_croc_path_change()
-            self.lineedit_croc_path.setText(files[0])
-
-    def _test_croc_path(self, is_checked: bool | None = None) -> None:
-        path: str = self.lineedit_croc_path.text()
-        result: str | None = self.worker.get_croc_version(path=path, recheck=True)
-
-        if result is None:
-            QMessageBox.warning(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_not_found:title"),
-                self.worker.settings.tr("dialog:change_croc_path_not_found:body"),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            if is_checked is not None:
-                self.checkbox_use_evar.blockSignals(True)
-                self.checkbox_use_evar.setChecked(not is_checked)
-                self.checkbox_use_evar.blockSignals(False)
-
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
+        if not dialog.exec():
             return
 
-        version_string: str = self.worker.get_croc_version_number_only(path=path, recheck=True)
-        is_newer: bool = tuple(int(x) for x in version_string.lstrip("v").split(".")) >= tuple(int(x) for x in self.worker.minimum_croc_version.lstrip("v").split("."))
+        self.worker.settings.save_single_setting("croc_path", dialog.get_final_croc_path())
 
-        if not is_newer:
-            QMessageBox.warning(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_is_outdated:title"),
-                "<br><br>".join([
-                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body1").format(v1=f"<b>v{self.worker.minimum_croc_version}</b>", v2=f"<b>v{version_string}</b>"),
-                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body2")
-                ]),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-            return
-
-        QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path_was_found:title"),
-            self.worker.settings.tr("dialog:change_croc_path_was_found:body"),
-            QMessageBox.StandardButton.Ok,
-            QMessageBox.StandardButton.Ok
-        )
-
-        self.worker.change_operation(CrocOperation.IDLE)
-        self.worker.change_action(CrocAction.NONE)
-
-        self.save_to_settings()
-        self.worker.settings.save_single_setting("croc_path", self.lineedit_croc_path.text())
-        self.worker.settings.save_single_setting("use_evar", self.checkbox_use_evar.isChecked())
-
-    def _update_croc_path(self, checked: bool) -> None:
-        if not checked and self.lineedit_croc_path.text() == "croc":
-            box = QMessageBox.information(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_is_default:title"),
-                "<br><br>".join([
-                    self.worker.settings.tr("dialog:change_croc_path_is_default:body1"),
-                    self.worker.settings.tr("dialog:change_croc_path_is_default:body2")
-                ]),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            self.checkbox_use_evar.blockSignals(True)
-            self.checkbox_use_evar.setChecked(True)
-            self.checkbox_use_evar.blockSignals(False)
-            return
-
-        body: list[str] = [
-            self.worker.settings.tr("dialog:change_croc_path_unchecked:body1"),
-            f"<b>{self.lineedit_croc_path.text()}</b>",
-            self.worker.settings.tr("dialog:change_croc_path_unchecked:body2"),
-            self.worker.settings.tr("dialog:change_croc_path:body3")
-        ]
-        if checked:
-            body = [
-                self.worker.settings.tr("dialog:change_croc_path_checked:body1"),
-                self.worker.settings.tr("dialog:change_croc_path_checked:body2"),
-                self.worker.settings.tr("dialog:change_croc_path:body3")
-            ]
-
-        final_body: str = "<br><br>".join(body)
-
-        box = QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path:title"),
-            final_body,
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-
-        if box == QMessageBox.StandardButton.Cancel:
-            self.checkbox_use_evar.blockSignals(True)
-            self.checkbox_use_evar.setChecked(not checked)
-            self.checkbox_use_evar.blockSignals(False)
-            return
-
-        self._test_croc_path(checked)
-
-    def _warn_croc_path_change(self) -> None:
-        if self.worker.settings.use_evar:
-            return
-
-        if self.worker.settings.croc_path == self.lineedit_croc_path.text():
-            return
-        
-        box = QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path:title"),
-            self.worker.settings.tr("dialog:change_croc_path_unfocused:body"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-
-        if box == QMessageBox.StandardButton.Cancel:
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-            return
-        
-        self._test_croc_path()
-
-    def _open_use_evar_info(self) -> None:
-        QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:about_croc_path:title"),
-            "<br><br>".join([
-                self.worker.settings.tr("dialog:about_croc_path:body1"),
-                self.worker.settings.tr("dialog:about_croc_path:body2"),
-                self.worker.settings.tr("dialog:about_croc_path:body3"),
-                self.worker.settings.tr("dialog:about_croc_path:body4")
-            ]),
-            QMessageBox.StandardButton.Ok,
-            QMessageBox.StandardButton.Ok
-        )
+    def on_ready(self) -> None:
+        self._load_from_settings()
+        self._enable_disable_settings()
+        self._set_previous_settings()
+        self._startup_updates_check()

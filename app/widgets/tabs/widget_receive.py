@@ -117,9 +117,9 @@ class ReceiveWidget(QWidget):
         group = QGroupBox()
         layout = QVBoxLayout(group)
 
-        self.lineedit_path = QLineEdit()
-        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
-        self.lineedit_path.setText(self._get_default_path())
+        self.lineedit_receive_path = QLineEdit()
+        self.lineedit_receive_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.lineedit_receive_path.setText(self._get_default_path())
         self._update_path_tooltip()
 
         self.btn_open_output_path = QPushButton(self.worker.settings.tr("receive:btn:open_output_folder"))
@@ -130,7 +130,7 @@ class ReceiveWidget(QWidget):
         self.btn_default_path = QPushButton(self.worker.settings.tr("receive:btn:default_folder"))
         self.btn_default_path.setMinimumHeight(50)
 
-        layout.addWidget(self.lineedit_path)
+        layout.addWidget(self.lineedit_receive_path)
         layout.addWidget(self.btn_open_output_path)
         layout.addStretch()
         layout.addWidget(self.btn_browse_output_folder, stretch=1)
@@ -223,7 +223,7 @@ class ReceiveWidget(QWidget):
     def _retranslate(self) -> None:
         """Retranslate everything on language change."""
 
-        self.lineedit_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.lineedit_receive_path.setPlaceholderText(self.worker.settings.tr("receive:lineedit:placeholder_path"))
         self.btn_open_output_path.setText(self.worker.settings.tr("receive:btn:open_output_folder"))
         self.btn_browse_output_folder.setText(self.worker.settings.tr("receive:btn:select_folder"))
         self.btn_default_path.setText(self.worker.settings.tr("receive:btn:default_folder"))
@@ -244,7 +244,7 @@ class ReceiveWidget(QWidget):
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
-        self.lineedit_path.textChanged.connect(self._entered_output_path)
+        self.lineedit_receive_path.textChanged.connect(self._entered_output_path)
         self.lineedit_code.textChanged.connect(self._typed_in_code)
 
         self.btn_open_output_path.clicked.connect(self._click_open_output_folder_button)
@@ -375,22 +375,22 @@ class ReceiveWidget(QWidget):
 
     def _update_path_tooltip(self) -> None:
         if self._output_path:
-            self.lineedit_path.setToolTip(self._output_path)
+            self.lineedit_receive_path.setToolTip(self._output_path)
             return
 
-        self.lineedit_path.setToolTip(self.worker.settings.tr("receive:lineedit:placeholder_path"))
+        self.lineedit_receive_path.setToolTip(self.worker.settings.tr("receive:lineedit:placeholder_path"))
     
 
 
     def _click_browse_button(self) -> None:
-        dialog = QFileDialog(directory=self.lineedit_path.text())
+        dialog = QFileDialog(directory=self.lineedit_receive_path.text())
         dialog.setFileMode(QFileDialog.FileMode.Directory)
 
         if dialog.exec():
-            self.lineedit_path.setText(dialog.selectedFiles()[0])
+            self.lineedit_receive_path.setText(dialog.selectedFiles()[0])
     
     def _click_default_path_button(self) -> None:
-        self.lineedit_path.setText(self._get_default_path())
+        self.lineedit_receive_path.setText(self._get_default_path())
 
     def _click_receive_button(self) -> None:
         is_active = self.worker.state.action not in (

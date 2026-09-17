@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 import certifi
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtGui import QIcon, QDesktopServices
@@ -12,7 +11,7 @@ from app.workers.worker_croc import CrocWorker, CrocAction
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.4.54"
+_APP_VERSION = "1.4.6"
 _MINIMUM_CROC_VERSION = "11.2.4"
 
 
@@ -50,14 +49,6 @@ def main() -> None:
     # Create and show main window
     window = MainWindow(worker)
     window.show()
-
-    # Test if croc is installed. If not, raise an error
-    if shutil.which(worker.get_croc_path()) is None:
-        _croc_not_installed(window, worker)
-
-    # Test if croc is below minimum version
-    elif _is_croc_too_old(worker):
-        _croc_too_old(window, worker)
 
     # General exit logic
     sys.exit(app.exec())

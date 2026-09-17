@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QLabel, QGroupBox, QScrollArea,
     QDialog
 )
-from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtCore import Qt, QUrl, pyqtSignal
 from PyQt6.QtGui import QFont, QPixmap, QFont, QDesktopServices
 
 import app.utils as app_utils
@@ -18,6 +18,8 @@ _TESTERS = ["OctoToon", "inktrinket"]
 
 class AboutWindow(QDialog):
     """Swamp Swap's About window."""
+
+    update_croc_version = pyqtSignal()
 
     def __init__(self, worker: CrocWorker, parent=None) -> None:
         # Run base init
@@ -37,6 +39,7 @@ class AboutWindow(QDialog):
         self._build_central()
 
         self._connect_signals()
+        self._update_croc_version()
 
     # Construct the UI
     def _build_central(self) -> None:
@@ -82,7 +85,7 @@ class AboutWindow(QDialog):
         self.label_version = QLabel(self.worker.settings.tr("about:version:swampswap").format(v=self.worker.settings.app_version))
         self.label_version.setWordWrap(True)
 
-        self.label_croc_version = QLabel(self.worker.get_croc_version())
+        self.label_croc_version = QLabel()
         self.label_croc_version.setWordWrap(True)
 
         self.disclaimer_label = QLabel(self.worker.settings.tr("about:disclaimer"))
@@ -217,4 +220,4 @@ class AboutWindow(QDialog):
         return lang_credits
 
     def _update_croc_version(self) -> None:
-        self.label_croc_version.setText(self.worker.get_croc_version(recheck=True))
+        self.label_croc_version.setText(self.worker.get_croc_version_from_path(self.worker.settings.croc_path))

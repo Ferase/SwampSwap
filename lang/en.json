@@ -43,9 +43,11 @@
     "dialog:swampswap_up_to_date:body":                 "Your version of Swamp Swap ({v1}) is up to date with the remote version on GitHub ({v2}).",
 
     "dialog:croc_not_found:title":                      "croc not found!",
-    "dialog:croc_not_found:body1":                      "It looks like Swamp Swap couldn't find croc!",
-    "dialog:croc_not_found:body2":                      "Please click <b>Open</b> to go to croc's GitHub page so you can get it, or choose <b>Close</b> to close the program.",
-    "dialog:croc_not_found:body3":                      "Alternatively, if you do have croc installed but don't have it on your PATH, choose <b>Ignore</b> and set its path at <b>Settings > General > croc executable path</b>.",
+    "dialog:croc_not_found:body1":                      "It looks like Swamp Swap couldn't find croc! Swamp Swap is unusable without it.",
+    "dialog:croc_not_found_first:body2":                "You must either install croc via your system's pacakge manager, or switch the dropdown in the next window to <b>Standalone executable</b> and search for croc's executable if it isn't on your system's PATH.",
+    "dialog:croc_not_found_path:body2":                 "Currently, you have configured Swamp Swap to access croc <b>via your system PATH</b>, meaning you previously had croc installed via a standard installer, package manager, or you manually added it to your system's PATH environment variable.",
+    "dialog:croc_not_found_standalone:body2":           "Currently, you have configured Swamp Swap to access croc <b>via a croc executable you previously downloaded and placed somewhere,</b> meaning you liley downloaded croc from the official GitHub page.",
+    "dialog:croc_not_found:body3":                      "If you ahve moved or misplaced croc, please go to <br>Settings > General > Change croc executable</b> to configure croc again.",
 
     "dialog:croc_too_old:title":                        "croc too old",
     "dialog:croc_too_old:body1":                        "It looks like your installation of croc is too old!",
@@ -125,26 +127,32 @@
     "dialog:close_warning_operation:body":              "An operation is currently running. If you close Swamp Swap, it will be terminated. Are you sure you wish to proceed?",
 
     "dialog:first_run_path_create:title":               "Receive path doesn't exist",
-    "dialog:first_run_path_create:body1":               "The provided receive path doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
+    "dialog:first_run_path_create:body1":               "The provided receive path {p} doesn't exist. If this is intentional, the full path will be created when you receive files for the first time.",
     "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
 
-    "dialog:change_croc_path:title":                    "Changing croc path",
-    "dialog:change_croc_path_checked:body1":            "By checking <b>Use croc on your PATH</b>, Swamp Swap will attempt to find and use croc via your system PATH.",
-    "dialog:change_croc_path_checked:body2":            "If you know croc isn't on your PATH or you are unsure of what this means, press <b>Cancel</b>.",
-    "dialog:change_croc_path_unchecked:body1":          "By unchecking <b>Use croc on your PATH</b>, Swamp Swap will attempt to find and use croc via the path specified:",
-    "dialog:change_croc_path_unchecked:body2":          "If you have installed croc via a package manager, have added it to your PATH yourself, or you are unsure of what this means, press <b>Cancel</b>.",
-    "dialog:change_croc_path_unfocused:body":           "By changing the croc path, Swamp Swap must make sure the path points to a valid croc executable.",
-    "dialog:change_croc_path:body3":                    "Swamp Swap will now attempt to handshake with croc. Do you wish to proceed?",
+    "dialog:first_run_path_not_valid:title":            "Receive path is not valid",
+    "dialog:first_run_path_not_valid:body":             "The provided receive path {p} is not valid. Please enter an existing folder path or a valid folder path Swamp Swap should create.",
 
-    "dialog:change_croc_path_not_found:title":          "croc was not found",
-    "dialog:change_croc_path_not_found:body":           "croc could not be found at the specified location. If you're certain this is a croc executable, ensure you have permission to access it. Reverting to old settings.",
+    "dialog:detect_croc_path_not_exist:title":          "croc path is invalid",
+    "dialog:detect_croc_path_not_exist:body":           "The provided path {p} is either invalid or does not exist.",
 
-    "dialog:change_croc_path_was_found:title":          "croc was found!",
-    "dialog:change_croc_path_was_found:body":           "Swamp Swap found croc at the desired path.",
+    "dialog:detect_croc_path_is_not_croc:title":        "Selected file is not croc",
+    "dialog:detect_croc_path_is_not_croc:body":         "The file {p} is either not croc or failed to run properly. It is most likely the wrong executable.",
 
-    "dialog:change_croc_path_is_default:title":         "Entered croc path is the same as PATH version",
-    "dialog:change_croc_path_is_default:body1":         "It looks like the croc path line entry currently reads \"croc\", which is the same as using croc via your PATH.",
-    "dialog:change_croc_path_is_default:body2":         "Please browse for the croc executable you want to use, then try unchecking again.",
+    "dialog:detect_croc_path_not_on_path:title":        "croc not found on system",
+    "dialog:detect_croc_path_not_on_path:body":         "croc is not globally accessible on your System's PATH, please install it or, if you've downloaded the standalone executable from GitHUb, switch the dropdown to <b>Standard executable</b> and find it on your computer.",
+    
+    "dialog:detect_croc_path_found_on_path:title":      "croc found!",
+    "dialog:detect_croc_path_found_on_path:body":       "Swamp Swap detected a valid croc install on your PATH!",
+
+    "dialog:detect_croc_path_found_standalone:title":   "Standalone croc found!",
+    "dialog:detect_croc_path_found_standalone:body":    "Swamp Swap detected a valid croc executable at {p}!",
+
+    "dialog:detect_croc_path_found_too_old:title":              "croc out of date",
+    "dialog:detect_croc_path_found_too_old_path:body1":         "The croc version found on your PATH is too old for Swamp Swap. ({v1} < {v2})",
+    "dialog:detect_croc_path_found_too_old_standalone:body1":   "This croc version found at {p} is too old for Swamp Swap. ({v1} < {v2})",
+    "dialog:detect_croc_path_found_too_old_path:body2":         "Please update your croc install or select a standalone executable instead.",
+    "dialog:detect_croc_path_found_too_old_standalone:body2":   "Please download a newer version of croc.",
 
     "dialog:change_croc_path_is_outdated:title":        "croc is out of date",
     "dialog:change_croc_path_is_outdated:body1":        "Swamp Swap requires a minimum croc verrsion of {v1}, but the croc executable you provided has a version of {v2}.",
@@ -194,7 +202,19 @@
     "menubar:window_bad_code:body":                     "The provided code was blank or invalid.",
 
     "firstrun:window:title":                            "First run setup",
+    "firstrun:group:find_croc":                         "Detect croc",
     "firstrun:group:set_settings":                      "Set your settings",
+
+    "detect_croc:window:title":                         "Detect croc",
+    "detect_croc:label:croc_exists":                    "croc status:",
+    "detect_croc:label:croc_exists_yes":                "Success! croc detected in {p}",
+    "detect_croc:label:croc_exists_no":                 "Not detected",
+    "detect_croc:combo:system":                         "System",
+    "detect_croc:combo:standalone":                     "Standalone executable",
+    "detect_croc:combo:tooltip":                        "Select the method Swamp Swap will use to detect a usable croc application on your comptuer.",
+    "detect_croc:lineedit:placeholder":                 "path/to/croc",
+    "detect_croc:lineedit:tooltip":                     "Enter the exact absolute path to the croc version you want Swamp Swap to use.",
+    "detect_croc:btn:verify":                           "Detect croc",
 
     "send:tab:files":                                   "Files",
     "send:tab:text":                                    "Text",
@@ -227,6 +247,7 @@
     "receive:lineedit:placeholder_code":                "Paste your code here",
     "receive:btn:paste_code":                           "Paste code",
 
+    "options:heading:croc_setup":                       "croc",
     "options:heading:general":                          "General",
     "options:heading:ui":                               "User Interface",
     "options:heading:send":                             "Sending",
@@ -238,11 +259,9 @@
     "options:btn:reset_defaults":                       "Reset to defaults",
     "options:btn:revert_settings":                      "Revert changes",
 
-    "options:croc_path:label":                          "croc executable path",
-    "options:croc_path:placeholder":                    "path/to/croc",
-    "options:croc_path:tooltip":                        "The path to the croc executable. This is disregarded if you're using the croc installed on your PATH.",
-    "options:use_evar:label":                           "Use croc on your PATH",
-    "options:use_evar:tooltip":                         "Use this if you have installed croc via a package manager (winget, apt, pacman, etc.) or know that croc is on your PATH.",
+    "options:detect_croc:btn":                          "Configure croc...",
+    "options:detect_croc:tooltip":                      "Opens a window that will allow you to tell Swamp Swap where to launch croc from.",
+    
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",
     "options:startup_croc_updates_check:label":         "Check for croc updates on startup",

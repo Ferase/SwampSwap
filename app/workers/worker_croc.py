@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -368,43 +369,57 @@ class CrocWorker(QThread):
         return self.settings.tr(key)
     
 
-    
-    def get_croc_version(self, path: str | None = None, recheck: bool = False) -> str | None:
-        """Get the output from croc --version as a string."""
 
-        croc_path: str = self.get_croc_path()
-        if path:
-            croc_path = path
-
+    def get_croc_version_from_path(self, path: str) -> str | None:
         try:
-            if self.croc_version is None or recheck:
-                output: str = subprocess.run([croc_path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
-                if not output.startswith("croc version"):
-                    return None
-
+            output: str = subprocess.run([path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
+            if output.startswith("croc version"):
                 return output
-        
-            return self.croc_version
+
+            return None
         
         except (FileNotFoundError, PermissionError):
             return None
+
+    def strip_croc_version_text(self, text: str) -> str:
+        return text.split("croc version ")[1]
     
-    def get_croc_version_number_only(self, path: str | None = None, recheck: bool = False) -> str | None:
+    def get_croc_version_from_path_number_only(self, path: str) -> str | None:
         """Get just the version number from croc --version for comparison purposes."""
 
-        version: str | None = self.get_croc_version(path, recheck)
+        version: str | None = self.get_croc_version_from_path(path)
         if version is None:
             return None
 
-        return version.split("croc version ")[1]
+        return self.strip_croc_version_text(version)
+
+    def version_string_to_tuple(self, version_string: str) -> tuple[int]:
+        return tuple(int(x) for x in version_string.lstrip("v").split("."))
+
+    def is_croc_version_at_path_greater_than_minimum(self, path: str) -> bool:
+        version_string: str = self.get_croc_version_from_path_number_only(path)
+        version: tuple[int] = self.version_string_to_tuple(version_string)
+
+        return version >= self.version_string_to_tuple(self.minimum_croc_version)
 
     def get_app_version(self) -> str:
         """Get the version of Swamp Swap as a string."""
         
         return self.app_version
 
-    def get_croc_path(self) -> str:
-        if self.settings.use_evar:
-            return "croc"
-
+    def get_croc_path_from_settings(self) -> str:
         return self.settings.croc_path
+
+    def check_croc_exists(self) -> bool:
+        if self.settings.croc_path and Path(self.settings.croc_path).exists():
+            return True
+
+        path_result: str | None = shutil.which("croc")
+
+        if path_result:
+            return True
+
+        return False
+
+    def apply_croc_path(self, path: str) -> None:
+        self.settings.croc_path = path

@@ -12,8 +12,7 @@ _SETTINGS_VERSION: int = 1
 # Default settings
 _DEFAULTS: dict[str, bool | str | float] = {
     # General
-    "croc_path": "",
-    "use_evar": True,
+    "croc_path": "croc",
     "startup_console": False,
     "startup_croc_updates_check": True,
     "startup_swampswap_updates_check": True,
@@ -115,7 +114,6 @@ class SettingsManager(QObject):
 
         # General
         self.croc_path: str | None = None
-        self.use_evar: bool | None = None
         self.startup_console: bool | None = None
         self.startup_croc_updates_check: bool | None = None
         self.startup_swampswap_updates_check: bool | None = None

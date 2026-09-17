@@ -20,402 +20,7 @@ from app.widgets.tabs.widget_receive import ReceiveWidget
 from app.widgets.tabs.widget_settings import SettingsWidget
 from app.windows.window_console import ConsoleWindow
 from app.windows.window_about import AboutWindow
-
-
-
-class FirstRunReceivePathDialog(QDialog):
-    def __init__(self, worker: CrocWorker, parent=None):
-        super().__init__(parent)
-
-        self.worker = worker
-
-        self.confirmed_croc_path: bool = False
-
-        self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
-        self.setFixedSize(500, 400)
-
-        self._build_central()
-        self._connect_signals()
-
-    def _build_central(self) -> None:
-        root = QVBoxLayout(self)
-        root.setSpacing(8)
-
-        main_group = self._build_main()
-        buttons_group = self._build_buttons()
-
-        root.addWidget(main_group)
-        root.addWidget(buttons_group)
-
-    def _build_main(self) -> QGroupBox:
-        self.main_group = QGroupBox(self.worker.settings.tr("firstrun:group:set_settings"))
-        layout = QVBoxLayout(self.main_group)
-
-        self.label_croc_path = QLabel(self.worker.settings.tr("options:croc_path:label"))
-        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-
-        croc_path_row = QHBoxLayout()
-        self.lineedit_croc_path = app_utils.FocusLineEdit()
-        self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-
-        self.btn_browse_for_croc = QPushButton(self.worker.settings.tr("generic:browse"))
-
-        checkbox_row = QHBoxLayout()
-        self.checkbox_use_evar = QCheckBox(self.worker.settings.tr("options:use_evar:label"))
-        self.checkbox_use_evar.setToolTip(self.worker.settings.tr("options:use_evar:tooltip"))
-        self.checkbox_use_evar.setChecked(self.worker.settings.use_evar)
-        self.btn_use_evar_info = QPushButton("?")
-        self.btn_use_evar_info.setFixedSize(20, 20)
-
-        self.label_path = QLabel(self.worker.settings.tr("options:default_receive_path:label"))
-        self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
-
-        path_row = QHBoxLayout()
-        self.lineedit_path = QLineEdit()
-        self.lineedit_path.setText(self.worker.settings.default_receive_path)
-        self.lineedit_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
-
-        self.btn_browse = QPushButton(self.worker.settings.tr("generic:browse"))
-
-        ui_grid = QGridLayout()
-
-        self.label_lang = QLabel(self.worker.settings.tr("options:language:label"))
-        self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
-
-        self.combo_lang = app_utils.BoundedComboBox()
-        self.combo_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
-        self.combo_lang.addItems(self.worker.settings.locale_manager.get_lang_list())
-        self.combo_lang.setCurrentText(self.worker.settings.lang)
-
-        # Language will remain disabled until another language is added
-        self.combo_lang.setEnabled(False)
-
-        self.label_theme = QLabel(self.worker.settings.tr("options:theme:label"))
-        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
-
-        self.combo_theme = app_utils.BoundedComboBox()
-        self.combo_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
-        self.combo_theme.addItems(self.worker.settings.theme_manager.get_theme_list() + ["Random"])
-        self.combo_theme.setCurrentText(self.worker.settings.theme)
-
-        self.checkbox_enable_sound = QCheckBox(self.worker.settings.tr("options:enable_sound:label"))
-        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
-        self.checkbox_enable_sound.setChecked(self.worker.settings.enable_sound)
-
-        layout.addWidget(self.label_croc_path)
-
-        layout.addLayout(croc_path_row)
-        croc_path_row.addWidget(self.lineedit_croc_path)
-        croc_path_row.addWidget(self.btn_browse_for_croc)
-
-        layout.addLayout(checkbox_row)
-        checkbox_row.addWidget(self.checkbox_use_evar)
-        checkbox_row.addWidget(self.btn_use_evar_info, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        layout.addSpacing(16)
-
-        layout.addLayout(ui_grid)
-        ui_grid.addWidget(self.label_lang, 0, 0)
-        ui_grid.addWidget(self.combo_lang, 1, 0)
-        ui_grid.addWidget(self.label_theme, 0, 1)
-        ui_grid.addWidget(self.combo_theme, 1, 1)
-
-        layout.addStretch()
-
-        layout.addWidget(self.label_path)
-
-        layout.addLayout(path_row)
-        path_row.addWidget(self.lineedit_path)
-        path_row.addWidget(self.btn_browse)
-
-        layout.addStretch()
-
-        layout.addWidget(self.checkbox_enable_sound)
-
-        layout.addStretch()
-
-        return self.main_group
-
-    def _build_buttons(self) -> None:
-        group = QGroupBox()
-        layout = QHBoxLayout(group)
-
-        self.btn_ok = QPushButton(self.worker.settings.tr("generic:ok"))
-
-        layout.addStretch()
-        layout.addWidget(self.btn_ok)
-
-        return group
-
-    def _retranslate(self) -> None:
-        self.setWindowTitle(self.worker.settings.tr("firstrun:window:title"))
-        self.main_group.setTitle(self.worker.settings.tr("firstrun:group:set_settings"))
-        
-        self.label_croc_path.setText(self.worker.settings.tr("options:croc_path:label"))
-        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.btn_croc_browse.setText(self.worker.settings.tr("generic:browse"))
-        
-        self.label_path.setText(self.worker.settings.tr("options:default_receive_path:label"))
-        self.label_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
-        self.lineedit_path.setToolTip(self.worker.settings.tr("options:default_receive_path:tooltip"))
-        self.btn_browse.setText(self.worker.settings.tr("generic:browse"))
-
-        self.label_lang.setText(self.worker.settings.tr("options:language:label"))
-        self.label_lang.setToolTip(self.worker.settings.tr("options:language:tooltip"))
-        self.label_theme.setText(self.worker.settings.tr("options:theme:label"))
-        self.label_theme.setToolTip(self.worker.settings.tr("options:theme:tooltip"))
-
-        self.checkbox_enable_sound.setText(self.worker.settings.tr("options:enable_sound:label"))
-        self.checkbox_enable_sound.setToolTip(self.worker.settings.tr("options:enable_sound:tooltip"))
-
-        self.btn_ok.setText(self.worker.settings.tr("generic:ok"))
-
-    def _connect_signals(self) -> None:
-        self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
-
-        self.lineedit_croc_path.focus_lost.connect(self._warn_croc_path_change)
-        self.lineedit_croc_path.textChanged.connect(self._enable_disable_button)
-        self.btn_browse_for_croc.clicked.connect(self._browse_for_croc)
-        self.checkbox_use_evar.toggled.connect(self._update_croc_path)
-        self.btn_use_evar_info.clicked.connect(self._open_use_evar_info)
-
-        self.btn_browse.clicked.connect(self._browse)
-        self.lineedit_path.textChanged.connect(self._enable_disable_button)
-
-        self.combo_lang.currentTextChanged.connect(self._change_lang)
-        self.combo_theme.currentTextChanged.connect(self._change_theme)
-        self.checkbox_enable_sound.toggled.connect(self._enable_disable_sound)
-
-        self.btn_ok.clicked.connect(self._accept)
-
-    def _browse(self) -> None:
-        dialog = QFileDialog(directory=self.lineedit_path.text())
-        dialog.setFileMode(QFileDialog.FileMode.Directory)
-
-        if dialog.exec():
-            self.lineedit_path.setText(dialog.selectedFiles()[0])
-
-    def _enable_disable_button(self) -> None:
-        croc_path_bool: bool = self.checkbox_use_evar.isChecked()
-        croc_path_xor: bool = croc_path_bool or bool(self.lineedit_croc_path.text())
-
-        all_text: bool = all([
-            croc_path_xor,
-            self.lineedit_path.text()
-        ])
-
-        print(all_text)
-
-        self.btn_ok.setEnabled(all_text)
-
-    def _change_lang(self, lang: str) -> None:
-        self.worker.settings.lang = lang
-        self.worker.settings.change_language()
-
-    def _change_theme(self, theme: str) -> None:
-        self.worker.settings.theme = theme
-        self.worker.settings.change_theme()
-
-    def _enable_disable_sound(self, enabled: bool) -> None:
-        if enabled:
-            self.worker.sound_manager.play_enable_sound()
-
-        self.worker.settings.enable_sound = enabled
-
-
-
-    def _browse_for_croc(self) -> None:
-        dialog = QFileDialog(self)
-        dialog.setWindowTitle(self.worker.settings.tr(""))
-        
-        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
-        
-        if sys.platform == "win32":
-            dialog.setNameFilter("Executables (*.exe)")
-        else:
-            dialog.setNameFilter("All Files (*)")
-            
-        if dialog.exec():
-            files = dialog.selectedFiles()
-
-            if not files:
-                return
-
-            self._warn_croc_path_change()
-            self.lineedit_croc_path.setText(files[0])
-
-    def _test_croc_path(self, is_checked: bool | None = None) -> bool:
-        path: str = self.lineedit_croc_path.text()
-        result: str | None = self.worker.get_croc_version(path=path, recheck=True)
-
-        if result is None:
-            QMessageBox.warning(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_not_found:title"),
-                self.worker.settings.tr("dialog:change_croc_path_not_found:body"),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            if is_checked is not None:
-                self.checkbox_use_evar.blockSignals(True)
-                self.checkbox_use_evar.setChecked(not is_checked)
-                self.checkbox_use_evar.blockSignals(False)
-
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-            return False
-
-        version_string: str = self.worker.get_croc_version_number_only(path=path, recheck=True)
-        is_newer: bool = tuple(int(x) for x in version_string.lstrip("v").split(".")) >= tuple(int(x) for x in self.worker.minimum_croc_version.lstrip("v").split("."))
-
-        if not is_newer:
-            QMessageBox.warning(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_is_outdated:title"),
-                "<br><br>".join([
-                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body1").format(v1=f"<b>v{self.worker.minimum_croc_version}</b>", v2=f"<b>v{version_string}</b>"),
-                    self.worker.settings.tr("dialog:change_croc_path_is_outdated:body2")
-                ]),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-            return False
-
-        QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path_was_found:title"),
-            self.worker.settings.tr("dialog:change_croc_path_was_found:body"),
-            QMessageBox.StandardButton.Ok,
-            QMessageBox.StandardButton.Ok
-        )
-
-        self.confirmed_croc_path = True
-        return True
-
-    def _update_croc_path(self, checked: bool) -> None:
-        if not checked and self.lineedit_croc_path.text() == "croc":
-            box = QMessageBox.information(
-                self,
-                self.worker.settings.tr("dialog:change_croc_path_is_default:title"),
-                "<br><br>".join([
-                    self.worker.settings.tr("dialog:change_croc_path_is_default:body1"),
-                    self.worker.settings.tr("dialog:change_croc_path_is_default:body2")
-                ]),
-                QMessageBox.StandardButton.Ok,
-                QMessageBox.StandardButton.Ok
-            )
-
-            self.checkbox_use_evar.blockSignals(True)
-            self.checkbox_use_evar.setChecked(True)
-            self.checkbox_use_evar.blockSignals(False)
-            return
-
-        body: list[str] = [
-            self.worker.settings.tr("dialog:change_croc_path_unchecked:body1"),
-            f"<b>{self.lineedit_croc_path.text()}</b>",
-            self.worker.settings.tr("dialog:change_croc_path_unchecked:body2"),
-            self.worker.settings.tr("dialog:change_croc_path:body3")
-        ]
-        if checked:
-            body = [
-                self.worker.settings.tr("dialog:change_croc_path_checked:body1"),
-                self.worker.settings.tr("dialog:change_croc_path_checked:body2"),
-                self.worker.settings.tr("dialog:change_croc_path:body3")
-            ]
-
-        final_body: str = "<br><br>".join(body)
-
-        box = QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path:title"),
-            final_body,
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-
-        if box == QMessageBox.StandardButton.No:
-            self.checkbox_use_evar.blockSignals(True)
-            self.checkbox_use_evar.setChecked(not checked)
-            self.checkbox_use_evar.blockSignals(False)
-            return
-
-        self._test_croc_path(checked)
-
-    def _warn_croc_path_change(self) -> None:
-        if self.worker.settings.use_evar:
-            return
-
-        if self.worker.settings.croc_path == self.lineedit_croc_path.text():
-            return
-        
-        box = QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:change_croc_path:title"),
-            self.worker.settings.tr("dialog:change_croc_path_unfocused:body"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
-
-        if box == QMessageBox.StandardButton.No:
-            self.lineedit_croc_path.setText(self.worker.settings.croc_path)
-            return
-        
-        self._test_croc_path()
-
-
-
-    def _accept(self) -> None:
-        if not self.confirmed_croc_path:
-            if not self._test_croc_path():
-                return
-
-        if Path(self.get_path()).exists():
-            self.accept()
-            return
-
-        box = QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:first_run_path_create:title"),
-            self.worker.settings.tr("dialog:first_run_path_create:body1") + "<br><br>" + self.worker.settings.tr("dialog:first_run_path_create:body2"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.Yes
-        )
-
-        if box == QMessageBox.StandardButton.No:
-            return
-        
-        self.accept()
-
-    def get_path(self) -> str:
-        return self.lineedit_path.text()
-
-    def get_croc_path(self) -> str:
-        return self.lineedit_croc_path.text()
-
-    def _open_use_evar_info(self) -> None:
-        QMessageBox.information(
-            self,
-            self.worker.settings.tr("dialog:about_croc_path:title"),
-            "<br><br>".join([
-                self.worker.settings.tr("dialog:about_croc_path:body1"),
-                self.worker.settings.tr("dialog:about_croc_path:body2"),
-                self.worker.settings.tr("dialog:about_croc_path:body3"),
-                self.worker.settings.tr("dialog:about_croc_path:body4")
-            ]),
-            QMessageBox.StandardButton.Ok,
-            QMessageBox.StandardButton.Ok
-        )
-
-
-
-    def reject(self):
-        sys.exit()
-        super().reject()
-
+from app.windows.dialogs.dialog_firstrun import FirstRunReceivePathDialog
 
 
 
@@ -931,21 +536,18 @@ class MainWindow(QMainWindow):
 
     def _first_run(self) -> None:
         if self.worker.settings.settings_file_path.exists():
+            self._check_for_croc()
+            self.widget_settings.on_ready()
             return
 
         dialog = FirstRunReceivePathDialog(self.worker, self)
 
         if dialog.exec():
+            self.widget_settings.on_ready()
+
             self.worker.settings.default_receive_path = dialog.get_path()
-            self.widget_receive.lineedit_path.setText(dialog.get_path())
+            self.widget_receive.lineedit_receive_path.setText(dialog.get_path())
             self.widget_settings.lineedit_defualt_receive_path.setText(dialog.get_path())
-
-            if not dialog.checkbox_use_evar.isChecked():
-                self.widget_settings.lineedit_croc_path.setText(dialog.get_croc_path())
-
-            self.widget_settings.checkbox_use_evar.blockSignals(True)
-            self.widget_settings.checkbox_use_evar.setChecked(dialog.checkbox_use_evar.isChecked())
-            self.widget_settings.checkbox_use_evar.blockSignals(False)
 
             self.widget_settings.combo_lang.setCurrentText(dialog.combo_lang.currentText())
 
@@ -956,10 +558,23 @@ class MainWindow(QMainWindow):
 
             self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
 
-            if dialog.confirmed_croc_path:
+            if dialog.verified:
                 self.worker.change_operation(CrocOperation.IDLE)
                 self.worker.change_action(CrocAction.NONE)
+                self.worker.apply_croc_path(dialog.get_final_croc_path())
 
             self.widget_settings.save_to_settings()
             self.worker.settings.save_settings()
             self.widget_settings.clear_dirty()
+
+    def _check_for_croc(self) -> None:
+        if self.worker.check_croc_exists():
+            return
+
+        box = QMessageBox.warning(
+            self,
+            self.worker.settings.tr("dialog:outdated_settings:title"),
+            self.worker.settings.tr("dialog:outdated_settings:body1") + "<br><br>" + self.worker.settings.tr("dialog:outdated_settings:body2"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes
+        )
