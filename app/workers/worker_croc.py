@@ -37,6 +37,8 @@ class CrocWorker(QThread):
     finished = pyqtSignal(int, CrocOperation)
     error = pyqtSignal(str)
 
+    croc_is_accessible = pyqtSignal(bool)
+
     # Percentage transferred, filename (truncated), and the prefix (hashing/zipping)
     progress_update = pyqtSignal(int, str, str)
 
@@ -52,6 +54,7 @@ class CrocWorker(QThread):
         self.minimum_croc_version = minimum_croc_version
         
         self.state: CrocState = CrocState()
+        self.is_croc_accessible: bool = False
 
         self.settings = SettingsManager(app_name, app_version)
         self.sound_manager = SoundManager(self.settings)
@@ -426,3 +429,10 @@ class CrocWorker(QThread):
 
     def get_croc_path(self) -> str:
         return self.settings.croc_path
+
+    def set_croc_accessible(self, accessible: bool) -> None:
+        self.is_croc_accessible = accessible
+        self.croc_is_accessible.emit(accessible)
+
+    def is_croc_currently_accessible(self) -> bool:
+        return self.is_croc_accessible

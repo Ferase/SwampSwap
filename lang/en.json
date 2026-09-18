@@ -158,6 +158,11 @@
     "dialog:change_croc_path_is_outdated:body1":        "Swamp Swap requires a minimum croc verrsion of {v1}, but the croc executable you provided has a version of {v2}.",
     "dialog:change_croc_path_is_outdated:body2":        "Please provide a version of croc at or above the minimum version required by Swamp Swap.",
 
+    "dialog:change_croc_path_no_longer_valid:title":                "croc not found",
+    "dialog:change_croc_path_no_longer_valid_path:body1":           "Swamp Swap cannot find croc on your system's PATH. croc may have been uninstalled or its PATH entry may have been removed.",
+    "dialog:change_croc_path_no_longer_valid_standalone:body1":     "Swamp Swap cannot find croc at your specified path ({p}). It may have been moved or deleted.",
+    "dialog:change_croc_path_no_longer_valid:body2":                "Please download/reinstall croc and configure it inside <b>Settings > croc > Configure croc...</b>",
+
     "dialog:about_croc_path:title":                     "About croc on the PATH",
     "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment variables.",
     "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH. Whatever path is written in the text box above is ignored when this is checked.",

@@ -1031,9 +1031,36 @@ class SettingsWidget(QWidget):
             return
 
         self.worker.settings.save_single_setting("croc_path", dialog.get_final_croc_path())
+        self.worker.set_croc_accessible(True)
+
+    def _check_croc_exists(self) -> None:
+        version_poke: str | None = self.worker.get_croc_version_from_path(self.worker.get_croc_path())
+        if version_poke is not None:
+            self.worker.set_croc_accessible(True)
+            return
+    
+        self.worker.change_action(CrocAction.ERROR)
+
+        body1_text: str = self.worker.settings.tr("dialog:change_croc_path_no_longer_valid_path:body1")
+        if self.worker.get_croc_path() != "croc":
+            body1_text = self.worker.settings.tr("dialog:change_croc_path_no_longer_valid_standalone:body1").format(p=f"<b>{self.worker.get_croc_path()}</b>")
+
+        QMessageBox.critical(
+            self,
+            self.worker.settings.tr("dialog:change_croc_path_no_longer_valid:title"),
+            "<br><br>".join([
+                body1_text,
+                self.worker.settings.tr("dialog:change_croc_path_no_longer_valid:body2")
+            ]),
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok
+        )
+
+        self.worker.set_croc_accessible(False)
 
     def on_ready(self) -> None:
         self._load_from_settings()
         self._enable_disable_settings()
         self._set_previous_settings()
         self._startup_updates_check()
+        self._check_croc_exists()

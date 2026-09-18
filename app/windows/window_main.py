@@ -567,6 +567,7 @@ class MainWindow(QMainWindow):
             self.widget_settings.save_to_settings()
             self.worker.settings.save_settings()
             self.widget_settings.clear_dirty()
+            self.worker.set_croc_accessible(True)
 
     def _check_for_croc(self) -> None:
         if self.worker.check_croc_exists():

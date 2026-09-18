@@ -241,6 +241,7 @@ class ReceiveWidget(QWidget):
         self.worker.state_changed.connect(self._state_responses)
         self.worker.line_received.connect(self._read_command_line)
         self.worker.finished.connect(self._on_finish)
+        self.worker.croc_is_accessible.connect(self._determine_main_button_behavior)
 
         self.worker.settings.locale_manager.language_changed.connect(self._retranslate)
 
@@ -261,6 +262,10 @@ class ReceiveWidget(QWidget):
         self.btn_receive.setText(self.worker.settings.tr("generic:receive"))
 
     def _determine_main_button_behavior(self) -> None:
+        if not self.worker.is_croc_currently_accessible():
+            self.btn_receive.setEnabled(False)
+            return
+        
         operation: CrocOperation = self.worker.get_operation()
         is_operating: bool = operation != CrocOperation.IDLE
         code_entered: bool = bool(self.lineedit_code.text())
