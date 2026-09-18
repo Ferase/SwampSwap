@@ -458,13 +458,6 @@ class SettingsWidget(QWidget):
         self.btn_detect_croc.setToolTip(self.worker.settings.tr("options:detect_croc:tooltip"))
 
         self.general_group.setTitle(self.worker.settings.tr("options:heading:general"))
-        self.checkbox_use_evar.setText(self.worker.settings.tr("options:use_evar:label"))
-        self.checkbox_use_evar.setToolTip(self.worker.settings.tr("options:use_evar:tooltip"))
-        self.label_croc_path.setText(self.worker.settings.tr("options:croc_path:label"))
-        self.label_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.lineedit_croc_path.setPlaceholderText(self.worker.settings.tr("options:croc_path:placeholder"))
-        self.lineedit_croc_path.setToolTip(self.worker.settings.tr("options:croc_path:tooltip"))
-        self.btn_browse_for_croc.setText(self.worker.settings.tr("generic:browse"))
         self.checkbox_startup_console.setText(self.worker.settings.tr("options:startup_console:label"))
         self.checkbox_startup_console.setToolTip(self.worker.settings.tr("options:startup_console:tooltip"))
         self.checkbox_startup_croc_updates_check.setText(self.worker.settings.tr("options:startup_croc_updates_check:label"))

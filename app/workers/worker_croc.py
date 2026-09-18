@@ -423,3 +423,6 @@ class CrocWorker(QThread):
 
     def apply_croc_path(self, path: str) -> None:
         self.settings.croc_path = path
+
+    def get_croc_path(self) -> str:
+        return self.settings.croc_path

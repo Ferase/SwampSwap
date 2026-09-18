@@ -7,7 +7,7 @@ from app.managers.manager_locale import LocaleManager
 from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
 
-_SETTINGS_VERSION: int = 1
+_SETTINGS_VERSION: int = 2
 
 # Default settings
 _DEFAULTS: dict[str, bool | str | float] = {

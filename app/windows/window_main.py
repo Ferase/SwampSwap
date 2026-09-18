@@ -533,6 +533,7 @@ class MainWindow(QMainWindow):
             return
 
         self.worker.settings.set_defaults()
+        self.worker.settings.save_settings()
 
     def _first_run(self) -> None:
         if self.worker.settings.settings_file_path.exists():

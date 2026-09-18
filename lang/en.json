@@ -140,7 +140,7 @@
     "dialog:detect_croc_path_is_not_croc:body":         "The file {p} is either not croc or failed to run properly. It is most likely the wrong executable.",
 
     "dialog:detect_croc_path_not_on_path:title":        "croc not found on system",
-    "dialog:detect_croc_path_not_on_path:body":         "croc is not globally accessible on your System's PATH, please install it or, if you've downloaded the standalone executable from GitHUb, switch the dropdown to <b>Standard executable</b> and find it on your computer.",
+    "dialog:detect_croc_path_not_on_path:body":         "croc is not globally accessible on your System's PATH, please install it or, if you've downloaded the standalone executable from GitHUu, switch the dropdown to <b>Standard executable</b> and find it on your computer.",
     
     "dialog:detect_croc_path_found_on_path:title":      "croc found!",
     "dialog:detect_croc_path_found_on_path:body":       "Swamp Swap detected a valid croc install on your PATH!",
