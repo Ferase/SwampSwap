@@ -433,7 +433,7 @@ class CrocWorker(QThread):
     def set_croc_accessible(self, accessible: bool) -> None:
         if self.get_operation() == CrocOperation.IDLE:
             if accessible:
-                self.change_action(CrocAction.None)
+                self.change_action(CrocAction.NONE)
             else:
                 self.change_action(CrocAction.ERROR)
 
