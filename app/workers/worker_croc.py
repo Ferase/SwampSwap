@@ -431,6 +431,12 @@ class CrocWorker(QThread):
         return self.settings.croc_path
 
     def set_croc_accessible(self, accessible: bool) -> None:
+        if self.get_operation() == CrocOperation.IDLE:
+            if accessible:
+                self.change_action(CrocAction.None)
+            else:
+                self.change_action(CrocAction.ERROR)
+
         self.is_croc_accessible = accessible
         self.croc_is_accessible.emit(accessible)
 

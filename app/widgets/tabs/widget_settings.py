@@ -1038,8 +1038,6 @@ class SettingsWidget(QWidget):
         if version_poke is not None:
             self.worker.set_croc_accessible(True)
             return
-    
-        self.worker.change_action(CrocAction.ERROR)
 
         body1_text: str = self.worker.settings.tr("dialog:change_croc_path_no_longer_valid_path:body1")
         if self.worker.get_croc_path() != "croc":
