@@ -534,6 +534,7 @@ class MainWindow(QMainWindow):
 
         self.worker.settings.set_defaults()
         self.worker.settings.save_settings()
+        self.widget_settings.check_croc_exists()
 
     def _first_run(self) -> None:
         if self.worker.settings.settings_file_path.exists():

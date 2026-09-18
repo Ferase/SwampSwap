@@ -1033,7 +1033,7 @@ class SettingsWidget(QWidget):
         self.worker.settings.save_single_setting("croc_path", dialog.get_final_croc_path())
         self.worker.set_croc_accessible(True)
 
-    def _check_croc_exists(self) -> None:
+    def check_croc_exists(self) -> None:
         version_poke: str | None = self.worker.get_croc_version_from_path(self.worker.get_croc_path())
         if version_poke is not None:
             self.worker.set_croc_accessible(True)
@@ -1063,4 +1063,4 @@ class SettingsWidget(QWidget):
         self._enable_disable_settings()
         self._set_previous_settings()
         self._startup_updates_check()
-        self._check_croc_exists()
+        self.check_croc_exists()
