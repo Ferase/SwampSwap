@@ -228,17 +228,7 @@ class FirstRunReceivePathDialog(QDialog):
             self.lineedit_receive_path.setText(dialog.selectedFiles()[0])
 
     def _enable_disable_button(self) -> None:
-        croc_path_bool: bool = self.checkbox_use_evar.isChecked()
-        croc_path_xor: bool = croc_path_bool or bool(self.get_croc_path())
-
-        all_text: bool = all([
-            croc_path_xor,
-            self.lineedit_receive_path.text()
-        ])
-
-        print(all_text)
-
-        self.btn_ok.setEnabled(all_text)
+        self.btn_ok.setEnabled(bool(self.lineedit_receive_path.text()))
 
     def _change_lang(self, lang: str) -> None:
         self.worker.settings.lang = lang
@@ -494,7 +484,7 @@ class FirstRunReceivePathDialog(QDialog):
             self,
             self.worker.settings.tr("dialog:first_run_path_create:title"),
             "<br><br>".join([
-                self.worker.settings.tr("dialog:first_run_path_create:body1"),format(p=f"<b>{self.get_path()}</b>"),
+                self.worker.settings.tr("dialog:first_run_path_create:body1").format(p=f"<b>{self.get_path()}</b>"),
                 self.worker.settings.tr("dialog:first_run_path_create:body2")
             ]),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
