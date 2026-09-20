@@ -858,12 +858,24 @@ class SettingsWidget(QWidget):
         if box2 == QMessageBox.StandardButton.Yes:
             self._set_defaults()
 
+    def _display_save_button_as_saving(self, saving: bool) -> None:
+        text: str = self.worker.settings.tr("generic:save")
+        if saving:
+            text = self.worker.settings.tr("generic:saving")
+
+        self.btn_save.setText(text)
+        self.btn_save.setDisabled(saving)
+
     def _click_save_button(self) -> None:
+        self._display_save_button_as_saving(True)
+
         self.save_to_settings()
         self.worker.settings.save_settings()
         self.clear_dirty()
 
-        box = QMessageBox.information(
+        self._display_save_button_as_saving(False)
+
+        QMessageBox.information(
             self,
             self.worker.settings.tr("dialog:saved_settings:title"),
             self.worker.settings.tr("dialog:saved_settings:body"),

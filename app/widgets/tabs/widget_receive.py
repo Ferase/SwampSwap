@@ -411,7 +411,22 @@ class ReceiveWidget(QWidget):
             self.worker.change_action(CrocAction.CANCELLED)
             return
 
-        self._create_output_directory()
+        try:
+            self._create_output_directory()
+        except (OSError, FileNotFoundError):
+            box = QMessageBox.critical(
+                self,
+                self.worker.settings.tr("dialog:first_run_path_not_valid:title"),
+                "<br><br>".join([
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body1").format(p=f"<b>{self.lineedit_receive_path.text()}</b>"),
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body2"),
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body3")
+                ]),
+                QMessageBox.StandardButton.Ok,
+                QMessageBox.StandardButton.Ok
+            )
+            return
+
         self.worker.start_receive(self._code, self._output_path)
 
     def _click_open_output_folder_button(self) -> None:

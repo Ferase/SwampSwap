@@ -469,18 +469,21 @@ class FirstRunReceivePathDialog(QDialog):
             return
 
         try:
-            Path(self.get_path()).resolve(strict=False)
-        except OSError:
+            Path(self.get_path()).mkdir(exist_ok=True)
+        except (OSError, FileNotFoundError):
             QMessageBox.critical(
                 self,
                 self.worker.settings.tr("dialog:first_run_path_not_valid:title"),
-                self.worker.settings.tr("dialog:first_run_path_not_valid:body"),format(p=f"<b>{self.get_path()}</b>"),
+                "<br><br>".join([
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body1"),format(p=f"<b>{self.lineedit_receive_path.text()}</b>"),
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body2")
+                ]),
                 QMessageBox.StandardButton.Ok,
                 QMessageBox.StandardButton.Ok
             )
             return
 
-        box = QMessageBox.warning(
+        box = QMessageBox.information(
             self,
             self.worker.settings.tr("dialog:first_run_path_create:title"),
             "<br><br>".join([

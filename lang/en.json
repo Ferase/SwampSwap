@@ -10,6 +10,7 @@
     "generic:submit":                                   "Submit",
     "generic:ok":                                       "OK",
     "generic:save":                                     "Save",
+    "generic:saving":                                   "Saving...",
     "generic:cancel":                                   "Cancel",
     "generic:clear":                                    "Clear",
     "generic:clear_list":                               "Clear list",
@@ -131,7 +132,9 @@
     "dialog:first_run_path_create:body2":               "Do you wish to proceed?",
 
     "dialog:first_run_path_not_valid:title":            "Receive path is not valid",
-    "dialog:first_run_path_not_valid:body":             "The provided receive path {p} is not valid. Please enter an existing folder path or a valid folder path Swamp Swap should create.",
+    "dialog:first_run_path_not_valid:body1":            "The provided receive path {p} is not valid and cannot be created.",
+    "dialog:first_run_path_not_valid:body2":            "Please enter an existing folder path or a valid folder path Swamp Swap should create.",
+    "dialog:first_run_path_not_valid:body3":            "Additionally, you likely want to change the default receive path for future transfers by going to <b>Settings > Receiving > Default receive path</b> and set the default path to a valid one as well.",
 
     "dialog:detect_croc_path_not_exist:title":          "croc path is invalid",
     "dialog:detect_croc_path_not_exist:body":           "The provided path {p} is either invalid or does not exist.",

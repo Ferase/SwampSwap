@@ -107,8 +107,8 @@ class CrocWorker(QThread):
             (r"Zipping", CrocAction.WAIT_FOR_PEER),
             (r"Adding", CrocAction.WAIT_FOR_PEER),
             (r"On the other computer, run:", CrocAction.WAIT_FOR_PEER),
-            (r"Sending \(->", CrocAction.SEND_IN_PROGRESS),
-            (r"Receiving \(<-", CrocAction.RECEIVE_IN_PROGRESS),
+            (r"Sending \(", CrocAction.SEND_IN_PROGRESS),
+            (r"Receiving \(", CrocAction.RECEIVE_IN_PROGRESS),
 
             (r"Accept", CrocAction.WAIT_FOR_APPROVAL),
             (r"Display", CrocAction.WAIT_FOR_APPROVAL),

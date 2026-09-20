@@ -40,7 +40,7 @@ class AnimationManager(QObject):
     def __init__(self) -> None:
         super().__init__()
         self._tracked_operation: CrocOperation = CrocOperation.IDLE
-        self._idle_timeout = QTimer()
+        # self._idle_timeout = QTimer()
         self._idle_timeout_time: int = 5000
 
         self.animations: dict[CrocAction, QMovie] = {}
@@ -94,7 +94,7 @@ class AnimationManager(QObject):
         """Connect all necessary Qt signals."""
 
         self.status_changed.connect(self._change_animation)
-        self._idle_timeout.timeout.connect(self._return_idle_animation)
+        # self._idle_timeout.timeout.connect(self._return_idle_animation)
 
 
 
@@ -115,10 +115,10 @@ class AnimationManager(QObject):
         if operation != CrocOperation.IDLE:
             self._tracked_operation = operation
 
-        if action in [CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]:
-            self._idle_timeout.start(self._idle_timeout_time)
-        else:
-            self._idle_timeout.stop()
+        # if action in [CrocAction.COMPLETED, CrocAction.CANCELLED, CrocAction.ERROR]:
+        #     self._idle_timeout.start(self._idle_timeout_time)
+        # else:
+        #     self._idle_timeout.stop()
 
         if previous_anim is not self.current_anim:
             previous_anim.stop()
