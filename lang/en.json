@@ -181,6 +181,7 @@
     "state:idle":                                       "Idle",
     "state:zipping":                                    "Zipping",
     "state:hashing":                                    "Hashing",
+    "state:ready":                                      "Ready",
     "state:wait_peer":                                  "Waiting for peer",
     "state:sending":                                    "Sending",
     "state:connect_peer":                               "Connecting to peer",
@@ -281,7 +282,7 @@
     "options:btn:check_update_swampswap":               "Check for Swamp Swap update",
 
     "options:language:label":                           "Language",
-    "options:language:tooltip":                         "Set the application's display language.",
+    "options:language:tooltip":                         "Set the application's display language (WIP - More languages to come later).",
     "options:theme:label":                              "Theme",
     "options:theme:tooltip":                            "Set the application's color theme.",
     "options:animation_matches_theme:label":            "Enable animation theming",

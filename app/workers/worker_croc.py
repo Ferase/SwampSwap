@@ -20,6 +20,10 @@ _ZIPPING_RE = re.compile(
     r"Zipping",
     re.IGNORECASE
 )
+_SET_READY_RE = re.compile(
+    r"Sending 0 files",
+    re.IGNORECASE
+)
 
 
 
@@ -122,6 +126,11 @@ class CrocWorker(QThread):
                 return
             
     def _check_for_progress(self, line: str) -> bool:
+        match_ready = _SET_READY_RE.match(line.strip())
+        if match_ready:
+            self.progress_update.emit(0, "", "ready")
+            return
+
         match_zipping = _ZIPPING_RE.match(line.strip())
         match = _PROGRESS_RE.match(line.strip())
 
@@ -183,9 +192,13 @@ class CrocWorker(QThread):
             self._proc.wait()
 
             # If we didn't cancel the operation, change the current CrocAction
-            if self.state.action != CrocAction.CANCELLED:
+            if self.get_action() != CrocAction.CANCELLED:
+                    
+                if self.get_action() not in [CrocAction.SEND_IN_PROGRESS, CrocAction.RECEIVE_IN_PROGRESS] and self._proc.returncode == 0:
+                    self.change_action(CrocAction.CANCELLED)
+
                 # If exit code is 0, it completed successfully
-                if self._proc.returncode == 0:
+                elif self._proc.returncode == 0:
                     self.change_action(CrocAction.COMPLETED)
                 
                 # If the exit code is anything else, it's an error

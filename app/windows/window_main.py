@@ -129,6 +129,7 @@ class MainWindow(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
+        self.progress_bar.setTextVisible(True)
 
         layout.addWidget(self.label_animation)
         layout.addSpacing(8)
