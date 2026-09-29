@@ -1,12 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
 
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('lang', 'lang'), ('assets', 'assets'), ('icon.ico', '.'), ('themes.json', '.')],
-    hiddenimports=[],
+    datas=[('lang', 'lang'), ('assets', 'assets'), ('icon.ico', '.'), ('themes.json', '.'), *collect_data_files('PyQt6')],
+    hiddenimports=['PyQt6.QtDBus', 'PyQt6.sip'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
