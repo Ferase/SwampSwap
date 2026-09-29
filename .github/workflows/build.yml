@@ -70,14 +70,23 @@ jobs:
             libxkbcommon-x11-0 \
             libgl1
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies (non-Qt)
         run: pip install -r requirements.txt
 
-      - name: Install PyQt6 via apt fallback (aarch64)
+      - name: Install PyQt6 (x86_64)
+        if: runner.os != 'Linux' || matrix.arch != 'aarch64'
+        run: pip install -r requirements-qt.txt
+
+      - name: Install PyQt6 (aarch64)
         if: runner.os == 'Linux' && matrix.arch == 'aarch64'
         run: |
-          python -c "import PyQt6" 2>/dev/null || \
-            sudo apt-get install -y python3-pyqt6
+          sudo apt-get install -y \
+            python3-pyqt6 \
+            python3-pyqt6.qtmultimedia \
+            python3-pyqt6.qtsvg \
+            python3-pyqt6.qtopengl
+          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+          sudo cp -r /usr/lib/python3/dist-packages/PyQt6 "$SITE_PACKAGES/"
 
       - name: Build with PyInstaller
         run: pyinstaller ${{ matrix.spec_file }}
