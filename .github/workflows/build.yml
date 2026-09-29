@@ -17,6 +17,7 @@ jobs:
             appimage_name: SwampSwap_x86_64.AppImage
             appimage_tool: appimagetool-x86_64.AppImage
             spec_file: build_onedir.spec
+            arch: x86_64
 
           - os: ubuntu-22.04-arm
             artifact_name: SwampSwap_Linux_aarch64
@@ -24,6 +25,7 @@ jobs:
             appimage_name: SwampSwap_aarch64.AppImage
             appimage_tool: appimagetool-aarch64.AppImage
             spec_file: build_onedir.spec
+            arch: aarch64
 
           - os: windows-latest
             artifact_name: SwampSwap_Windows_x86_64
@@ -51,7 +53,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Qt xcb dependencies (Linux)
+      - name: Install xcb dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -q
@@ -68,8 +70,14 @@ jobs:
             libxkbcommon-x11-0 \
             libgl1
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Install PyQt6 via apt fallback (aarch64)
+        if: runner.os == 'Linux' && matrix.arch == 'aarch64'
+        run: |
+          python -c "import PyQt6" 2>/dev/null || \
+            sudo apt-get install -y python3-pyqt6
 
       - name: Build with PyInstaller
         run: pyinstaller ${{ matrix.spec_file }}
