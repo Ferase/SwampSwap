@@ -77,16 +77,23 @@ jobs:
         if: runner.os != 'Linux' || matrix.arch != 'aarch64'
         run: pip install -r requirements-qt.txt
 
+      - name: Install Qt6 build dependencies (aarch64)
+        if: runner.os == 'Linux' && matrix.arch == 'aarch64'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y \
+            qt6-base-dev \
+            qt6-base-dev-tools \
+            qt6-multimedia-dev \
+            libqt6svg6-dev \
+            qmake6
+
       - name: Install PyQt6 (aarch64)
         if: runner.os == 'Linux' && matrix.arch == 'aarch64'
         run: |
-          sudo apt-get install -y \
-            python3-pyqt6 \
-            python3-pyqt6.qtmultimedia \
-            python3-pyqt6.qtsvg \
-            python3-pyqt6.qtopengl
-          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          sudo cp -r /usr/lib/python3/dist-packages/PyQt6 "$SITE_PACKAGES/"
+          # Point sip/pyqtbuild at the Qt6 qmake
+          pip install "PyQt6>=6.7.0" "PyQt6-Qt6>=6.7.0" \
+            --config-settings --qmake=qmake6
 
       - name: Build with PyInstaller
         run: pyinstaller ${{ matrix.spec_file }}
