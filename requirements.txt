@@ -1,4 +1,6 @@
 certifi
 numpy
-PyQt6>=6.6.0
+PyQt6>=6.7.0
+PyQt6-Qt6>=6.7.0
+PyInstaller>=6.0
 pyinstaller
