@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             artifact_name: SwampSwap_Linux_x86_64
             archive: SwampSwap_Linux_x86_64.tar.gz
             appimage_name: SwampSwap_x86_64.AppImage
