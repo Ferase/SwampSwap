@@ -284,7 +284,7 @@ class FirstRunReceivePathDialog(QDialog):
                 self,
                 self.worker.settings.tr("dialog:first_run_path_not_valid:title"),
                 "<br><br>".join([
-                    self.worker.settings.tr("dialog:first_run_path_not_valid:body1"),format(p=f"<b>{self.lineedit_receive_path.text()}</b>"),
+                    self.worker.settings.tr("dialog:first_run_path_not_valid:body1").format(p=f"<b>{self.lineedit_receive_path.text()}</b>"),
                     self.worker.settings.tr("dialog:first_run_path_not_valid:body2")
                 ]),
                 QMessageBox.StandardButton.Ok,

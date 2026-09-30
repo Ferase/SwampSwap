@@ -113,6 +113,8 @@ def determine_received_path(folder_name: str) -> Path:
     # If the application is a frozen executable, mark it relative to the executable
     if getattr(sys, "frozen", False):
         base_dir = Path(sys.executable).resolve().parent
+        if os.access(base_dir, os.R_OK) and not os.access(base_dir, os.W_OK):
+            base_dir = Path.home() / "Downloads"
 
     # If the application is a script, mark it relative to the script
     else:
