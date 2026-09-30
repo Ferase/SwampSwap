@@ -78,10 +78,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $CrocVersion = "11.5.4"
+          CROC_VERSION = "11.5.4"
           New-Item -ItemType Directory -Force -Path croc
           Invoke-WebRequest `
-            -Uri "https://github.com/schollz/croc/releases/download/v$CrocVersion/croc_v$CrocVersion_${{ matrix.croc_binary_suffix }}" `
+            -Uri "https://github.com/schollz/croc/releases/download/v${CROC_VERSION}/croc_v${CROC_VERSION}_${{ matrix.croc_binary_suffix }}" `
             -OutFile croc_download.zip
           Expand-Archive -Path croc_download.zip -DestinationPath croc
 
