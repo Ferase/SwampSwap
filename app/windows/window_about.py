@@ -226,15 +226,15 @@ class AboutWindow(QDialog):
         return lang_credits
 
     def _update_croc_version(self) -> None:
-        version: str | None = self.worker.get_croc_version_from_path_number_only(self.worker.settings.croc_path)
+        version: str | None = self.worker.get_croc_version_number_only()
         version_string: str = self.worker.settings.tr("detect_croc:label:croc_not_found") if version is None else self.worker.settings.tr("about:version:croc").format(v=f"<b>{version}</b>")
         self.label_croc_version.setText(version_string)
 
-        croc_source: str = self.worker.settings.tr("detect_croc:combo:standalone")
+        croc_source: str = self.worker.settings.tr("detect_croc:combo:bundled")
         if version is None:
             croc_source = self.worker.settings.tr("detect_croc:label:croc_not_found")
         else:
-            if self.worker.settings.croc_path == "croc":
+            if self.worker.settings.use_system_croc:
                 croc_source = f"<b>{self.worker.settings.tr('detect_croc:combo:system')}</b>"
 
         source_text: str = self.worker.settings.tr("about:croc:source").format(s=f"<br><b>{croc_source}</b>")

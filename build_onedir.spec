@@ -1,13 +1,21 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
+import os, sys
 
+if sys.platform == 'win32':
+    croc_src = os.path.join('croc', 'croc.exe')
+    croc_dest = 'croc'
+else:
+    croc_src = os.path.join('croc', 'croc')
+    croc_dest = 'croc'
+
+croc_binaries = [(croc_src, croc_dest)] if os.path.exists(croc_src) else []
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
-    datas=[('lang', 'lang'), ('assets', 'assets'), ('icon.ico', '.'), ('themes.json', '.'), *collect_data_files('PyQt6')],
-    hiddenimports=['PyQt6.QtDBus', 'PyQt6.sip'],
+    binaries=croc_binaries,
+    datas=[('lang', 'lang'), ('assets', 'assets'), ('icon.ico', '.'), ('themes.json', '.')],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

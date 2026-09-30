@@ -129,7 +129,6 @@ class MainWindow(QMainWindow):
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
-        self.progress_bar.setTextVisible(True)
 
         layout.addWidget(self.label_animation)
         layout.addSpacing(8)
@@ -535,14 +534,12 @@ class MainWindow(QMainWindow):
 
         self.worker.settings.set_defaults()
         self.worker.settings.save_settings()
-        self.widget_settings.check_croc_exists()
 
     def _first_run(self) -> None:
         if self.worker.settings.settings_file_path.exists():
-            self._check_for_croc()
             self.widget_settings.on_ready()
             return
-
+        
         dialog = FirstRunReceivePathDialog(self.worker, self)
 
         if dialog.exec():
@@ -561,24 +558,6 @@ class MainWindow(QMainWindow):
 
             self.widget_settings.checkbox_enable_sound.setChecked(dialog.checkbox_enable_sound.isChecked())
 
-            if dialog.verified:
-                self.worker.change_operation(CrocOperation.IDLE)
-                self.worker.change_action(CrocAction.NONE)
-                self.worker.apply_croc_path(dialog.get_final_croc_path())
-
             self.widget_settings.save_to_settings()
             self.worker.settings.save_settings()
             self.widget_settings.clear_dirty()
-            self.worker.set_croc_accessible(True)
-
-    def _check_for_croc(self) -> None:
-        if self.worker.check_croc_exists():
-            return
-
-        box = QMessageBox.warning(
-            self,
-            self.worker.settings.tr("dialog:outdated_settings:title"),
-            self.worker.settings.tr("dialog:outdated_settings:body1") + "<br><br>" + self.worker.settings.tr("dialog:outdated_settings:body2"),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.Yes
-        )

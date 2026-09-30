@@ -7,12 +7,14 @@ from app.managers.manager_locale import LocaleManager
 from app.managers.manager_theme import ThemeManager
 import app.utils as app_utils
 
-_SETTINGS_VERSION: int = 2
+_SETTINGS_VERSION: int = 3
 
 # Default settings
 _DEFAULTS: dict[str, bool | str | float] = {
+    # croc
+    "use_system_croc": False,
+
     # General
-    "croc_path": "croc",
     "startup_console": False,
     "startup_croc_updates_check": True,
     "startup_swampswap_updates_check": True,
@@ -112,8 +114,10 @@ class SettingsManager(QObject):
         self.settings_version_baseline: int = _SETTINGS_VERSION
         self.settings_version: int | None = None
 
+        # croc
+        self.use_system_croc: bool | None = None
+
         # General
-        self.croc_path: str | None = None
         self.startup_console: bool | None = None
         self.startup_croc_updates_check: bool | None = None
         self.startup_swampswap_updates_check: bool | None = None

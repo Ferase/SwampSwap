@@ -344,10 +344,6 @@ class SendWidget(QWidget):
         self.btn_send.setEnabled(False)
 
     def _determine_main_button_behavior(self) -> None:
-        if not self.worker.is_croc_currently_accessible():
-            self.btn_send.setEnabled(False)
-            return
-
         operation: CrocOperation = self.worker.get_operation()
         is_operating: bool = operation != CrocOperation.IDLE
         code_entered: bool = bool(self.lineedit_code.text())

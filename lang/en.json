@@ -136,41 +136,26 @@
     "dialog:first_run_path_not_valid:body2":            "Please enter an existing folder path or a valid folder path Swamp Swap should create.",
     "dialog:first_run_path_not_valid:body3":            "Additionally, you likely want to change the default receive path for future transfers by going to <b>Settings > Receiving > Default receive path</b> and set the default path to a valid one as well.",
 
-    "dialog:detect_croc_path_not_exist:title":          "croc path is invalid",
-    "dialog:detect_croc_path_not_exist:body":           "The provided path {p} is either invalid or does not exist.",
+    "dialog:croc_not_on_system:title":                  "croc not installed on your system",
+    "dialog:croc_not_on_system:body":                   "You do not have croc installed on your system. Reverting to bundled croc binary.",
 
-    "dialog:detect_croc_path_is_not_croc:title":        "Selected file is not croc",
-    "dialog:detect_croc_path_is_not_croc:body":         "The file {p} is either not croc or failed to run properly. It is most likely the wrong executable.",
+    "dialog:system_croc_too_old:title":                 "System croc is too old",
+    "dialog:system_croc_too_old:body1":                 "Your system-wide install of croc is version {v1}, but Swamp Swap requires at least version {v2}.",
+    "dialog:system_croc_too_old:body2":                 "Reverting to bundled croc binary.",
 
-    "dialog:detect_croc_path_not_on_path:title":        "croc not found on system",
-    "dialog:detect_croc_path_not_on_path:body":         "croc is not globally accessible on your System's PATH, please install it or, if you've downloaded the standalone executable from GitHUu, switch the dropdown to <b>Standard executable</b> and find it on your computer.",
-    
-    "dialog:detect_croc_path_found_on_path:title":      "croc found!",
-    "dialog:detect_croc_path_found_on_path:body":       "Swamp Swap detected a valid croc install on your PATH!",
+    "dialog:switched_to_system_croc:title":             "Now using system croc",
+    "dialog:switched_to_system_croc:body":              "Swamp Swap will now use your system croc installation.",
 
-    "dialog:detect_croc_path_found_standalone:title":   "Standalone croc found!",
-    "dialog:detect_croc_path_found_standalone:body":    "Swamp Swap detected a valid croc executable at {p}!",
+    "dialog:switched_to_bundled_croc:title":            "Now using bundled croc",
+    "dialog:switched_to_bundled_croc:body":             "Swamp Swap will now use its own bundled croc installation.",
 
-    "dialog:detect_croc_path_found_too_old:title":              "croc out of date",
-    "dialog:detect_croc_path_found_too_old_path:body1":         "The croc version found on your PATH is too old for Swamp Swap. ({v1} < {v2})",
-    "dialog:detect_croc_path_found_too_old_standalone:body1":   "This croc version found at {p} is too old for Swamp Swap. ({v1} < {v2})",
-    "dialog:detect_croc_path_found_too_old_path:body2":         "Please update your croc install or select a standalone executable instead.",
-    "dialog:detect_croc_path_found_too_old_standalone:body2":   "Please download a newer version of croc.",
+    "dialog:system_croc_lost:title":                    "System croc not found",
+    "dialog:system_croc_lost:body1":                    "Swamp Swap can't find croc on your system.",
+    "dialog:system_croc_lost:body2":                    "Reverting to bundled croc binary instead.",
 
-    "dialog:change_croc_path_is_outdated:title":        "croc is out of date",
-    "dialog:change_croc_path_is_outdated:body1":        "Swamp Swap requires a minimum croc verrsion of {v1}, but the croc executable you provided has a version of {v2}.",
-    "dialog:change_croc_path_is_outdated:body2":        "Please provide a version of croc at or above the minimum version required by Swamp Swap.",
-
-    "dialog:change_croc_path_no_longer_valid:title":                "croc not found",
-    "dialog:change_croc_path_no_longer_valid_path:body1":           "Swamp Swap cannot find croc on your system's PATH. croc may have been uninstalled or its PATH entry may have been removed.",
-    "dialog:change_croc_path_no_longer_valid_standalone:body1":     "Swamp Swap cannot find croc at your specified path ({p}). It may have been moved or deleted.",
-    "dialog:change_croc_path_no_longer_valid:body2":                "Please download/reinstall croc and configure it inside <b>Settings > croc > Configure croc...</b>",
-
-    "dialog:about_croc_path:title":                     "About croc on the PATH",
-    "dialog:about_croc_path:body1":                     "Swamp Swap allows you to use croc from one of two sources: an executable in an arbitrary location on your PC, and via your PATH environment variables.",
-    "dialog:about_croc_path:body2":                     "If you've installed croc via a package manager like winget, apt, pacman, etc, it is very likely croc is accessible at any time in your terminal by typing \"croc\". This means it is on your PATH. Thus, you can safely check this box and allow Swamp Swap to use the version of croc installed to your system's PATH. Whatever path is written in the text box above is ignored when this is checked.",
-    "dialog:about_croc_path:body3":                     "However, if you've just downloaded the executable from GitHub and placed it somewhere, or you'd like to use a different supported version of croc instead of one installed on your PATH, you will want to unckeck this box and browse to your desired croc executable.",
-    "dialog:about_croc_path:body4":                     "Swamp Swap will automatically verify if the option you've selected is valid. You must resolve a proper croc installation or executable before using Swamp Swap.",
+    "dialog:bundled_croc_lost:title":                   "Bundled croc not found",
+    "dialog:bundled_croc_lost:body1":                   "The croc binary bundled with Swamp Swap was not found.",
+    "dialog:bundled_croc_lost:body2":                   "Please re-download Swamp Swap from the GitHub.",
 
     "file_dialog:choose_files":                         "Select files to send",
     "file_dialog:choose_folders":                       "Select folders to send",
@@ -219,8 +204,8 @@
     "detect_croc:label:croc_exists_yes":                "Success! croc detected in {p}",
     "detect_croc:label:croc_exists_no":                 "Not detected",
     "detect_croc:label:croc_not_found":                 "Not found",
+    "detect_croc:combo:bundled":                        "Bundled",
     "detect_croc:combo:system":                         "System",
-    "detect_croc:combo:standalone":                     "Standalone executable",
     "detect_croc:combo:tooltip":                        "Select the method Swamp Swap will use to detect a usable croc application on your comptuer.",
     "detect_croc:lineedit:placeholder":                 "path/to/croc",
     "detect_croc:lineedit:tooltip":                     "Enter the exact absolute path to the croc version you want Swamp Swap to use.",
@@ -269,8 +254,9 @@
     "options:btn:reset_defaults":                       "Reset to defaults",
     "options:btn:revert_settings":                      "Revert changes",
 
-    "options:detect_croc:btn":                          "Configure croc...",
-    "options:detect_croc:tooltip":                      "Opens a window that will allow you to tell Swamp Swap where to launch croc from.",
+    "options:use_system_croc:label":                    "Use system croc",
+    "options:use_system_croc:tooltip":                  "If checked, Swamp Swap will use the croc version installed on your system. Leave unchecked to continue using the bundled croc binary.",
+    "options:use_system_croc:tooltip:disabled":         "You do not have a system-wide croc package installed on your system. Swamp Swap will continue using its own bundled version of croc.",
     
     "options:startup_console:label":                    "Show console on startup",
     "options:startup_console:tooltip":                  "If checked, the console window will always start open when the program starts.",

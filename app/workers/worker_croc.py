@@ -227,7 +227,7 @@ class CrocWorker(QThread):
         """Construct the command to send files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then settings, and then send
-        args = [self.get_croc_path()]
+        args = [self.resolve_croc()]
         args.append("--disable-clipboard")
         args.extend(self.settings.build_general_flags())
         args.append("send")
@@ -277,7 +277,7 @@ class CrocWorker(QThread):
         """Construct the command to receive files and then pass it to CrocWorker.run() automatically."""
 
         # croc, then build flags
-        args = [self.get_croc_path()]
+        args = [self.resolve_croc()]
         args.extend(self.settings.build_general_flags())
         
         # Pass the output path
@@ -386,7 +386,12 @@ class CrocWorker(QThread):
     
 
 
-    def get_croc_version_from_path(self, path: str) -> str | None:
+    def does_croc_exist(self) -> bool:
+        return bool(self.get_croc_version())
+    
+    def get_croc_version(self) -> str | None:
+        path: str = self.resolve_croc()
+
         try:
             output: str = subprocess.run([path, "--version"], stdout=subprocess.PIPE).stdout.decode("utf-8")
             if output.startswith("croc version"):
@@ -400,10 +405,10 @@ class CrocWorker(QThread):
     def strip_croc_version_text(self, text: str) -> str:
         return text.split("croc version ")[1]
     
-    def get_croc_version_from_path_number_only(self, path: str) -> str | None:
+    def get_croc_version_number_only(self) -> str | None:
         """Get just the version number from croc --version for comparison purposes."""
 
-        version: str | None = self.get_croc_version_from_path(path)
+        version: str | None = self.get_croc_version()
         if version is None:
             return None
 
@@ -412,8 +417,10 @@ class CrocWorker(QThread):
     def version_string_to_tuple(self, version_string: str) -> tuple[int]:
         return tuple(int(x) for x in version_string.lstrip("v").split("."))
 
-    def is_croc_version_at_path_greater_than_minimum(self, path: str) -> bool:
-        version_string: str = self.get_croc_version_from_path_number_only(path)
+    def is_croc_version_greater_than_minimum(self) -> bool:
+        path: str = self.resolve_croc()
+
+        version_string: str = self.get_croc_version_number_only()
         version: tuple[int] = self.version_string_to_tuple(version_string)
 
         return version >= self.version_string_to_tuple(self.minimum_croc_version)
@@ -423,35 +430,24 @@ class CrocWorker(QThread):
         
         return self.app_version
 
-    def get_croc_path_from_settings(self) -> str:
-        return self.settings.croc_path
+    def resolve_croc(self) -> str:
+        # Get system installed croc (only available as an option if Swamp Swap can see another croc instance on the user's PATH)
+        if self.settings.use_system_croc:
+            return shutil.which("croc") or "croc"
 
-    def check_croc_exists(self) -> bool:
-        if self.settings.croc_path and Path(self.settings.croc_path).exists():
-            return True
+        # Get bundled binary
+        if getattr(sys, "frozen", False):
+            croc_path: str = str(Path(sys._MEIPASS) / "croc" / "croc")
+            if sys.platform == "win32":
+                croc_path += ".exe"
+            
+            return croc_path
 
-        path_result: str | None = shutil.which("croc")
+        # Get croc binary when running as main.py
+        return str(Path.cwd() / "croc" / "croc")
 
-        if path_result:
+    def is_system_croc_installed(self) -> bool:
+        if shutil.which("croc"):
             return True
 
         return False
-
-    def apply_croc_path(self, path: str) -> None:
-        self.settings.croc_path = path
-
-    def get_croc_path(self) -> str:
-        return self.settings.croc_path
-
-    def set_croc_accessible(self, accessible: bool) -> None:
-        if self.get_operation() == CrocOperation.IDLE:
-            if accessible:
-                self.change_action(CrocAction.NONE)
-            else:
-                self.change_action(CrocAction.ERROR)
-
-        self.is_croc_accessible = accessible
-        self.croc_is_accessible.emit(accessible)
-
-    def is_croc_currently_accessible(self) -> bool:
-        return self.is_croc_accessible
