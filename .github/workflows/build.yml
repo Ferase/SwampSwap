@@ -97,21 +97,30 @@ jobs:
       - name: Build AppImage
         if: runner.os == 'Linux'
         run: |
-          wget -q 'https://github.com/AppImage/appimagetool/releases/download/continuous/${{ matrix.appimage_tool }}' \
+          wget -q "https://github.com/AppImage/appimagetool/releases/download/continuous/${{ matrix.appimage_tool }}" \
             -O appimagetool
           chmod +x appimagetool
 
           mkdir -p SwampSwap.AppDir/usr/bin
-
           cp -r dist/SwampSwap SwampSwap.AppDir/usr/bin/SwampSwap
-
           cp AppRun SwampSwap.AppDir/AppRun
           cp SwampSwap.desktop SwampSwap.AppDir/SwampSwap.desktop
           cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
 
           ARCH=$(uname -m) ./appimagetool --appimage-extract-and-run \
+            --updateinformation "gh-releases-zsync|Ferase|SwampSwap|latest|${{ matrix.appimage_name }}.zsync" \
             SwampSwap.AppDir \
-            '${{ matrix.appimage_name }}'
+            "${{ matrix.appimage_name }}"
+
+      - name: Upload AppImage artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.appimage_name }}
+          path: |
+            ${{ matrix.appimage_name }}
+            ${{ matrix.appimage_name }}.zsync
+          retention-days: 30
 
       - name: Upload AppImage artifact
         if: runner.os == 'Linux'
