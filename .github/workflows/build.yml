@@ -116,7 +116,7 @@ jobs:
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.appimage_name }}
+          name: appimage_${{ matrix.artifact_name }}
           path: |
             ${{ matrix.appimage_name }}
             ${{ matrix.appimage_name }}.zsync
