@@ -431,11 +431,10 @@ class CrocWorker(QThread):
         return self.app_version
 
     def resolve_croc(self) -> str:
-        # Get system installed croc (only available as an option if Swamp Swap can see another croc instance on the user's PATH)
+        # Get system installed croc
         if self.settings.use_system_croc:
             return shutil.which("croc") or "croc"
 
-        # Get bundled binary
         if getattr(sys, "frozen", False):
             croc_path: str = str(Path(sys._MEIPASS) / "croc" / "croc")
             if sys.platform == "win32":

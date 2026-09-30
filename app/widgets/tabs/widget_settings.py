@@ -931,14 +931,17 @@ class SettingsWidget(QWidget):
 
 
 
-    def _new_swampswap_version_available(self, parent, worker: CrocWorker, new_version: str) -> None:
+    def _new_swampswap_version_available(self, new_version: str) -> None:
         """Raise an alert if a new Swamp Swap version is detected on the Ferase/SwampSwap repo on GitHub"""
 
         # Ask the user if they want to update
         result = QMessageBox.information(
-            parent,
-            worker.settings.tr("dialog:swampswap_update_available:title"),
-            worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>") + "<br><br>" + worker.settings.tr("dialog:swampswap_update_available:body2"),
+            self,
+            self.worker.settings.tr("dialog:swampswap_update_available:title"),
+            "<br><br>".join([
+                self.worker.settings.tr("dialog:swampswap_update_available:body1").format(v=f"<b>{new_version}</b>"),
+                self.worker.settings.tr("dialog:swampswap_update_available:body2")
+            ]),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.Yes
         )
@@ -970,7 +973,7 @@ class SettingsWidget(QWidget):
             self._swampswap_up_to_date(version)
             return
         
-        self._new_swampswap_version_available(self.parent(), self.worker, version)
+        self._new_swampswap_version_available(version)
 
     def _startup_updates_check(self) -> None:
         self._update_checker_swampswap = UpdateChecker(self.worker.get_app_version(), "Ferase", "SwampSwap")

@@ -19,50 +19,31 @@
 
 This is a simple user interface that operates croc directly by constructing commands and executing them via `subprocess`. This project is intended to make working with croc a bit more interactive and give users that prefer GUIs a more convenient way to use the program.
 
-This project does not use any code from croc and will not install it if you don't have it. Please visit <a href="https://github.com/schollz/croc" target="_blank">croc's repository</a> to see how to install it.
+This project does not utilize any of croc's source code, however releases of this project from **v1.5** onwards do bundle croc binaries.
 
 ## Installing
 
-Before installing Swamp Swap, you must install croc for your system. Brief instructions will be given below for Windows due to the convenience of `winget`, but you should refer to the [official install guide](https://github.com/schollz/croc#install) for all other systems since there are several distributions and package managers on which croc is available for macOS, Linux, Conda, Docker, and more.
+Swamp Swap bundles the croc binaries from [this release](https://github.com/schollz/croc/releases/tag/v11.5.4) of the program. Thus, you won't need to manually download or install croc for your system.
 
-Note that you can also obtain releases from [croc's releases page](https://github.com/schollz/croc/releases/latest) and use those instead of anything from any of the package managers, though it's not as convenient as getting it from a package manager and could requrie advanced setup for your system in certain cases.
+However, if you have croc installed on your system via a package manager (`winget`, `apt`, `dnf`, `zypper`, `pacman`, or `apk` acording to croc's [official repository](https://github.com/schollz/croc/releases/latest)), you can enable the option **Use system croc** in **Settings > croc > Use system croc** to make Swamp Swap use that version of croc instead of the one bundled within itself. This isn't generally recommended, as croc updates can sometimes include changes that will break some functionality of Swamp Swap.
 
 ### On Windows
 
-1. Open your command prompt and use `winget`, the pre-installed Windows package manager, to install croc from the official Windows repository:
-    ```
-    winget install schollz.croc
-    ```
-    - If you are running `winget` for the first time, it will ask you to agree to their policies. Press `y` for everything to proceed
-    - If you already have croc installed via `winget`, you can update it/check for updates by doing:
-        ```
-        winget upgrade schollz.croc
-        ```
-2. Once croc is installed, go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download **SwampSwap_Windows_x86_64.zip**
-3. Extract **SwampSwap_Windows_x86_64.zip** anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
-4. Enter the extracted folder, and open **SwampSwap.exe**
-5. You will be prompted to set up the program
-6. It should launch!
+1. Extract **SwampSwap_Windows_x86_64.zip** anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
+2. Enter the extracted folder, and open **SwampSwap.exe**
+3. You will be prompted to set up the program.
 
 ### macOS
 
-According to the [official install guide](https://github.com/schollz/croc#install), croc is available via `brew` and `port`. See the official install guide for more.
-
-1. After installing croc, go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download either **SwampSwap_macOS_x86_64.tar.gz** (Intel processors) or **SwampSwap_macOS_arm64.tar.gz** (ARM/Apple processors) based on your system's architecture.
-2. Extract the **.tar.gz** file anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
-4. Enter the extracted folder, and open the file **SwampSwap**
-5. You will be prompted to set up the program
-6. It should launch!
+1. Extract the **.tar.gz** file anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
+2. Enter the extracted folder, and open the file **SwampSwap**
+3. You will be prompted to set up the program.
 
 ### Linux
 
-Please refer to the [official install guide](https://github.com/schollz/croc#install) for info on installing croc for your Linux distribution/package manager.
-
-1. After installing croc, go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download one of these four files depending on your system architecture and prefeerence:
+1. Go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download one of these four files depending on your system architecture and prefeerence:
     - **SwampSwap_Linux_x86_64.tar.gz** (Intel processor, archive containing executable)
-    - **SwampSwap_Linux_aarch64.tar.gz** (ARM64 processor, archive containing executable)
     - **SwampSwap_Linux_x86_64.AppImage** (Intel processor, full AppImage)
-    - **SwampSwap_Linux_aarch64.AppImage** (ARM64 processor, full AppImage)
 2. If you downloaded an **.tar.gz** file:
     1. Extract the **.tar.gz** file anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
     2. Enter the extracted folder, and open the file **SwampSwap**
@@ -70,16 +51,15 @@ Please refer to the [official install guide](https://github.com/schollz/croc#ins
     1. Save the AppImage into your downloads folder (or anywhere you can easily get to it)
     2. Open a terminal wherever you saved the AppImage to, and make it executable
         ```
-        chmod +x ./SwampSwap_Linux_YourArchHere.AppImage
+        chmod +x ./SwampSwap_Linux_x86_64.AppImage
         ```
     3. Then, run the install command:
         ```
-        ./SwampSwap_Linux_YourArchHere.AppImage --install
+        ./SwampSwap_Linux_x86_64.AppImage --install
         ```
     4. You should get a message that Swamp Swap was installed
     5. Open your application launcher and search for Swamp Swap, then run it
-4. You will be prompted to set up the program
-5. It should launch!
+4. You will be prompted to set up the program.
 
 ### Notes
 
@@ -155,4 +135,4 @@ pyinstaller build_onedir.spec
 
 ## Disclaimer
 
-This project is in no way affiliated with Zack Schollz or the croc project directly. This is purely a fun project that does not aim to (nor is capable of) replace croc or its functionality. It requires you have croc installed and will not install it for you.
+This project is in no way affiliated with Zack Schollz or the croc project directly. This is purely a fun project that does not aim to (nor is capable of) replace croc or its functionality.
