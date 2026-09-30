@@ -37,7 +37,7 @@ _DEFAULTS: dict[str, bool | str | float] = {
     "clear_filelist_after": False,
 
     # Receive
-    "default_receive_path": str(app_utils.determine_received_path("received")),
+    "default_receive_path": str(app_utils.determine_received_path("SwampSwapReceived")),
     "overwrite": False,
 
     # Relay
@@ -189,7 +189,7 @@ class SettingsManager(QObject):
             self.set_all_from_dict(json_data)
 
     def _get_defualt_receive_path(self) -> str:
-        defualt_path: str = str(app_utils.determine_received_path("received"))
+        defualt_path: str = str(app_utils.determine_received_path("SwampSwapReceived"))
         return defualt_path
 
 
