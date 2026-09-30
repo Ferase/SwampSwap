@@ -16,22 +16,22 @@ jobs:
             archive: SwampSwap_Linux_x86_64.tar.gz
             appimage_name: SwampSwap_x86_64.AppImage
             appimage_tool: appimagetool-x86_64.AppImage
-            spec_file: build_onedir.spec
+            croc_binary_suffix: Linux-64bit.tar.gz
 
           - os: windows-latest
             artifact_name: SwampSwap_Windows_x86_64
             archive: SwampSwap_Windows_x86_64.zip
-            spec_file: build_onedir.spec
+            croc_binary_suffix: Windows-64bit.zip
 
           - os: macos-15-intel
             artifact_name: SwampSwap_macOS_x86_64
             archive: SwampSwap_macOS_x86_64.tar.gz
-            spec_file: build_onedir.spec
+            croc_binary_suffix: macOS-64bit.tar.gz
 
           - os: macos-latest
             artifact_name: SwampSwap_macOS_arm64
             archive: SwampSwap_macOS_arm64.tar.gz
-            spec_file: build_onedir.spec
+            croc_binary_suffix: macOS-ARM64.tar.gz
 
     runs-on: ${{ matrix.os }}
 
@@ -64,8 +64,29 @@ jobs:
       - name: Install Python dependencies (non-Qt)
         run: pip install -r requirements.txt
 
+      - name: Download croc (macOS/Linux)
+        if: runner.os != 'Windows'
+        run: |
+          CROC_VERSION="11.5.4"
+          mkdir -p croc
+          curl -sL "https://github.com/schollz/croc/releases/download/v${CROC_VERSION}/croc_v${CROC_VERSION}_${{ matrix.croc_binary_suffix }}" \
+            -o croc_download.tar.gz
+          tar -xzf croc_download.tar.gz -C croc croc
+          chmod +x croc/croc
+
+      - name: Download croc (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $CrocVersion = "11.5.4"
+          New-Item -ItemType Directory -Force -Path croc
+          Invoke-WebRequest `
+            -Uri "https://github.com/schollz/croc/releases/download/v$CrocVersion/croc_v$CrocVersion_${{ matrix.croc_binary_suffix }}" `
+            -OutFile croc_download.zip
+          Expand-Archive -Path croc_download.zip -DestinationPath croc
+
       - name: Build with PyInstaller
-        run: pyinstaller ${{ matrix.spec_file }}
+        run: pyinstaller build.spec
 
       - name: Build AppImage
         if: runner.os == 'Linux'

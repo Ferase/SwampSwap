@@ -1076,8 +1076,8 @@ class SettingsWidget(QWidget):
             self,
             self.worker.settings.tr("dialog:bundled_croc_lost:title"),
             "<br><br>".join([
-                self.worker.settings.tr("dialog:system_croc_lost:body1"),
-                self.worker.settings.tr("dialog:system_croc_lost:body2")
+                self.worker.settings.tr("dialog:bundled_croc_lost:body1"),
+                self.worker.settings.tr("dialog:bundled_croc_lost:body2")
             ]),
             QMessageBox.StandardButton.Ok,
             QMessageBox.StandardButton.Ok
