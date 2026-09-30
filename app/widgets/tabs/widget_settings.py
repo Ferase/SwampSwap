@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
     QCheckBox, QSlider, QApplication, QHBoxLayout,
     QFileDialog, QSizePolicy
 )
-from PyQt6.QtCore import pyqtSignal, Qt, QProcess, QUrl
+from PyQt6.QtCore import pyqtSignal, Qt, QProcess, QUrl, QTimer
 from PyQt6.QtGui import QDesktopServices
 
 from get_version import UpdateChecker
@@ -857,7 +857,9 @@ class SettingsWidget(QWidget):
 
     def _click_save_button(self) -> None:
         self._display_save_button_as_saving(True)
+        QTimer.singleShot(1, self._perform_save)
 
+    def _perform_save(self) -> None:
         self.save_to_settings()
         self.worker.settings.save_settings()
         self.clear_dirty()
