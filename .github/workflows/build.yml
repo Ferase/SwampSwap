@@ -78,11 +78,17 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          CROC_VERSION = "11.5.4"
+          $CrocVersion = "11.5.4"
+          $CrocUrl = "https://github.com/schollz/croc/releases/download/v$CrocVersion/croc_v${CrocVersion}_${{ matrix.croc_binary_suffix }}"
+
           New-Item -ItemType Directory -Force -Path croc
+
+          Write-Host "Downloading: $CrocUrl"
           Invoke-WebRequest `
-            -Uri "https://github.com/schollz/croc/releases/download/v${CROC_VERSION}/croc_v${CROC_VERSION}_${{ matrix.croc_binary_suffix }}" `
-            -OutFile croc_download.zip
+            -Uri $CrocUrl `
+            -OutFile croc_download.zip `
+            -UseBasicParsing
+
           Expand-Archive -Path croc_download.zip -DestinationPath croc
 
       - name: Build with PyInstaller
