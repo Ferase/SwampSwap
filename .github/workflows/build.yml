@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-20.04
             artifact_name: SwampSwap_Linux_x86_64
             archive: SwampSwap_Linux_x86_64.tar.gz
             appimage_name: SwampSwap_x86_64.AppImage
@@ -42,7 +42,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
       - name: Install xcb dependencies (Linux)
         if: runner.os == 'Linux'
