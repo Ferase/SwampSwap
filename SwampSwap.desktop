@@ -1,6 +1,9 @@
 [Desktop Entry]
 Name=SwampSwap
+Comment=Secure file transfer
 Exec=SwampSwap
-Icon=SwampSwap
+Icon=io.github.Ferase.SwampSwap
 Type=Application
 Categories=Network;FileTransfer;
+Keywords=croc;transfer;send;receive;
+StartupWMClass=SwampSwap

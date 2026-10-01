@@ -102,10 +102,19 @@ jobs:
           chmod +x appimagetool
 
           mkdir -p SwampSwap.AppDir/usr/bin
+          mkdir -p SwampSwap.AppDir/usr/share/metainfo
+          mkdir -p SwampSwap.AppDir/usr/share/icons/hicolor/256x256/apps
+
           cp -r dist/SwampSwap SwampSwap.AppDir/usr/bin/SwampSwap
           cp AppRun SwampSwap.AppDir/AppRun
           cp SwampSwap.desktop SwampSwap.AppDir/SwampSwap.desktop
           cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
+
+          cp io.github.Ferase.SwampSwap.metainfo.xml \
+            SwampSwap.AppDir/usr/share/metainfo/io.github.Ferase.SwampSwap.metainfo.xml
+
+          cp SwampSwap.png \
+            SwampSwap.AppDir/usr/share/icons/hicolor/256x256/apps/io.github.Ferase.SwampSwap.png
 
           ARCH=$(uname -m) ./appimagetool --appimage-extract-and-run \
             --updateinformation "gh-releases-zsync|Ferase|SwampSwap|latest|${{ matrix.appimage_name }}.zsync" \
@@ -120,14 +129,6 @@ jobs:
           path: |
             ${{ matrix.appimage_name }}
             ${{ matrix.appimage_name }}.zsync
-          retention-days: 30
-
-      - name: Upload AppImage artifact
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.appimage_name }}
-          path: ${{ matrix.appimage_name }}
           retention-days: 30
 
       - name: Archive build (Linux/macOS)
