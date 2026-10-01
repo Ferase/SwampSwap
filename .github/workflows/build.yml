@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             artifact_name: SwampSwap_Linux_x86_64
             archive: SwampSwap_Linux_x86_64.tar.gz
             appimage_name: SwampSwap_x86_64.AppImage
@@ -39,29 +39,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python (Windows/macOS)
+        if: runner.os != 'Linux'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install xcb dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y \
-            libxcb-cursor0 \
-            libxcb-icccm4 \
-            libxcb-image0 \
-            libxcb-keysyms1 \
-            libxcb-randr0 \
-            libxcb-render-util0 \
-            libxcb-shape0 \
-            libxcb-xinerama0 \
-            libxcb-xkb1 \
-            libxkbcommon-x11-0 \
-            libgl1
-
-      - name: Install Python dependencies (non-Qt)
+      - name: Install Python dependencies (Windows/macOS)
+        if: runner.os != 'Linux'
         run: pip install -r requirements.txt
 
       - name: Download croc (macOS/Linux)
@@ -91,8 +76,15 @@ jobs:
 
           Expand-Archive -Path croc_download.zip -DestinationPath croc
 
-      - name: Build with PyInstaller
+      - name: Build with PyInstaller (Windows/macOS)
+        if: runner.os != 'Linux'
         run: pyinstaller build.spec
+
+      - name: Build with PyInstaller (manylinux)
+        if: runner.os == 'Linux'
+        uses: docker://quay.io/pypa/manylinux_2_28_x86_64:latest
+        with:
+          args: bash -c "cd /github/workspace && yum install -y xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL && /opt/python/cp311-cp311/bin/pip install -r requirements.txt && /opt/python/cp311-cp311/bin/pyinstaller build.spec"
 
       - name: Build AppImage
         if: runner.os == 'Linux'
