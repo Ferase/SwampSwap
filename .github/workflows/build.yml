@@ -109,12 +109,13 @@ jobs:
           cp AppRun SwampSwap.AppDir/AppRun
           cp SwampSwap.desktop SwampSwap.AppDir/SwampSwap.desktop
           cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
+          cp SwampSwap.png SwampSwap.AppDir/io.github.Ferase.SwampSwap.png
 
           cp io.github.Ferase.SwampSwap.metainfo.xml \
             SwampSwap.AppDir/usr/share/metainfo/io.github.Ferase.SwampSwap.metainfo.xml
 
           cp SwampSwap.png \
-            SwampSwap.AppDir/io.github.Ferase.SwampSwap.png
+            SwampSwap.AppDir/usr/share/icons/hicolor/256x256/apps/io.github.Ferase.SwampSwap.png
 
           ARCH=$(uname -m) ./appimagetool --appimage-extract-and-run \
             --updateinformation "gh-releases-zsync|Ferase|SwampSwap|latest|${{ matrix.appimage_name }}.zsync" \
