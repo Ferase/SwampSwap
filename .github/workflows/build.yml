@@ -84,15 +84,14 @@ jobs:
         if: runner.os == 'Linux'
         uses: docker://quay.io/pypa/manylinux_2_28_x86_64:latest
         with:
-          args: >-
+          args:
             bash -c "
               cd /github/workspace &&
               yum install -y xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL &&
               /opt/python/cp311-cp311/bin/pip install aqtinstall &&
               /opt/python/cp311-cp311/bin/aqt install-qt linux desktop 6.7.0 linux_gcc_64 -O /qt &&
-              export QMAKE=/qt/6.7.0/gcc_64/bin/qmake &&
-              /opt/python/cp311-cp311/bin/pip install -r requirements.txt &&
-              /opt/python/cp311-cp311/bin/pyinstaller build.spec
+              /opt/python/cp311-cp311/bin/pip install PyQt6>=6.7.0 --config-settings --qmake=/qt/6.7.0/gcc_64/bin/qmake &&
+              /opt/python/cp311-cp311/bin/pip install -r requirements.txt && /opt/python/cp311-cp311/bin/pyinstaller build.spec
             "
             
       - name: Build AppImage
