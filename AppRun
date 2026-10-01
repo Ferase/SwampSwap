@@ -19,12 +19,13 @@ if [[ "$1" == "--install" ]]; then
     cat > "$DESKTOP_DIR/SwampSwap.desktop" <<EOF
 [Desktop Entry]
 Name=Swamp Swap
-GenericName=croc
 Comment=A GUI wrapper for the croc CLI file transfer program
 Exec=${INSTALL_DIR}/SwampSwap.AppImage
-Icon=SwampSwap
+Icon=io.github.Ferase.SwampSwap
 Type=Application
 Categories=Network;FileTransfer;
+Keywords=croc;transfer;send;receive;
+StartupWMClass=SwampSwap
 EOF
 
     update-desktop-database "$DESKTOP_DIR" 2>/dev/null
