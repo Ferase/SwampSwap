@@ -108,10 +108,9 @@ jobs:
           cp -r dist/SwampSwap SwampSwap.AppDir/usr/bin/SwampSwap
           cp AppRun SwampSwap.AppDir/AppRun
           cp SwampSwap.desktop SwampSwap.AppDir/SwampSwap.desktop
-          cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
           cp SwampSwap.png SwampSwap.AppDir/io.github.Ferase.SwampSwap.png
 
-          cp io.github.Ferase.SwampSwap.metainfo.xml \
+          cp metainfo.xml \
             SwampSwap.AppDir/usr/share/metainfo/io.github.Ferase.SwampSwap.metainfo.xml
 
           cp SwampSwap.png \
