@@ -13,7 +13,7 @@ if [[ "$1" == "--install" ]]; then
     chmod +x "$INSTALL_DIR/SwampSwap.AppImage"
 
     # Install icon
-    cp "${HERE}/SwampSwap.png" "$ICON_DIR/SwampSwap.png"
+    cp "${HERE}/io.github.Ferase.SwampSwap.png" "$ICON_DIR/io.github.Ferase.SwampSwap.png"
 
     # Write desktop entry pointing at the installed AppImage
     cat > "$DESKTOP_DIR/SwampSwap.desktop" <<EOF
