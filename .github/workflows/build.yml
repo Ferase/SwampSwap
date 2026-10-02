@@ -100,7 +100,7 @@ jobs:
           args:
             bash -c "
               cd /github/workspace &&
-              dnf install -y python3.11 python3.11-pip python3.11-devel xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL &&
+              dnf install -y python3.11 python3.11-pip python3.11-devel xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL || (dnf module enable -y python311 && dnf install -y python3.11 python3.11-pip python3.11-devel xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL) &&
               python3.11 -m pip install PyQt6==6.9.1 PyQt6-Qt6==6.9.1 &&
               python3.11 -m pip install -r requirements.txt &&
               python3.11 -m PyInstaller build.spec
