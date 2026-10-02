@@ -644,6 +644,7 @@ class SendWidget(QWidget):
                 lambda: self._copy_code()
             )
 
+        self._clear_code()
         self.worker.start_send(items_for_croc, exclusions_for_croc, self.lineedit_code.text())
         self._enable_controls()
 
@@ -662,7 +663,6 @@ class SendWidget(QWidget):
         self.widget_files.btn_add_folders.setDisabled(block_all)
         self.widget_files.btn_view_file_list.setDisabled(block_all or can_send_no_files)
         self.widget_files.btn_clear_list.setDisabled(block_all or can_send_no_files)
-        self.checkbox_regenerate_code.setDisabled(block_all)
 
     def _mark_send_type(self, send_type: SendType) -> None:
         self._send_type = send_type
