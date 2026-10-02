@@ -92,6 +92,19 @@ jobs:
               /opt/python/cp311-cp311/bin/pip install -r requirements.txt &&
               /opt/python/cp311-cp311/bin/pyinstaller build.spec
             "
+
+      - name: Build with PyInstaller (manylinux)
+        if: runner.os == 'Linux'
+        uses: docker://almalinux:8
+        with:
+          args:
+            bash -c "
+              cd /github/workspace &&
+              dnf install -y python3.11 python3.11-pip python3.11-devel xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL &&
+              python3.11 -m pip install PyQt6==6.9.1 PyQt6-Qt6==6.9.1 &&
+              python3.11 -m pip install -r requirements.txt &&
+              python3.11 -m PyInstaller build.spec
+            "
             
       - name: Build AppImage
         if: runner.os == 'Linux'
