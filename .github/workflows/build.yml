@@ -39,14 +39,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python (Windows/macOS)
-        if: runner.os != 'Linux'
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
-      - name: Install Python dependencies (Windows/macOS)
-        if: runner.os != 'Linux'
+      - name: Install xcb dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y \
+            libxcb-cursor0 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-shape0 \
+            libxcb-xinerama0 \
+            libxcb-xkb1 \
+            libxkbcommon-x11-0 \
+            libgl1
+
+      - name: Install Python dependencies (non-Qt)
         run: pip install -r requirements.txt
 
       - name: Download croc (macOS/Linux)
@@ -76,24 +91,9 @@ jobs:
 
           Expand-Archive -Path croc_download.zip -DestinationPath croc
 
-      - name: Build with PyInstaller (Windows/macOS)
-        if: runner.os != 'Linux'
+      - name: Build with PyInstaller
         run: pyinstaller build.spec
 
-      - name: Build with PyInstaller (manylinux)
-        if: runner.os == 'Linux'
-        uses: docker://almalinux:8
-        with:
-          args:
-            bash -c "
-              cd /github/workspace &&
-              dnf install -y epel-release &&
-              dnf install -y python3.11 python3.11-pip python3.11-devel xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm mesa-libGL &&
-              python3.11 -m pip install PyQt6==6.9.1 PyQt6-Qt6==6.9.1 &&
-              python3.11 -m pip install -r requirements.txt &&
-              python3.11 -m PyInstaller build.spec
-            "
-            
       - name: Build AppImage
         if: runner.os == 'Linux'
         run: |
@@ -111,7 +111,7 @@ jobs:
           cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
           cp SwampSwap.png SwampSwap.AppDir/io.github.Ferase.SwampSwap.png
 
-          cp metainfo.xml \
+          cp io.github.Ferase.SwampSwap.metainfo.xml \
             SwampSwap.AppDir/usr/share/metainfo/io.github.Ferase.SwampSwap.metainfo.xml
 
           cp SwampSwap.png \
