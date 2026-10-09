@@ -43,7 +43,7 @@ However, if you have croc installed on your system via a package manager (`winge
 
 1. Go to the [releases page for Swamp Swap](https://github.com/Ferase/SwampSwap/releases/latest) and download one of these four files depending on your system architecture and prefeerence:
     - **SwampSwap_Linux_x86_64.tar.gz** (Intel processor, archive containing executable)
-    - **SwampSwap_Linux_x86_64.AppImage** (Intel processor, full AppImage)
+    - **SwampSwap_Linux_x86_64.AppImage** (Intel processor, full AppImage with zsync update support)
 2. If you downloaded an **.tar.gz** file:
     1. Extract the **.tar.gz** file anywhere you'd like (Note: this is the actual program, not an installer, so extract it wherever you would most easily be able to use it from)
     2. Enter the extracted folder, and open the file **SwampSwap**
