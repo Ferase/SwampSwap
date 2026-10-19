@@ -5,6 +5,7 @@ if [[ "$1" == "--install" ]]; then
     INSTALL_DIR="${HOME}/.local/bin"
     DESKTOP_DIR="${HOME}/.local/share/applications"
     ICON_DIR="${HOME}/.local/share/icons/hicolor/256x256/apps"
+    DESKTOP_FILE="${DESKTOP_DIR}/SwampSwap.desktop"
 
     mkdir -p "$INSTALL_DIR" "$DESKTOP_DIR" "$ICON_DIR"
 
@@ -13,23 +14,28 @@ if [[ "$1" == "--install" ]]; then
     chmod +x "$INSTALL_DIR/SwampSwap.AppImage"
 
     # Install icon
-    cp "${HERE}/SwampSwap.png" "$ICON_DIR/SwampSwap.png"
+    cp "${HERE}/io.github.Ferase.SwampSwap.png" "$ICON_DIR/io.github.Ferase.SwampSwap.png"
 
-    # Write desktop entry pointing at the installed AppImage
-    cat > "$DESKTOP_DIR/SwampSwap.desktop" <<EOF
+    # IF the desktop file exists, modify it, otherwise create one
+    if [[ -f "$DESKTOP_FILE" ]]; then
+        sed -i "s|^Exec=.*|Exec=${INSTALL_DIR}/SwampSwap.AppImage|" "$DESKTOP_FILE"
+        echo "Swamp Swap shortcut updated."
+    else
+        cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Name=Swamp Swap
 Comment=A GUI wrapper for the croc CLI file transfer program
 Exec=${INSTALL_DIR}/SwampSwap.AppImage
-Icon=io.github.Ferase.SwampSwap
+Icon=SwampSwap.png
 Type=Application
 Categories=Network;FileTransfer;
 Keywords=croc;transfer;send;receive;
 StartupWMClass=SwampSwap
 EOF
+        echo "Swamp Swap has been installed. It should now appear in your application launcher."
+    fi
 
     update-desktop-database "$DESKTOP_DIR" 2>/dev/null
-    echo "Swamp Swap has been installed. It should now appear in your application launcher."
     exit 0
 fi
 
