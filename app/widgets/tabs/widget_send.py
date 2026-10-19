@@ -196,6 +196,7 @@ class SendWidget(QWidget):
         super().__init__(parent)
 
         self._send_type: SendType = SendType.FILES
+        self._user_typed_code_hold_clear: bool = False
         
         self.worker: CrocWorker = worker
 
@@ -300,8 +301,7 @@ class SendWidget(QWidget):
         self.files_added.connect(self._add_selected_files)
         self.folders_added.connect(self._add_selected_files)
 
-        self.lineedit_code.textChanged.connect(self._enable_copy_code_button)
-        self.lineedit_code.textChanged.connect(self._determine_main_button_behavior)
+        self.lineedit_code.textChanged.connect(self._typed_in_code)
 
         self.widget_files.btn_add_files.clicked.connect(self._click_browse_file_button)
         self.widget_files.btn_add_folders.clicked.connect(self._click_browse_folder_button)
@@ -435,7 +435,6 @@ class SendWidget(QWidget):
         if operation != CrocOperation.SENDING:
             return
 
-        self._clear_code()
         self._enable_controls()
 
         if self.worker.settings.clear_filelist_after and self.worker.get_action() == CrocAction.COMPLETED:
@@ -565,8 +564,19 @@ class SendWidget(QWidget):
         self.widget_files.btn_clear_list.setEnabled(enabled)
 
     def _clear_code(self) -> None:
-        if self.checkbox_regenerate_code.isChecked():
+        allow_regenerate: bool = self.checkbox_regenerate_code.isChecked()
+
+        if self._user_typed_code_hold_clear and allow_regenerate:
+            self._user_typed_code_hold_clear = False
+            return
+
+        if allow_regenerate:
             self.lineedit_code.clear()
+
+    def _typed_in_code(self, text: str) -> None:
+        self._user_typed_code_hold_clear = True
+        self._enable_copy_code_button(text)
+        self._determine_main_button_behavior()
 
 
 

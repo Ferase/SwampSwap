@@ -133,6 +133,10 @@ pyinstaller build_onedir.spec
 - Ferase (English)
 - *Other translations to come*
 
-## Disclaimer
+## Disclaimers
 
 This project is in no way affiliated with Zack Schollz or the croc project directly. This is purely a fun project that does not aim to (nor is capable of) replace croc or its functionality.
+
+## AI Disclosure
+
+I hadn't disclosed this previously, but I figure with the rise of many AI-originating projects in the mainstream, I should be transparent on Swamp Swap's place within that category. I will be explicit and say that no, **Swamp Swap was NOT prompted and built by any AI model**, most of the code was written enitrely by me with AI assistance regarding solving certain issues, testing feature plausibility, outlining certain (primarily cosmetic) features, and setting up the GitHub Actions workflow. Up to now and going forward, if any AI code was or is created for use with Swamp Swap, it has beena dn will always be entirely rewritten by me, ensuring the code is both optimized, doesn't stray from the desired implementation, and properly utilizes the systems I've put in place in the codebase to avoid redundancy. The code in this repository and the program itself are fully maintained by me, including commits, issues and pull requests, and no AI contributor(s) will ever be added to handle any such operation.
