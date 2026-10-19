@@ -106,7 +106,12 @@ jobs:
           mkdir -p SwampSwap.AppDir/usr/share/icons/hicolor/256x256/apps
 
           cp -r dist/SwampSwap SwampSwap.AppDir/usr/bin/SwampSwap
+          chmod +x SwampSwap.AppDir/usr/bin/SwampSwap/SwampSwap
+          chmod +x SwampSwap.AppDir/usr/bin/SwampSwap/_internal/croc/croc
+
           cp AppRun SwampSwap.AppDir/AppRun
+          chmod +x SwampSwap.AppDir/AppRun
+    
           cp SwampSwap.desktop SwampSwap.AppDir/SwampSwap.desktop
           cp SwampSwap.png SwampSwap.AppDir/SwampSwap.png
           cp SwampSwap.png SwampSwap.AppDir/io.github.Ferase.SwampSwap.png
