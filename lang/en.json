@@ -347,6 +347,7 @@
     "about:credits:ui_developers":                      "User interface by:",
     "about:credits:testers":                            "Tested by:",
     "about:credits:languages":                          "Translations by:",
+    "about:credits:name":                               "Named by:",
     
     "about:disclaimer":                                 "Swamp Swap is not affiliated with Zack Schollz or croc."
 }

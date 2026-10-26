@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QDialog
 )
 from PyQt6.QtCore import Qt, QUrl, pyqtSignal
-from PyQt6.QtGui import QFont, QPixmap, QFont, QDesktopServices
+from PyQt6.QtGui import QFont, QPixmap, QFont
 
 import app.utils as app_utils
 from app.workers.worker_croc import CrocWorker
@@ -13,6 +13,7 @@ from app.managers.manager_locale import SwampSwapLanguageList
 _CROC_DEVELOPERS = ["Zack Schollz"]
 _UI_DEVELOPERS = ["Ferase"]
 _TESTERS = ["OctoToon", "inktrinket"]
+_NAMER = ["OneDenseMF"]
 
 
 
@@ -131,11 +132,13 @@ class AboutWindow(QDialog):
         credits_ui_developers = self._build_single_credit(self.worker.settings.tr("about:credits:ui_developers"), _UI_DEVELOPERS)
         credits_testers = self._build_single_credit(self.worker.settings.tr("about:credits:testers"), _TESTERS)
         credits_languages = self._build_single_credit(self.worker.settings.tr("about:credits:languages"), self._get_language_credits_list())
+        credits_name = self._build_single_credit(self.worker.settings.tr("about:credits:name"), _NAMER)
 
         layout.addWidget(credits_croc)
         layout.addWidget(credits_ui_developers)
         layout.addWidget(credits_testers)
         layout.addWidget(credits_languages)
+        layout.addWidget(credits_name)
 
         return group
     
@@ -206,10 +209,10 @@ class AboutWindow(QDialog):
         self.worker.settings.settings_saved.connect(self._update_croc_version)
 
         self.btn_github_croc.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl("https://github.com/schollz/croc"))
+            lambda: app_utils.open_url("https://github.com/schollz/croc")
         )
         self.btn_github_swampswap.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl("https://github.com/Ferase/SwampSwap"))
+            lambda: app_utils.open_url("https://github.com/Ferase/SwampSwap")
         )
         
         self.btn_close.clicked.connect(self.reject)

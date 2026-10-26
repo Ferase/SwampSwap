@@ -6,8 +6,7 @@ from PyQt6.QtWidgets import (
     QCheckBox, QSlider, QApplication, QHBoxLayout,
     QFileDialog, QSizePolicy
 )
-from PyQt6.QtCore import pyqtSignal, Qt, QProcess, QUrl, QTimer
-from PyQt6.QtGui import QDesktopServices
+from PyQt6.QtCore import pyqtSignal, Qt, QProcess, QTimer
 
 from get_version import UpdateChecker
 import app.utils as app_utils
@@ -950,9 +949,7 @@ class SettingsWidget(QWidget):
 
         # If they do, open the GitHub
         if result == QMessageBox.StandardButton.Yes:
-            QDesktopServices.openUrl(
-                QUrl("https://github.com/Ferase/SwampSwap/releases/latest")
-            )
+            app_utils.open_url("https://github.com/Ferase/SwampSwap/releases/latest")
 
     def _swampswap_up_to_date(self, new_version: str) -> None:
         """Let the user know they are on the latest version of croc."""

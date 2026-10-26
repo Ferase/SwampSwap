@@ -5,9 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from PyQt6.QtCore import QThread, pyqtSignal, QUrl
+from PyQt6.QtCore import QThread, pyqtSignal
 
-import app.utils as app_utils
 from app.enums import CrocState, CrocOperation, CrocAction, CrocWAV
 from app.managers.manager_settings import SettingsManager
 from app.managers.manager_sound import SoundManager

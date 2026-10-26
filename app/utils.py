@@ -152,6 +152,23 @@ def get_settings_path(app_name: str, make_dir: bool = True) -> Path:
         config_dir.mkdir(parents=True, exist_ok=True)
 
     return config_dir
+
+def open_url(url: str) -> None:
+    """Open a URL in the user's default browser without using bundled libraries."""
+
+    # Windows
+    if sys.platform == "win32":
+        os.startfile(url)
+
+    # macOS
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", url])
+
+    # Linux
+    else:
+        env = os.environ.copy()
+        env.pop("LD_LIBRARY_PATH", None)
+        subprocess.Popen(["xdg-open", url], env=env)
     
 
 

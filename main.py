@@ -2,7 +2,7 @@ import os
 import sys
 import certifi
 from PyQt6.QtWidgets import QApplication, QMessageBox
-from PyQt6.QtGui import QIcon, QDesktopServices
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import QUrl
 
 import app.utils as app_utils
@@ -11,7 +11,7 @@ from app.workers.worker_croc import CrocWorker
 
 # Name and version variables
 _APP_NAME = "Swamp Swap"
-_APP_VERSION = "1.5.7"
+_APP_VERSION = "1.5.8"
 _MINIMUM_CROC_VERSION = "11.2.4"
 
 
