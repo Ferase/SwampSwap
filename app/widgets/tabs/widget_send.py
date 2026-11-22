@@ -301,7 +301,7 @@ class SendWidget(QWidget):
         self.files_added.connect(self._add_selected_files)
         self.folders_added.connect(self._add_selected_files)
 
-        self.lineedit_code.textChanged.connect(self._typed_in_code)
+        self.lineedit_code.textEdited.connect(self._typed_in_code)
 
         self.widget_files.btn_add_files.clicked.connect(self._click_browse_file_button)
         self.widget_files.btn_add_folders.clicked.connect(self._click_browse_folder_button)

@@ -67,7 +67,7 @@ jobs:
       - name: Download croc (macOS/Linux)
         if: runner.os != 'Windows'
         run: |
-          CROC_VERSION="11.5.4"
+          CROC_VERSION="11.6.6"
           mkdir -p croc
           curl -sL "https://github.com/schollz/croc/releases/download/v${CROC_VERSION}/croc_v${CROC_VERSION}_${{ matrix.croc_binary_suffix }}" \
             -o croc_download.tar.gz
@@ -78,7 +78,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $CrocVersion = "11.5.4"
+          $CrocVersion = "11.6.6"
           $CrocUrl = "https://github.com/schollz/croc/releases/download/v$CrocVersion/croc_v${CrocVersion}_${{ matrix.croc_binary_suffix }}"
 
           New-Item -ItemType Directory -Force -Path croc
